@@ -1,0 +1,1732 @@
+openapi: 3.0.2
+components:
+  schemas:
+    answer:
+      type: object
+      properties:
+        id:
+          type: integer
+          summary: PK
+        question_id:
+          type: integer
+          summary: 'Question id'
+        code:
+          type: string
+          summary: 'Answer code'
+        sort_order:
+          type: integer
+          summary: 'Answer sort order'
+        assessment_value:
+          type: integer
+          summary: ''
+        scale_id:
+          type: integer
+          summary: ''
+        # questions:
+        #   type: Question
+        #   summary: ''
+        # groups:
+        #   type: Question
+        #   summary: ''
+    answer_l10n:
+      type: object
+      properties:
+        id:
+          type: int
+          summary: 'Primary key'
+        answer_id:
+          type: int
+          summary: 'Answer Id'
+        answer:
+          type: string
+          summary: 'The answer text'
+        language:
+          type: string
+          summary: 'Language code'
+    # archived_table_settings:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: ''
+    #     survey_id:
+    #       type: integer
+    #       summary: ''
+    #     user_id:
+    #       type: integer
+    #       summary: ''
+    #     table_name:
+    #       type: string
+    #       summary: ''
+    #     table_type:
+    #       type: string
+    #       summary: ''
+    #     created:
+    #       type: string
+    #       summary: ''
+    # assessment:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: 'Primary key'
+    #     survey_id:
+    #       type: integer
+    #       summary: 'Survey id'
+    #     group_id:
+    #       type: integer
+    #       summary: 'Group id'
+    #     scope:
+    #       type: string
+    #       summary: ''
+    #     name:
+    #       type: string
+    #       summary: ''
+    #     minimum:
+    #       type: string
+    #       summary: ''
+    #     maximum:
+    #       type: string
+    #       summary: ''
+    #     message:
+    #       type: string
+    #       summary: ''
+    #     language:
+    #       type: string
+    #       summary: ''
+    # asset_version:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: pk
+    #     path:
+    #       type: string
+    #       summary: ''
+    #     version:
+    #       type: integer
+    #       summary: number
+    # box:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: 'Primary key'
+    #     position:
+    #       type: integer
+    #       summary: ''
+    #     url:
+    #       type: string
+    #       summary: ''
+    #     title:
+    #       type: string
+    #       summary: ''
+    #     icon:
+    #       type: string
+    #       summary: 'the icon class'
+    #     description:
+    #       type: string
+    #       summary: Description
+    #     page:
+    #       type: string
+    #       summary: ''
+    #     user_group:
+    #       type: integer
+    #       summary: 'UserGroup ID'
+    # condition:
+    #   type: object
+    #   properties:
+    #     value:
+    #       type: string
+    #       summary: 'Value to be compared against'
+    #     scenario:
+    #       type: integer
+    #       summary: 'Scenario number'
+    #     questions:
+    #       type: Question
+    #       summary: ''
+    # default_value:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: 'primary key'
+    #     question_id:
+    #       type: integer
+    #       summary: 'The question id'
+    #     scale_id:
+    #       type: integer
+    #       summary: 'Scale of question'
+    #     question:
+    #       type: Question
+    #       summary: ''
+    # default_value_l10n:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: 'Primary Key'
+    #     dvid:
+    #       type: integer
+    #       summary: ''
+    #     defaultvalue:
+    #       type: string
+    #       summary: 'default value'
+    #     language:
+    #       type: string
+    #       summary: 'connected language'
+    # expression_error:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: 'Primary key'
+    #     errortime:
+    #       type: string
+    #       summary: ''
+    #     survey_id:
+    #       type: integer
+    #       summary: 'Survey ID'
+    #     group_id:
+    #       type: integer
+    #       summary: 'Group ID'
+    #     question_id:
+    #       type: integer
+    #       summary: 'Question ID'
+    #     gseq:
+    #       type: integer
+    #       summary: ''
+    #     qseq:
+    #       type: integer
+    #       summary: ''
+    #     type:
+    #       type: string
+    #       summary: ''
+    #     eqn:
+    #       type: string
+    #       summary: ''
+    #     pretty_print:
+    #       type: string
+    #       summary: ''
+    failed_login_attempt:
+      type: object
+      properties:
+        id:
+          type: integer
+          summary: ''
+        ip:
+          type: string
+          summary: 'Ip address'
+        last_attempt:
+          type: string
+          summary: ''
+        number_attempts:
+          type: integer
+          summary: ''
+    # label:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: 'Primary Key'
+    #     lid:
+    #       type: integer
+    #       summary: 'Related Label Set'
+    #     code:
+    #       type: string
+    #       summary: ''
+    #     title:
+    #       type: string
+    #       summary: ''
+    #     sortorder:
+    #       type: integer
+    #       summary: ''
+    #     assessment_value:
+    #       type: integer
+    #       summary: ''
+    # label_l10n:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: 'Primary Key'
+    #     label_id:
+    #       type: integer
+    #       summary: 'Related Label ID'
+    #     title:
+    #       type: string
+    #       summary: title
+    #     language:
+    #       type: string
+    #       summary: 'connected language'
+    # label_set:
+    #   type: object
+    #   properties:
+    #     languages:
+    #       type: string
+    #       summary: ''
+    # map_tutorial_users:
+    #   type: object
+    #   properties:
+    #     tutorial_id:
+    #       type: integer
+    #       summary: ''
+    #     user_id:
+    #       type: integer
+    #       summary: ''
+    #     taken:
+    #       type: integer
+    #       summary: ''
+    # notification:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: ''
+    #     entity:
+    #       type: string
+    #       summary: 'survey or user'
+    #     entity_id:
+    #       type: string
+    #       summary: 'survey id or user id'
+    #     title:
+    #       type: string
+    #       summary: ''
+    #     message:
+    #       type: string
+    #       summary: ''
+    #     status:
+    #       type: string
+    #       summary: 'new, read'
+    #     importance:
+    #       type: integer
+    #       summary: '1 or 3. 3 will show popup on page load, 2 is reserved for future bell animation.'
+    #     display_class:
+    #       type: string
+    #       summary: 'warning, danger, success'
+    #     hash:
+    #       type: string
+    #       summary: ''
+    #     created:
+    #       type: string
+    #       summary: 'When the notification was created'
+    #     first_read:
+    #       type: string
+    #       summary: 'When the notification was read'
+    # participant:
+    #   type: object
+    #   properties:
+    #     participant_id:
+    #       type: string
+    #       summary: 'Primary Key'
+    #     firstname:
+    #       type: string
+    #       summary: ''
+    #     lastname:
+    #       type: string
+    #       summary: ''
+    #     email:
+    #       type: string
+    #       summary: ''
+    #     language:
+    #       type: string
+    #       summary: ''
+    #     blacklisted:
+    #       type: string
+    #       summary: ''
+    #     owner_uid:
+    #       type: integer
+    #       summary: ''
+    #     created_by:
+    #       type: integer
+    #       summary: ''
+    #     owner:
+    #       type: User
+    #       summary: ''
+    #     buttons:
+    #       type: string
+    #       summary: ''
+    #     checkbox:
+    #       type: string
+    #       summary: ''
+    #     all_extra_attributes:
+    #       type: array
+    #       summary: ''
+    #     blacklist_switch_button:
+    #       type: string
+    #       summary: ''
+    #     columns:
+    #       type: array
+    #       summary: ''
+    #     owners_list:
+    #       type: string
+    #       summary: ''
+    # participant_attribute:
+    #   type: object
+    #   properties:
+    #     participant_id:
+    #       type: integer
+    #       summary: ''
+    #     attribute_id:
+    #       type: integer
+    #       summary: ''
+    #     value:
+    #       type: string
+    #       summary: ''
+    #     participant:
+    #       type: Participant
+    #       summary: ''
+    #     participant_attribute_name:
+    #       type: ParticipantAttributeName
+    #       summary: ''
+    # participant_attribute_name:
+    #   type: object
+    #   properties:
+    #     attribute_id:
+    #       type: integer
+    #       summary: ''
+    #     attribute_type:
+    #       type: string
+    #       summary: ''
+    #     defaultname:
+    #       type: string
+    #       summary: ''
+    #     visible:
+    #       type: string
+    #       summary: ''
+    #     encrypted:
+    #       type: string
+    #       summary: ''
+    #     core_attribute:
+    #       type: string
+    #       summary: ''
+    #     participant_attribute:
+    #       type: ParticipantAttribute
+    #       summary: ''
+    #     AttributeTypeDropdownArray:
+    #       type: array
+    #       summary: ''
+    # participant_attribute_name_lang:
+    #   type: object
+    #   properties:
+    #     attribute_id:
+    #       type: integer
+    #       summary: ''
+    #     attribute_name:
+    #       type: string
+    #       summary: ''
+    #     lang:
+    #       type: string
+    #       summary: ''
+    #     participant_attribute_name:
+    #       type: ParticipantAttributeName
+    #       summary: ''
+    # participant_share:
+    #   type: object
+    #   properties:
+    #     participant_id:
+    #       type: string
+    #       summary: ''
+    #     share_uid:
+    #       type: integer
+    #       summary: ''
+    #     date_added:
+    #       type: string
+    #       summary: ''
+    #     can_edit:
+    #       type: string
+    #       summary: ''
+    #     participant:
+    #       type: Participant
+    #       summary: ''
+    #     shared_by:
+    #       type: User
+    #       summary: ''
+    permission:
+      type: object
+      properties:
+        id:
+          type: integer
+          summary: ''
+        entity:
+          type: string
+          summary: ''
+        entity_id:
+          type: integer
+          summary: ''
+        user_id:
+          type: integer
+          summary: ''
+        permission:
+          type: string
+          summary: ''
+        create_perm:
+          type: integer
+          summary: ''
+        read_perm:
+          type: integer
+          summary: ''
+        update_perm:
+          type: integer
+          summary: ''
+        delete_perm:
+          type: integer
+          summary: ''
+        import_perm:
+          type: integer
+          summary: ''
+        export_perm:
+          type: integer
+          summary: ''
+    # permission_templates:
+    #   type: object
+    #   properties:
+    #     ptid:
+    #       type: integer
+    #       summary: ''
+    #     name:
+    #       type: string
+    #       summary: ''
+    #     description:
+    #       type: string
+    #       summary: ''
+    #     renewed_last:
+    #       type: string
+    #       summary: ''
+    #     created_at:
+    #       type: string
+    #       summary: ''
+    #     created_by:
+    #       type: integer
+    #       summary: ''
+    # plugin:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: ''
+    #     name:
+    #       type: string
+    #       summary: ''
+    #     active:
+    #       type: integer
+    #       summary: 'default 0'
+    #     priority:
+    #       type: integer
+    #       summary: 'default 0'
+    #     version:
+    #       type: string
+    #       summary: ''
+    #     load_error:
+    #       type: string
+    #       summary: ''
+    #     plugin_type:
+    #       type: string
+    #       summary: ''
+    # plugin_setting:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: 'primary key'
+    #     model:
+    #       type: string
+    #       summary: ''
+    #     model_id:
+    #       type: integer
+    #       summary: ''
+    #     key:
+    #       type: string
+    #       summary: ''
+    #     value:
+    #       type: string
+    #       summary: ''
+    question:
+      type: object
+      properties:
+        question_id:
+          type: integer
+          summary: 'Question ID.'
+        survey_id:
+          type: integer
+          summary: 'Survey ID'
+        group_id:
+          type: integer
+          summary: 'QuestionGroup ID where question is displayed'
+        type:
+          type: string
+          summary: ''
+        title:
+          type: string
+          summary: 'Question Code'
+        preg:
+          type: string
+          summary: ''
+        question_order:
+          type: integer
+          summary: 'Question order in greoup'
+        parent_question_id:
+          type: integer
+          summary: 'Questions parent question ID eg for subquestions'
+        scale_id:
+          type: integer
+          summary: 'The scale ID'
+        relevance:
+          type: string
+          summary: 'Questions relevane equation'
+        module_name:
+          type: string
+          summary: ''
+        same_script:
+          type: integer
+          summary: 'Whether the same script should be used for all languages'
+    question_attribute:
+      type: object
+      properties:
+        id:
+          type: integer
+          summary: 'ID Primary key'
+        question_id:
+          type: integer
+          summary: 'Question ID'
+        value:
+          type: string
+          summary: 'Attribute value'
+    question_group:
+      type: object
+      properties:
+        id:
+          type: integer
+          summary: ID
+        survey_id:
+          type: integer
+          summary: 'Survey ID'
+        randomization_group:
+          type: string
+          summary: 'Randomization group'
+        survey:
+          type: Survey
+          summary: ''
+    question_group_l10n:
+      type: object
+      properties:
+        id:
+          type: integer
+        group_id:
+          type: integer
+        group_name:
+          type: string
+          summary: 'QuestionGroup display text. The actual question.'
+        description:
+          type: string
+        language:
+          type: string
+    question_l10n:
+      type: object
+      properties:
+        id:
+          type: integer
+          summary: 'primary key'
+        question_id:
+          type: integer
+          summary: 'question id'
+        question:
+          type: string
+          summary: 'Question display text. The actual question.'
+        help:
+          type: string
+        script:
+          type: string
+          summary: 'Question script to be executed on runtime'
+        language:
+          type: string
+    # question_theme:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: ''
+    #     name:
+    #       type: string
+    #       summary: ''
+    #     visible:
+    #       type: string
+    #       summary: ''
+    #     xml_path:
+    #       type: string
+    #       summary: ''
+    #     image_path:
+    #       type: string
+    #       summary: ''
+    #     title:
+    #       type: string
+    #       summary: ''
+    #     creation_date:
+    #       type: string
+    #       summary: ''
+    #     author:
+    #       type: string
+    #       summary: ''
+    #     author_email:
+    #       type: string
+    #       summary: ''
+    #     author_url:
+    #       type: string
+    #       summary: ''
+    #     copyright:
+    #       type: string
+    #       summary: ''
+    #     license:
+    #       type: string
+    #       summary: ''
+    #     version:
+    #       type: string
+    #       summary: ''
+    #     api_version:
+    #       type: string
+    #       summary: ''
+    #     description:
+    #       type: string
+    #       summary: ''
+    #     last_update:
+    #       type: string
+    #       summary: ''
+    #     owner_id:
+    #       type: integer
+    #       summary: ''
+    #     theme_type:
+    #       type: string
+    #       summary: ''
+    #     question_type:
+    #       type: string
+    #       summary: ''
+    #     core_theme:
+    #       type: integer
+    #       summary: ''
+    #     extends:
+    #       type: string
+    #       summary: ''
+    #     group:
+    #       type: string
+    #       summary: ''
+    #     settings:
+    #       type: string
+    #       summary: ''
+    # quota:
+    #   type: object
+    #   properties:
+    #     survey_id:
+    #       type: integer
+    #       summary: 'Survey ID'
+    #     qlimit:
+    #       type: integer
+    #       summary: 'Quota limit'
+    #     action:
+    #       type: integer
+    #       summary: ''
+    #     mainLanguagesetting:
+    #       type: QuotaLanguageSetting
+    #       summary: ''
+    #     currentLanguageSetting:
+    #       type: QuotaLanguageSetting
+    #       summary: ''
+    #     survey:
+    #       type: Survey
+    #       summary: ''
+    #     completeCount:
+    #       type: integer
+    #       summary: 'Count of completed interviews for this quota'
+    # quota_language_setting:
+    #   type: object
+    #   properties:
+    #     quotals_quota_id:
+    #       type: integer
+    #       summary: 'Quota ID'
+    #     quotals_name:
+    #       type: string
+    #       summary: 'Quota display name for this language'
+    #     quotals_message:
+    #       type: string
+    #       summary: 'Quota message for this language'
+    #     quota:
+    #       type: Quota
+    #       summary: ''
+    # quota_member:
+    #   type: object
+    #   properties:
+    #     survey_id:
+    #       type: integer
+    #       summary: 'Survey ID'
+    #     question_id:
+    #       type: integer
+    #       summary: 'Question ID'
+    #     quota_id:
+    #       type: integer
+    #       summary: 'Quota ID'
+    #     code:
+    #       type: string
+    #       summary: 'Answer code'
+    #     survey:
+    #       type: Survey
+    #       summary: ''
+    #     question:
+    #       type: Question
+    #       summary: ''
+    #     quota:
+    #       type: Quota
+    #       summary: ''
+    #     memberInfo:
+    #       type: array
+    #       summary: ''
+    # saved_control:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: 'Primary key'
+    #     survey_id:
+    #       type: integer
+    #       summary: 'Survey id'
+    #     srid:
+    #       type: integer
+    #       summary: ''
+    #     identifier:
+    #       type: string
+    #       summary: ''
+    #     access_code:
+    #       type: string
+    #       summary: ''
+    #     email:
+    #       type: string
+    #       summary: ''
+    #     ip:
+    #       type: string
+    #       summary: ''
+    #     saved_thisstep:
+    #       type: string
+    #       summary: ''
+    #     status:
+    #       type: string
+    #       summary: ''
+    #     saved_date:
+    #       type: string
+    #       summary: ''
+    #     ref_url:
+    #       type: string
+    #       summary: ''
+    # session:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: string
+    #       summary: 'Primary Key'
+    #     expire:
+    #       type: integer
+    #       summary: ''
+    #     data:
+    #       type: string
+    #       summary: ''
+    setting_global:
+      type: object
+      properties:
+        name:
+          type: string
+          summary: 'Setting name'
+        value:
+          type: string
+          summary: 'Setting value'
+    # settings_user:
+    #   type: object
+    #   properties:
+    #     user_id:
+    #       type: integer
+    #       summary: 'User id'
+    #     entity:
+    #       type: string
+    #       summary: 'Entity name'
+    #     entity_id:
+    #       type: string
+    #       summary: 'Entity ID'
+    #     name:
+    #       type: string
+    #       summary: 'Setting name'
+    #     value:
+    #       type: string
+    #       summary: 'Setting Value'
+    survey:
+      type: object
+      properties:
+        id:
+          type: integer
+          summary: 'Survey ID'
+        owner_id:
+          type: integer
+          summary: ''
+        admin_email:
+          type: string
+          summary: 'Survey administrator email address'
+        fax_to:
+          type: string
+          summary: ''
+        template:
+          type: string
+          summary: 'Template name'
+        language:
+          type: string
+          summary: 'Survey base language'
+        auto_number_start:
+          type: integer
+          summary: ''
+        use_captcha:
+          type: string
+          summary: ''
+        use_tokens:
+          type: string
+          summary: ''
+        bounce_email:
+          type: string
+          summary: 'Bounce email address'
+        attribute_descriptions:
+          type: string
+          summary: ''
+        email_notification_to:
+          type: string
+          summary: 'Email address to send basic admin notification email to'
+        bounce_time:
+          type: integer
+          summary: ''
+        bounce_processing:
+          type: string
+          summary: ''
+        bounce_account_type:
+          type: string
+          summary: ''
+        bounce_accounthost:
+          type: string
+          summary: ''
+        bounce_account_password:
+          type: string
+          summary: ''
+        bounce_account_encryption:
+          type: string
+          summary: ''
+        bounce_account_user:
+          type: string
+          summary: ''
+        google_analytics_api_key:
+          type: string
+          summary: 'Google Analytics Tracking ID'
+        token_encryption_options:
+          type: string
+          summary: 'Token encryption options'
+        creation_date:
+          type: string
+          summary: 'Creation date formatted according to user format'
+        start_date:
+          type: string
+          summary: 'Start date formatted according to user format'
+        expiry_date:
+          type: string
+          summary: 'Expiry date formatted according to user format'
+        # tokensTableName:
+        #   type: string
+        #   summary: 'Name of survey tokens table'
+        # responsesTableName:
+        #   type: string
+        #   summary: 'Name of survey resonses table'
+        # timingsTableName:
+        #   type: string
+        #   summary: 'Name of survey timings table'
+        # hasTokensTable:
+        #   type: boolean
+        #   summary: 'Whether survey has a tokens table or not'
+        # hasTimingsTable:
+        #   type: boolean
+        #   summary: 'Wheteher the survey timings table exists in DB'
+        # is_active:
+        #   type: bool
+        #   summary: 'Whether Survey is active'
+        # is_anonymized:
+        #   type: bool
+        #   summary: 'Whether survey is anonymized or not'
+        # is_save_timings:
+        #   type: bool
+        #   summary: 'Whether survey timings are saved'
+        # is_use_cookie:
+        #   type: bool
+        #   summary: 'Are cookies used to prevent repeated participation'
+        # is_allow_register:
+        #   type: bool
+        #   summary: 'Allow public registration'
+        # is_allow_save:
+        #   type: bool
+        #   summary: 'Is participant allowed save and resume later'
+        # is_auto_redirect:
+        #   type: bool
+        #   summary: 'Automatically load URL when survey complete'
+        # is_allow_prev:
+        #   type: bool
+        #   summary: 'Allow backwards navigation'
+        # is_print_answers:
+        #   type: bool
+        #   summary: 'Participants may print answers'
+        # is_ip_addr:
+        #   type: bool
+        #   summary: 'Whether Participants IP address will be saved'
+        # is_ip_anonymize:
+        #   type: bool
+        #   summary: 'Whether Participants IP address will be saved'
+        # is_ref_url:
+        #   type: bool
+        #   summary: 'Save referrer URL'
+        # is_publicStatistics:
+        #   type: bool
+        #   summary: 'Public statistics'
+        # is_publicGraphs:
+        #   type: bool
+        #   summary: 'Show graphs in public statistics'
+        # is_listPublic:
+        #   type: bool
+        #   summary: 'List survey publicly'
+        # is_html_email:
+        #   type: bool
+        #   summary: 'Use HTML format for token emails'
+        # is_send_confirmation:
+        #   type: bool
+        #   summary: 'Send confirmation emails'
+        # is_assessments:
+        #   type: bool
+        #   summary: 'Enable assessment mode'
+        # is_show_welcome:
+        #   type: bool
+        #   summary: 'Show welcome screen'
+        # is_show_progress:
+        #   type: bool
+        #   summary: 'how progress bar'
+        # show_survey_policy_notice:
+        #   type: bool
+        #   summary: 'Show the security notice'
+        # is_allow_edit_after_completion:
+        #   type: bool
+        #   summary: 'Allow multiple responses or update responses with one token'
+        # default_language:
+        #   type: SurveyLanguageSetting
+        #   summary: ''
+        # is_date_expired:
+        #   type: boolean
+        #   summary: 'Whether survey is expired depending on the current time and survey configuration status'
+    survey_language_setting:
+      type: object
+      properties:
+        id:
+          type: integer
+          summary: 'Survey ID'
+        title:
+          type: string
+          summary: 'Survey title in this language'
+        description:
+          type: string
+          summary: 'Survey description in this language'
+        date_format:
+          type: string
+          summary: ''
+        attribute_captions:
+          type: string
+          summary: ''
+        attachments:
+          type: string
+          summary: ''
+        survey:
+          type: Survey
+          summary: ''
+        owner:
+          type: User
+          summary: ''
+    # survey_link:
+    #   type: object
+    #   properties:
+    #     participant_id:
+    #       type: integer
+    #       summary: ''
+    #     token_id:
+    #       type: integer
+    #       summary: ''
+    #     survey_id:
+    #       type: integer
+    #       summary: ''
+    #     date_created:
+    #       type: string
+    #       summary: ''
+    #     date_invited:
+    #       type: string
+    #       summary: ''
+    #     date_completed:
+    #       type: string
+    #       summary: ''
+    #     participant:
+    #       type: Participant
+    #       summary: ''
+    #     survey:
+    #       type: Survey
+    #       summary: ''
+    #     dateFormat:
+    #       type: string
+    #       summary: ''
+    #     checkbox:
+    #       type: string
+    #       summary: ''
+    #     columns:
+    #       type: array
+    #       summary: ''
+    #     surveyIdLink:
+    #       type: string
+    #       summary: ''
+    #     lastInvited:
+    #       type: string
+    #       summary: ''
+    #     lastReminded:
+    #       type: string
+    #       summary: ''
+    # survey_urlparameter:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: ''
+    #     survey_id:
+    #       type: integer
+    #       summary: 'Survey ID'
+    #     parameter:
+    #       type: string
+    #       summary: ''
+    #     targetqid:
+    #       type: integer
+    #       summary: ''
+    #     targetsqid:
+    #       type: integer
+    #       summary: ''
+    # survey_menu:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: ''
+    #     parent_id:
+    #       type: integer
+    #       summary: ''
+    #     survey_id:
+    #       type: integer
+    #       summary: ''
+    #     user_id:
+    #       type: integer
+    #       summary: ''
+    #     ordering:
+    #       type: integer
+    #       summary: ''
+    #     level:
+    #       type: integer
+    #       summary: ''
+    #     title:
+    #       type: string
+    #       summary: ''
+    #     description:
+    #       type: string
+    #       summary: ''
+    #     changed_at:
+    #       type: string
+    #       summary: ''
+    #     changed_by:
+    #       type: integer
+    #       summary: ''
+    #     created_at:
+    #       type: string
+    #       summary: ''
+    #     created_by:
+    #       type: integer
+    #       summary: ''
+    #     active:
+    #       type: integer
+    #       summary: ''
+    # survey_menu_entries:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: ''
+    #     menu_id:
+    #       type: integer
+    #       summary: ''
+    #     user_id:
+    #       type: integer
+    #       summary: ''
+    #     ordering:
+    #       type: integer
+    #       summary: ''
+    #     title:
+    #       type: string
+    #       summary: ''
+    #     name:
+    #       type: string
+    #       summary: ''
+    #     menu_title:
+    #       type: string
+    #       summary: ''
+    #     menu_description:
+    #       type: string
+    #       summary: ''
+    #     menu_icon:
+    #       type: string
+    #       summary: ''
+    #     menu_class:
+    #       type: string
+    #       summary: ''
+    #     menu_link:
+    #       type: string
+    #       summary: ''
+    #     action:
+    #       type: string
+    #       summary: ''
+    #     template:
+    #       type: string
+    #       summary: ''
+    #     partial:
+    #       type: string
+    #       summary: ''
+    #     language:
+    #       type: string
+    #       summary: ''
+    #     permission:
+    #       type: string
+    #       summary: ''
+    #     permission_grade:
+    #       type: string
+    #       summary: ''
+    #     classes:
+    #       type: string
+    #       summary: ''
+    #     data:
+    #       type: string
+    #       summary: ''
+    #     getdatamethod:
+    #       type: string
+    #       summary: ''
+    #     changed_at:
+    #       type: string
+    #       summary: ''
+    #     changed_by:
+    #       type: integer
+    #       summary: ''
+    #     created_at:
+    #       type: string
+    #       summary: ''
+    #     created_by:
+    #       type: integer
+    #       summary: ''
+    #     active:
+    #       type: integer
+    #       summary: ''
+    #     menu:
+    #       type: Surveymenu
+    #       summary: ''
+    survey_group:
+      type: object
+      properties:
+        id:
+          type: integer
+          summary: ''
+        name:
+          type: string
+          summary: ''
+        title:
+          type: string
+          summary: ''
+        description:
+          type: string
+          summary: ''
+        sort_order:
+          type: integer
+          summary: ''
+        owner_id:
+          type: integer
+          summary: ''
+        parent_id:
+          type: integer
+          summary: ''
+        created:
+          type: string
+          summary: ''
+        modified:
+          type: string
+          summary: ''
+        created_by:
+          type: integer
+          summary: ''
+        parent_group:
+          type: object
+          summary: ''
+        has_surveys:
+          type: boolean
+          summary: ''
+    # surveys_group_settings:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: ''
+    #     owner_id:
+    #       type: integer
+    #       summary: ''
+    #     admin:
+    #       type: string
+    #       summary: ''
+    #     expires:
+    #       type: string
+    #       summary: ''
+    #     start_date:
+    #       type: string
+    #       summary: ''
+    #     admin_email:
+    #       type: string
+    #       summary: ''
+    #     anonymized:
+    #       type: string
+    #       summary: ''
+    #     format:
+    #       type: string
+    #       summary: ''
+    #     save_timings:
+    #       type: string
+    #       summary: ''
+    #     template:
+    #       type: string
+    #       summary: ''
+    #     datestamp:
+    #       type: string
+    #       summary: ''
+    #     use_cookie:
+    #       type: string
+    #       summary: ''
+    #     allow_register:
+    #       type: string
+    #       summary: ''
+    #     allow_save:
+    #       type: string
+    #       summary: ''
+    #     auto_number_start:
+    #       type: integer
+    #       summary: ''
+    #     auto_redirect:
+    #       type: string
+    #       summary: ''
+    #     allow_prev:
+    #       type: string
+    #       summary: ''
+    #     print_answers:
+    #       type: string
+    #       summary: ''
+    #     ip_addr:
+    #       type: string
+    #       summary: ''
+    #     ref_url:
+    #       type: string
+    #       summary: ''
+    #     # TODO: Make consistent
+    #     date_created:
+    #       type: string
+    #       summary: ''
+    #     showsurveypolicynotice:
+    #       type: integer
+    #       summary: ''
+    #     publicstatistics:
+    #       type: string
+    #       summary: ''
+    #     publicgraphs:
+    #       type: string
+    #       summary: ''
+    #     listpublic:
+    #       type: string
+    #       summary: ''
+    #     htmlemail:
+    #       type: string
+    #       summary: ''
+    #     sendconfirmation:
+    #       type: string
+    #       summary: ''
+    #     tokenanswerspersistence:
+    #       type: string
+    #       summary: ''
+    #     assessments:
+    #       type: string
+    #       summary: ''
+    #     usecaptcha:
+    #       type: string
+    #       summary: ''
+    #     bounce_email:
+    #       type: string
+    #       summary: ''
+    #     attributedescriptions:
+    #       type: string
+    #       summary: ''
+    #     emailresponseto:
+    #       type: string
+    #       summary: ''
+    #     emailnotificationto:
+    #       type: string
+    #       summary: ''
+    #     tokenlength:
+    #       type: integer
+    #       summary: ''
+    #     showxquestions:
+    #       type: string
+    #       summary: ''
+    #     showgroupinfo:
+    #       type: string
+    #       summary: ''
+    #     shownoanswer:
+    #       type: string
+    #       summary: ''
+    #     showqnumcode:
+    #       type: string
+    #       summary: ''
+    #     showwelcome:
+    #       type: string
+    #       summary: ''
+    #     showprogress:
+    #       type: string
+    #       summary: ''
+    #     questionindex:
+    #       type: integer
+    #       summary: ''
+    #     navigationdelay:
+    #       type: integer
+    #       summary: ''
+    #     nokeyboard:
+    #       type: string
+    #       summary: ''
+    #     alloweditaftercompletion:
+    #       type: string
+    #       summary: ''
+    #     ipanonymize:
+    #       type: string
+    #       summary: ''
+    # template:
+    #   type: object
+    #   properties:
+    #     name:
+    #       type: string
+    #       summary: 'Template name'
+    #     title:
+    #       type: string
+    #       summary: ''
+    #     creation_date:
+    #       type: string
+    #       summary: ''
+    #     author:
+    #       type: string
+    #       summary: ''
+    #     author_email:
+    #       type: string
+    #       summary: ''
+    #     author_url:
+    #       type: string
+    #       summary: ''
+    #     copyright:
+    #       type: string
+    #       summary: ''
+    #     license:
+    #       type: string
+    #       summary: ''
+    #     version:
+    #       type: string
+    #       summary: ''
+    #     view_folder:
+    #       type: string
+    #       summary: ''
+    #     files_folder:
+    #       type: string
+    #       summary: ''
+    #     description:
+    #       type: string
+    #       summary: ''
+    #     last_update:
+    #       type: string
+    #       summary: ''
+    #     api_version:
+    #       type: string
+    #       summary: ''
+    #     owner_id:
+    #       type: integer
+    #       summary: ''
+    #     extends:
+    #       type: string
+    #       summary: ''
+    # template_configuration:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #       summary: 'Primary key'
+    #     template_name:
+    #       type: string
+    #       summary: ''
+    #     survey_id:
+    #       type: integer
+    #       summary: 'Survey ID'
+    #     gsid:
+    #       type: integer
+    #       summary: ''
+    #     user_id:
+    #       type: integer
+    #       summary: 'user ID'
+    #     files_css:
+    #       type: string
+    #       summary: ''
+    #     files_js:
+    #       type: string
+    #       summary: ''
+    #     files_print_css:
+    #       type: string
+    #       summary: ''
+    #     options:
+    #       type: string
+    #       summary: ''
+    #     cssframework_name:
+    #       type: string
+    #       summary: ''
+    #     cssframework_css:
+    #       type: string
+    #       summary: ''
+    #     cssframework_js:
+    #       type: string
+    #       summary: ''
+    #     packages_to_load:
+    #       type: string
+    #       summary: ''
+    #     packages_ltr:
+    #       type: string
+    #       summary: ''
+    #     packages_rtl:
+    #       type: string
+    #       summary: ''
+    #     template:
+    #       type: Template
+    #       summary: ''
+    # token:
+    #   type: object
+    #   properties:
+    #     tutorial_id:
+    #       type: integer
+    #       summary: 'Token ID'
+    #     participant_id:
+    #       type: string
+    #       summary: 'Participant ID'
+    #     sent:
+    #       type: string
+    #       summary: ''
+    #     remindersent:
+    #       type: string
+    #       summary: ''
+    #     remindercount:
+    #       type: integer
+    #       summary: ''
+    #     usesleft:
+    #       type: integer
+    #       summary: 'How many uses left to fill questionnaire for this participant'
+    #     validfrom:
+    #       type: string
+    #       summary: ''
+    #     validuntil:
+    #       type: string
+    #       summary: ''
+    #     survey:
+    #       type: Survey
+    #       summary: ''
+    #     surveylink:
+    #       type: SurveyLink
+    #       summary: ''
+    #     tableSchema:
+    #       type: CDbTableSchema
+    #       summary: ''
+        # tutorial_id:
+        #   type: integer
+        #   summary: ''
+        # participant_id:
+        #   type: string
+        #   summary: ''
+        # firstname:
+        #   type: string
+        #   summary: ''
+        # lastname:
+        #   type: string
+        #   summary: ''
+        # email:
+        #   type: string
+        #   summary: ''
+        # emailstatus:
+        #   type: string
+        #   summary: ''
+        # token:
+        #   type: string
+        #   summary: ''
+        # language:
+        #   type: string
+        #   summary: ''
+        # blacklisted:
+        #   type: string
+        #   summary: ''
+        # sent:
+        #   type: string
+        #   summary: ''
+        # remindersent:
+        #   type: string
+        #   summary: ''
+        # remindercount:
+        #   type: integer
+        #   summary: ''
+        # completed:
+        #   type: string
+        #   summary: ''
+        # usesleft:
+        #   type: integer
+        #   summary: ''
+        # validfrom:
+        #   type: string
+        #   summary: ''
+        # validuntil:
+        #   type: string
+        #   summary: ''
+        # survey:
+        #   type: Survey
+        #   summary: ''
+        # standardCols:
+        #   type: array
+        #   summary: ''
+        # standardColsForGrid:
+        #   type: array
+        #   summary: ''
+        # custom_attributes:
+        #   type: array
+        #   summary: ''
+    # tutorial:
+    #   type: object
+    #   properties:
+    #     tutorial_id:
+    #       type: integer
+    #       summary: ''
+    #     name:
+    #       type: string
+    #       summary: ''
+    #     title:
+    #       type: string
+    #       summary: ''
+    #     icon:
+    #       type: string
+    #       summary: ''
+    #     description:
+    #       type: string
+    #       summary: ''
+    #     active:
+    #       type: integer
+    #       summary: ''
+    #     permission:
+    #       type: string
+    #       summary: ''
+    #     permission_grade:
+    #       type: string
+    #       summary: ''
+    #     settings:
+    #       type: string
+    #       summary: ''
+    # tutorial_entry:
+    #   type: object
+    #   properties:
+    #     teid:
+    #       type: integer
+    #       summary: ''
+    #     tutorial_id:
+    #       type: integer
+    #       summary: ''
+    #     title:
+    #       type: string
+    #       summary: ''
+    #     content:
+    #       type: string
+    #       summary: ''
+    #     settings:
+    #       type: string
+    #       summary: ''
+    #     t:
+    #       type: Tutorial
+    #       summary: ''
+    # tutorial_entry_relation:
+    #   type: object
+    #   properties:
+    #     teid:
+    #       type: integer
+    #       summary: ''
+    #     tutorial_id:
+    #       type: integer
+    #       summary: ''
+    #     user_id:
+    #       type: integer
+    #       summary: ''
+    #     survey_id:
+    #       type: integer
+    #       summary: ''
+    user:
+      type: object
+      properties:
+        users_name:
+          type: string
+          summary: 'Users username'
+        parent_id:
+          type: integer
+          summary: ''
+        validation_key:
+          type: string
+          summary: 'used for email link to reset or create a password for a survey participant'
+        validation_key_expiration:
+          type: string
+          summary: 'datetime when the validation key expires'
+        parent_user:
+          type: User
+          summary: 'Parent user'
+        last_login:
+          type: string
+          summary: ''
+    # user_group:
+    #   type: object
+    #   properties:
+    #     description:
+    #       type: string
+    #       summary: 'Group description'
+    #     owner_id:
+    #       type: integer
+    #       summary: 'Group owner user ID'
+    #     owner:
+    #       type: User
+    #       summary: 'Group ownre user'
+    #     countUsers:
+    #       type: integer
+    #       summary: 'Count of users in this group'
+    # user_in_group:
+    #   type: object
+    #   properties:
+    #     ugid:
+    #       type: integer
+    #       summary: 'UserGroup ID'
+    #     user_id:
+    #       type: int
+    #       summary: 'User ID'
+    #     users:
+    #       type: User
+    #       summary: 'Group ownre user'
+    # user_in_permissionrole:
+    #   type: object
+    #   properties:
+    #     ptid:
+    #       type: integer
+    #       summary: ''
+    #     user_id:
+    #       type: integer
+    #       summary: ''
