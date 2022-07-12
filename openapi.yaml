@@ -7,7 +7,7 @@ info:
     url: "https://www.gnu.org/licenses/gpl-2.0.html"
 
 paths:
-  /survey:
+  /surveys:
     get:
       summary: List all surveys
       responses:
@@ -44,7 +44,7 @@ paths:
         "403":
           $ref: "#/components/responses/permission_denied"
 
-  /survey/{id}:
+  /surveys/{id}:
     get:
       summary: Get a survey
       parameters:
@@ -68,7 +68,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/survey_id"
       responses:
-        "200":
+        "204":
           $ref: "#/components/responses/empty_ok"
         "401":
           $ref: "#/components/responses/unauthorized"
@@ -82,7 +82,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/survey_id"
       responses:
-        "200":
+        "204":
           $ref: "#/components/responses/empty_ok"
         "401":
           $ref: "#/components/responses/unauthorized"
