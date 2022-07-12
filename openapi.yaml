@@ -26,19 +26,14 @@ paths:
 
     post:
       summary: Create a new survey
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/survey_id"
       responses:
         "201":
-          description: Created
-          content:
-            application/json:
+          header:
+            Location:
+              description: URL of the new survey
+              required: true
               schema:
-                $ref: "#/components/schemas/survey_id"
+                type: string
         "401":
           $ref: "#/components/responses/unauthorized"
         "403":
@@ -122,20 +117,12 @@ paths:
       summary: Create a new question group in the survey
       parameters:
         - $ref: "#/components/parameters/survey_id"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                - $ref: "#/components/schemas/question_group_id"
       responses:
         "201":
           description: Created
           header:
             Location:
-              description: URI of the new question group
+              description: URL of the new question group
               required: true
               schema:
                 type: string
