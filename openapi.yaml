@@ -5,6 +5,7 @@ info:
   license:
     name: GPL-2.0
     url: "https://www.gnu.org/licenses/gpl-2.0.html"
+
 paths:
   /survey:
     get:
@@ -43,12 +44,72 @@ paths:
         "403":
           $ref: "#/components/responses/permission_denied"
 
+  /survey/{id}:
+    get:
+      summary: Get a survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/survey"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+
+    put:
+      summary: Updates a survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+      responses:
+        "200":
+          $ref: "#/components/responses/empty_ok"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+
+    delete:
+      summary: Deletes a survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+      responses:
+        "200":
+          $ref: "#/components/responses/empty_ok"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+
 components:
+  parameters:
+    survey_id:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/survey_id"
+
   responses:
-    unauthorized:
-      description: Unauthorized request
+    empty_ok:
+      description: OK
+    not_found:
+      description: Resource not found
     permission_denied:
       description: Permission denied
+    unauthorized:
+      description: Unauthorized request
+
   schemas:
     answer:
       type: object
