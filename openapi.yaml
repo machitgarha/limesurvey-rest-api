@@ -93,8 +93,6 @@ paths:
           $ref: "#/components/responses/not_found"
 
   /surveys/{survey_id}/groups:
-    summary: Question groups of a survey
-
     get:
       summary: List question groups of the survey
       parameters:
@@ -131,8 +129,70 @@ paths:
         "403":
           $ref: "#/components/responses/permission_denied"
 
+  /surveys/{survey_id}/groups/{question_group_id}:
+    get:
+      summary: Get a question group of the survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_group_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/question_group"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+
+    put:
+      summary: Updates a question group of the survey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/question_group"
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_group_id"
+      responses:
+        "204":
+          $ref: "#/components/responses/empty_ok"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+
+    delete:
+      summary: Deletes a question group in the survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_group_id"
+      responses:
+        "204":
+          $ref: "#/components/responses/empty_ok"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+
 components:
   parameters:
+    question_group_id:
+      name: question_group_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/question_group_id"
     survey_id:
       name: survey_id
       in: path
