@@ -44,7 +44,7 @@ paths:
         "403":
           $ref: "#/components/responses/permission_denied"
 
-  /surveys/{id}:
+  /surveys/{survey_id}:
     get:
       summary: Get a survey
       parameters:
@@ -97,10 +97,57 @@ paths:
         "404":
           $ref: "#/components/responses/not_found"
 
+  /surveys/{survey_id}/groups:
+    summary: Question groups of a survey
+
+    get:
+      summary: List question groups of the survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  - $ref: "#/components/schemas/question_group"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+
+    post:
+      summary: Create a new question group in the survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                - $ref: "#/components/schemas/question_group_id"
+      responses:
+        "201":
+          description: Created
+          header:
+            Location:
+              description: URI of the new question group
+              required: true
+              schema:
+                type: string
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+
 components:
   parameters:
     survey_id:
-      name: id
+      name: survey_id
       in: path
       required: true
       schema:
@@ -258,13 +305,12 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          description: ID
+          $ref: "#/components/schemas/question_group_id"
         survey_id:
           $ref: "#/components/schemas/survey_id"
-        randomization_group:
-          type: string
-          description: 'Randomization group'
+    question_group_id:
+      type: integer
+      description: Question group ID
     question_group_l10n:
       type: object
       properties:
