@@ -1,159 +1,203 @@
 openapi: 3.0.2
+info:
+  title: LimeSurvey REST API
+  version: 0.1.0-alpha.0
+  license:
+    name: GPL-2.0
+    url: "https://www.gnu.org/licenses/gpl-2.0.html"
+paths:
+  /survey:
+    get:
+      summary: List all surveys
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/survey"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+
+    post:
+      summary: Create a new survey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/survey_id"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/survey_id"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+
 components:
+  responses:
+    unauthorized:
+      description: Unauthorized request
+    permission_denied:
+      description: Permission denied
   schemas:
     answer:
       type: object
       properties:
         id:
           type: integer
-          summary: PK
+          description: PK
         question_id:
           type: integer
-          summary: 'Question id'
+          description: 'Question id'
         code:
           type: string
-          summary: 'Answer code'
+          description: 'Answer code'
         sort_order:
           type: integer
-          summary: 'Answer sort order'
+          description: 'Answer sort order'
         assessment_value:
           type: integer
-          summary: ''
+          description: ''
         scale_id:
           type: integer
-          summary: ''
+          description: ''
     answer_l10n:
       type: object
       properties:
         id:
-          type: int
-          summary: 'Primary key'
+          type: integer
+          description: 'Primary key'
         answer_id:
-          type: int
-          summary: 'Answer Id'
+          type: integer
+          description: 'Answer Id'
         answer:
           type: string
-          summary: 'The answer text'
+          description: 'The answer text'
         language:
           type: string
-          summary: 'Language code'
+          description: 'Language code'
     failed_login_attempt:
       type: object
       properties:
         id:
           type: integer
-          summary: ''
+          description: ''
         ip:
           type: string
-          summary: 'Ip address'
+          description: 'Ip address'
         last_attempt:
           type: string
-          summary: ''
+          description: ''
         number_attempts:
           type: integer
-          summary: ''
+          description: ''
     permission:
       type: object
       properties:
         id:
           type: integer
-          summary: ''
+          description: ''
         entity:
           type: string
-          summary: ''
+          description: ''
         entity_id:
           type: integer
-          summary: ''
+          description: ''
         user_id:
           type: integer
-          summary: ''
+          description: ''
         permission:
           type: string
-          summary: ''
+          description: ''
         create_perm:
           type: integer
-          summary: ''
+          description: ''
         read_perm:
           type: integer
-          summary: ''
+          description: ''
         update_perm:
           type: integer
-          summary: ''
+          description: ''
         delete_perm:
           type: integer
-          summary: ''
+          description: ''
         import_perm:
           type: integer
-          summary: ''
+          description: ''
         export_perm:
           type: integer
-          summary: ''
+          description: ''
     question:
       type: object
       properties:
         question_id:
           type: integer
-          summary: 'Question ID.'
+          description: 'Question ID.'
         survey_id:
-          type: integer
-          summary: 'Survey ID'
+          $ref: "#/components/schemas/survey_id"
         group_id:
           type: integer
-          summary: 'QuestionGroup ID where question is displayed'
+          description: 'QuestionGroup ID where question is displayed'
         type:
           type: string
-          summary: ''
+          description: ''
         title:
           type: string
-          summary: 'Question Code'
+          description: 'Question Code'
         preg:
           type: string
-          summary: ''
+          description: ''
         question_order:
           type: integer
-          summary: 'Question order in greoup'
+          description: 'Question order in greoup'
         parent_question_id:
           type: integer
-          summary: 'Questions parent question ID eg for subquestions'
+          description: 'Questions parent question ID eg for subquestions'
         scale_id:
           type: integer
-          summary: 'The scale ID'
+          description: 'The scale ID'
         relevance:
           type: string
-          summary: 'Questions relevane equation'
+          description: 'Questions relevane equation'
         module_name:
           type: string
-          summary: ''
+          description: ''
         same_script:
           type: integer
-          summary: 'Whether the same script should be used for all languages'
+          description: 'Whether the same script should be used for all languages'
     question_attribute:
       type: object
       properties:
         id:
           type: integer
-          summary: 'ID Primary key'
+          description: 'ID Primary key'
         question_id:
           type: integer
-          summary: 'Question ID'
+          description: 'Question ID'
         value:
           type: string
-          summary: 'Attribute value'
+          description: 'Attribute value'
     question_group:
       type: object
       properties:
         id:
           type: integer
-          summary: ID
+          description: ID
         survey_id:
-          type: integer
-          summary: 'Survey ID'
+          $ref: "#/components/schemas/survey_id"
         randomization_group:
           type: string
-          summary: 'Randomization group'
-        survey:
-          type: Survey
-          summary: ''
+          description: 'Randomization group'
     question_group_l10n:
       type: object
       properties:
@@ -163,7 +207,7 @@ components:
           type: integer
         group_name:
           type: string
-          summary: 'QuestionGroup display text. The actual question.'
+          description: 'QuestionGroup display text. The actual question.'
         description:
           type: string
         language:
@@ -173,18 +217,18 @@ components:
       properties:
         id:
           type: integer
-          summary: 'primary key'
+          description: 'primary key'
         question_id:
           type: integer
-          summary: 'question id'
+          description: 'question id'
         question:
           type: string
-          summary: 'Question display text. The actual question.'
+          description: 'Question display text. The actual question.'
         help:
           type: string
         script:
           type: string
-          summary: 'Question script to be executed on runtime'
+          description: 'Question script to be executed on runtime'
         language:
           type: string
     setting_global:
@@ -192,169 +236,161 @@ components:
       properties:
         name:
           type: string
-          summary: 'Setting name'
+          description: 'Setting name'
         value:
           type: string
-          summary: 'Setting value'
+          description: 'Setting value'
     survey:
       type: object
       properties:
         id:
-          type: integer
-          summary: 'Survey ID'
+          $ref: "#/components/schemas/survey_id"
         owner_id:
           type: integer
-          summary: ''
         admin_email:
           type: string
-          summary: 'Survey administrator email address'
+          description: 'Survey administrator email address'
         fax_to:
           type: string
-          summary: ''
+          description: ''
         template:
           type: string
-          summary: 'Template name'
+          description: 'Template name'
         language:
           type: string
-          summary: 'Survey base language'
+          description: 'Survey base language'
         auto_number_start:
           type: integer
-          summary: ''
+          description: ''
         use_captcha:
           type: string
-          summary: ''
+          description: ''
         use_tokens:
           type: string
-          summary: ''
+          description: ''
         bounce_email:
           type: string
-          summary: 'Bounce email address'
+          description: 'Bounce email address'
         attribute_descriptions:
           type: string
-          summary: ''
+          description: ''
         email_notification_to:
           type: string
-          summary: 'Email address to send basic admin notification email to'
+          description: 'Email address to send basic admin notification email to'
         bounce_time:
           type: integer
-          summary: ''
+          description: ''
         bounce_processing:
           type: string
-          summary: ''
+          description: ''
         bounce_account_type:
           type: string
-          summary: ''
+          description: ''
         bounce_accounthost:
           type: string
-          summary: ''
+          description: ''
         bounce_account_password:
           type: string
-          summary: ''
+          description: ''
         bounce_account_encryption:
           type: string
-          summary: ''
+          description: ''
         bounce_account_user:
           type: string
-          summary: ''
+          description: ''
         google_analytics_api_key:
           type: string
-          summary: 'Google Analytics Tracking ID'
+          description: 'Google Analytics Tracking ID'
         token_encryption_options:
           type: string
-          summary: 'Token encryption options'
+          description: 'Token encryption options'
         creation_date:
           type: string
-          summary: 'Creation date formatted according to user format'
+          description: 'Creation date formatted according to user format'
         start_date:
           type: string
-          summary: 'Start date formatted according to user format'
+          description: 'Start date formatted according to user format'
         expiry_date:
           type: string
-          summary: 'Expiry date formatted according to user format'
+          description: 'Expiry date formatted according to user format'
+    survey_id:
+      type: integer
+      description: Survey ID
     survey_language_setting:
       type: object
       properties:
         id:
           type: integer
-          summary: 'Survey ID'
+          description: 'Survey ID'
         title:
           type: string
-          summary: 'Survey title in this language'
+          description: 'Survey title in this language'
         description:
           type: string
-          summary: 'Survey description in this language'
+          description: 'Survey description in this language'
         date_format:
           type: string
-          summary: ''
+          description: ''
         attribute_captions:
           type: string
-          summary: ''
+          description: ''
         attachments:
           type: string
-          summary: ''
-        survey:
-          type: Survey
-          summary: ''
-        owner:
-          type: User
-          summary: ''
+          description: ''
     survey_group:
       type: object
       properties:
         id:
           type: integer
-          summary: ''
+          description: ''
         name:
           type: string
-          summary: ''
+          description: ''
         title:
           type: string
-          summary: ''
+          description: ''
         description:
           type: string
-          summary: ''
+          description: ''
         sort_order:
           type: integer
-          summary: ''
+          description: ''
         owner_id:
           type: integer
-          summary: ''
+          description: ''
         parent_id:
           type: integer
-          summary: ''
+          description: ''
         created:
           type: string
-          summary: ''
+          description: ''
         modified:
           type: string
-          summary: ''
+          description: ''
         created_by:
           type: integer
-          summary: ''
+          description: ''
         parent_group:
           type: object
-          summary: ''
+          description: ''
         has_surveys:
           type: boolean
-          summary: ''
+          description: ''
     user:
       type: object
       properties:
         users_name:
           type: string
-          summary: 'Users username'
+          description: 'Users username'
         parent_id:
           type: integer
-          summary: ''
+          description: ''
         validation_key:
           type: string
-          summary: 'used for email link to reset or create a password for a survey participant'
+          description: 'used for email link to reset or create a password for a survey participant'
         validation_key_expiration:
           type: string
-          summary: 'datetime when the validation key expires'
-        parent_user:
-          type: User
-          summary: 'Parent user'
+          description: 'datetime when the validation key expires'
         last_login:
           type: string
-          summary: ''
+          description: ''
