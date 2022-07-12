@@ -65,6 +65,12 @@ paths:
 
     put:
       summary: Updates a survey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/survey"
       parameters:
         - $ref: "#/components/parameters/survey_id"
       responses:
