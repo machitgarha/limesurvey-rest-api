@@ -1,0 +1,13 @@
+{
+    "name": "machitgarha/limesurvey-rest-plugin",
+    "description": "LimeSurvey REST API plugin",
+    "type": "library",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Mohammad Amin Chitgarha",
+            "email": "machitgarha@outlook.com"
+        }
+    ],
+    "require": {}
+}
