@@ -1,8 +1,8 @@
 empty_ok:
   description: OK
 
-not_acceptable:
-  description: Not acceptable
+method_not_allowed:
+  description: Method not allowed
 
 not_found:
   description: Resource not found
