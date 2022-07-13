@@ -185,8 +185,107 @@ paths:
         "404":
           $ref: "#/components/responses/not_found"
 
+  /surveys/{survey_id}/questions:
+    get:
+      summary: List questions of the survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  - $ref: "#/components/schemas/question"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+
+    post:
+      summary: Create a new question in the survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+      responses:
+        "201":
+          description: Created
+          header:
+            Location:
+              description: URL of the new question
+              required: true
+              schema:
+                type: string
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+
+  /surveys/{survey_id}/questions/{question_id}:
+    get:
+      summary: Get a question of the survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/question"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+
+    put:
+      summary: Updates a question of the survey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/question"
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_id"
+      responses:
+        "204":
+          $ref: "#/components/responses/empty_ok"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+
+    delete:
+      summary: Deletes a question in the survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_id"
+      responses:
+        "204":
+          $ref: "#/components/responses/empty_ok"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+
 components:
   parameters:
+    question_id:
+      name: question_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/question_id"
     question_group_id:
       name: question_group_id
       in: path
@@ -301,9 +400,8 @@ components:
     question:
       type: object
       properties:
-        question_id:
-          type: integer
-          description: 'Question ID.'
+        id:
+          $ref: "#/components/schemas/question_id"
         survey_id:
           $ref: "#/components/schemas/survey_id"
         group_id:
@@ -348,6 +446,9 @@ components:
         value:
           type: string
           description: 'Attribute value'
+    question_id:
+      type: integer
+      description: Question ID
     question_group:
       type: object
       properties:
