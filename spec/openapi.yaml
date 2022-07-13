@@ -15,10 +15,10 @@ paths:
   /surveys/{survey_id}:
     $ref: "./paths/surveys_by_id.yaml"
 
-  /surveys/{survey_id}/groups:
+  /surveys/{survey_id}/question_groups:
     $ref: "./paths/surveys/question_groups.yaml"
 
-  /surveys/{survey_id}/groups/{question_group_id}:
+  /surveys/{survey_id}/question_groups/{question_group_id}:
     $ref: "./paths/surveys/question_groups_by_id.yaml"
 
   /surveys/{survey_id}/questions:
