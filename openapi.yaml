@@ -6,6 +6,7 @@ info:
     name: GPL-2.0
     url: "https://www.gnu.org/licenses/gpl-2.0.html"
 
+# TODO: Add 409 Conflict to POSTs
 paths:
   /surveys:
     get:
@@ -60,14 +61,14 @@ paths:
 
     put:
       summary: Updates a survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/survey"
-      parameters:
-        - $ref: "#/components/parameters/survey_id"
       responses:
         "204":
           $ref: "#/components/responses/empty_ok"
@@ -151,15 +152,15 @@ paths:
 
     put:
       summary: Updates a question group of the survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_group_id"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/question_group"
-      parameters:
-        - $ref: "#/components/parameters/survey_id"
-        - $ref: "#/components/parameters/question_group_id"
       responses:
         "204":
           $ref: "#/components/responses/empty_ok"
@@ -208,6 +209,17 @@ paths:
       summary: Create a new question in the survey
       parameters:
         - $ref: "#/components/parameters/survey_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                group_id:
+                  $ref: "#/components/schemas/question_group_id"
+                title:
+                  type: string
       responses:
         "201":
           description: Created
@@ -244,15 +256,15 @@ paths:
 
     put:
       summary: Updates a question of the survey
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_id"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/question"
-      parameters:
-        - $ref: "#/components/parameters/survey_id"
-        - $ref: "#/components/parameters/question_id"
       responses:
         "204":
           $ref: "#/components/responses/empty_ok"
@@ -406,13 +418,13 @@ components:
           $ref: "#/components/schemas/survey_id"
         group_id:
           type: integer
-          description: 'QuestionGroup ID where question is displayed'
+          description: Question group ID where question is displayed
         type:
           type: string
           description: ''
         title:
           type: string
-          description: 'Question Code'
+          description: Question Code
         preg:
           type: string
           description: ''
