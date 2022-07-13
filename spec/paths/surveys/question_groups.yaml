@@ -1,0 +1,35 @@
+get:
+  summary: List question groups of the survey
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../components/schemas/question_group.yaml#/question_group"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"
+
+post:
+  summary: Create a new question group in the survey
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+  responses:
+    "201":
+      description: Created
+      headers:
+        Location:
+          description: URL of the new question group
+          required: true
+          schema:
+            type: string
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"

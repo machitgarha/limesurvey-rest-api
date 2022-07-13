@@ -1,0 +1,54 @@
+get:
+  summary: Get a question group of the survey
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+    - $ref: "../../components/parameters.yaml#/question_group_id"
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/question_group.yaml#/question_group"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"
+    "404":
+      $ref: "../../components/responses.yaml#/not_found"
+
+put:
+  summary: Updates a question group of the survey
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+    - $ref: "../../components/parameters.yaml#/question_group_id"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/question_group.yaml#/question_group"
+  responses:
+    "204":
+      $ref: "../../components/responses.yaml#/empty_ok"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"
+    "404":
+      $ref: "../../components/responses.yaml#/not_found"
+
+delete:
+  summary: Deletes a question group in the survey
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+    - $ref: "../../components/parameters.yaml#/question_group_id"
+  responses:
+    "204":
+      $ref: "../../components/responses.yaml#/empty_ok"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"
+    "404":
+      $ref: "../../components/responses.yaml#/not_found"

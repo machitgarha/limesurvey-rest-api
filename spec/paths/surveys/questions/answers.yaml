@@ -1,0 +1,40 @@
+get:
+  summary: List answers of a survey question (if supported)
+  parameters:
+    - $ref: "../../../components/parameters.yaml#/survey_id"
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../../components/schemas/answer.yaml#/answer"
+    "401":
+      $ref: "../../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../../components/responses.yaml#/permission_denied"
+    "405":
+      $ref: "../../../components/responses.yaml#/method_not_allowed"
+
+post:
+  summary: Adds a new answer to a survey question (if supported)
+  parameters:
+    - $ref: "../../../components/parameters.yaml#/survey_id"
+    - $ref: "../../../components/parameters.yaml#/question_id"
+  responses:
+    "201":
+      description: Created
+      headers:
+        Location:
+          description: URL of the new answer
+          required: true
+          schema:
+            type: string
+    "401":
+      $ref: "../../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../../components/responses.yaml#/permission_denied"
+    "405":
+      $ref: "../../../components/responses.yaml#/method_not_allowed"
