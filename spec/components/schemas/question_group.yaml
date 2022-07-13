@@ -1,0 +1,26 @@
+question_group:
+  type: object
+  properties:
+    id:
+      $ref: "#/question_group_id"
+    survey_id:
+      $ref: "./survey.yaml#/survey_id"
+
+question_group_id:
+  type: integer
+  description: Question group ID
+
+question_group_l10n:
+  type: object
+  properties:
+    id:
+      type: integer
+    group_id:
+      type: integer
+    group_name:
+      type: string
+      description: 'QuestionGroup display text. The actual question.'
+    description:
+      type: string
+    language:
+      type: string

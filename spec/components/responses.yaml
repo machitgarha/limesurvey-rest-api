@@ -1,0 +1,14 @@
+empty_ok:
+  description: OK
+
+not_acceptable:
+  description: Not acceptable
+
+not_found:
+  description: Resource not found
+
+permission_denied:
+  description: Permission denied
+
+unauthorized:
+  description: Unauthorized request

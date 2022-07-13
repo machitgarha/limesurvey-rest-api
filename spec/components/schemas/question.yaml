@@ -1,0 +1,74 @@
+question:
+  type: object
+  properties:
+    id:
+      $ref: "#/question_id"
+    survey_id:
+      $ref: "./survey.yaml#/survey_id"
+    group_id:
+      type: integer
+      description: Question group ID where question is displayed
+    type:
+      type: string
+      description: ''
+    title:
+      type: string
+      description: Question Code
+    preg:
+      type: string
+      description: ''
+    question_order:
+      type: integer
+      description: 'Question order in greoup'
+    parent_question_id:
+      type: integer
+      description: 'Questions parent question ID eg for subquestions'
+    scale_id:
+      type: integer
+      description: 'The scale ID'
+    relevance:
+      type: string
+      description: 'Questions relevane equation'
+    module_name:
+      type: string
+      description: ''
+    same_script:
+      type: integer
+      description: 'Whether the same script should be used for all languages'
+
+question_attribute:
+  type: object
+  properties:
+    id:
+      type: integer
+      description: 'ID Primary key'
+    question_id:
+      type: integer
+      description: 'Question ID'
+    value:
+      type: string
+      description: 'Attribute value'
+
+question_id:
+  type: integer
+  description: Question ID
+
+question_l10n:
+  type: object
+  properties:
+    id:
+      type: integer
+      description: 'primary key'
+    question_id:
+      type: integer
+      description: 'question id'
+    question:
+      type: string
+      description: 'Question display text. The actual question.'
+    help:
+      type: string
+    script:
+      type: string
+      description: 'Question script to be executed on runtime'
+    language:
+      type: string

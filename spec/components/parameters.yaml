@@ -1,0 +1,27 @@
+answer_id:
+  name: answer_id
+  in: path
+  required: true
+  schema:
+    $ref: "./schemas/answer.yaml#/answer_id"
+
+question_id:
+  name: question_id
+  in: path
+  required: true
+  schema:
+    $ref: "./schemas/question.yaml#/question_id"
+
+question_group_id:
+  name: question_group_id
+  in: path
+  required: true
+  schema:
+    $ref: "./schemas/question_group.yaml#/question_group_id"
+
+survey_id:
+  name: survey_id
+  in: path
+  required: true
+  schema:
+    $ref: "./schemas/survey.yaml#/survey_id"

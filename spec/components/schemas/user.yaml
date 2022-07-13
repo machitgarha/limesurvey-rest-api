@@ -1,0 +1,18 @@
+user:
+  type: object
+  properties:
+    users_name:
+      type: string
+      description: 'Users username'
+    parent_id:
+      type: integer
+      description: ''
+    validation_key:
+      type: string
+      description: 'used for email link to reset or create a password for a survey participant'
+    validation_key_expiration:
+      type: string
+      description: 'datetime when the validation key expires'
+    last_login:
+      type: string
+      description: ''

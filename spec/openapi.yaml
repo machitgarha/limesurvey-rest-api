@@ -1,0 +1,399 @@
+openapi: 3.0.2
+info:
+  title: LimeSurvey REST API
+  version: 0.1.0-alpha.0
+  license:
+    name: GPL-2.0
+    url: "https://www.gnu.org/licenses/gpl-2.0.html"
+
+# TODO: Add 409 Conflict to POSTs
+paths:
+  /surveys:
+    get:
+      summary: List all surveys
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./components/schemas/survey.yaml#/survey"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+
+    post:
+      summary: Create a new survey
+      responses:
+        "201":
+          description: Created
+          headers:
+            Location:
+              description: URL of the new survey
+              required: true
+              schema:
+                type: string
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+
+  /surveys/{survey_id}:
+    get:
+      summary: Get a survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./components/schemas/survey.yaml#/survey"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+
+    put:
+      summary: Updates a survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./components/schemas/survey.yaml#/survey"
+      responses:
+        "204":
+          $ref: "./components/responses.yaml#/empty_ok"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+
+    delete:
+      summary: Deletes a survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+      responses:
+        "204":
+          $ref: "./components/responses.yaml#/empty_ok"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+
+  /surveys/{survey_id}/groups:
+    get:
+      summary: List question groups of the survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./components/schemas/question_group.yaml#/question_group"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+
+    post:
+      summary: Create a new question group in the survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+      responses:
+        "201":
+          description: Created
+          headers:
+            Location:
+              description: URL of the new question group
+              required: true
+              schema:
+                type: string
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+
+  /surveys/{survey_id}/groups/{question_group_id}:
+    get:
+      summary: Get a question group of the survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+        - $ref: "./components/parameters.yaml#/question_group_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./components/schemas/question_group.yaml#/question_group"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+
+    put:
+      summary: Updates a question group of the survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+        - $ref: "./components/parameters.yaml#/question_group_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./components/schemas/question_group.yaml#/question_group"
+      responses:
+        "204":
+          $ref: "./components/responses.yaml#/empty_ok"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+
+    delete:
+      summary: Deletes a question group in the survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+        - $ref: "./components/parameters.yaml#/question_group_id"
+      responses:
+        "204":
+          $ref: "./components/responses.yaml#/empty_ok"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+
+  /surveys/{survey_id}/questions:
+    get:
+      summary: List questions of the survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./components/schemas/question.yaml#/question"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+
+    post:
+      summary: Create a new question in the survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                group_id:
+                  $ref: "./components/schemas/question_group.yaml#/question_group_id"
+                title:
+                  type: string
+      responses:
+        "201":
+          description: Created
+          headers:
+            Location:
+              description: URL of the new question
+              required: true
+              schema:
+                type: string
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+
+  /surveys/{survey_id}/questions/{question_id}:
+    get:
+      summary: Get a question of the survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+        - $ref: "./components/parameters.yaml#/question_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./components/schemas/question.yaml#/question"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+
+    put:
+      summary: Updates a question of the survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+        - $ref: "./components/parameters.yaml#/question_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./components/schemas/question.yaml#/question"
+      responses:
+        "204":
+          $ref: "./components/responses.yaml#/empty_ok"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+
+    delete:
+      summary: Deletes a question in the survey
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+        - $ref: "./components/parameters.yaml#/question_id"
+      responses:
+        "204":
+          $ref: "./components/responses.yaml#/empty_ok"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+
+  /surveys/{survey_id}/questions/{question_id}/answers:
+    get:
+      summary: List answers of a survey question (if supported)
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./components/schemas/answer.yaml#/answer"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "406":
+          $ref: "./components/responses.yaml#/not_acceptable"
+
+    post:
+      summary: Adds a new answer to a survey question (if supported)
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+        - $ref: "./components/parameters.yaml#/question_id"
+      responses:
+        "201":
+          description: Created
+          headers:
+            Location:
+              description: URL of the new answer
+              required: true
+              schema:
+                type: string
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "406":
+          $ref: "./components/responses.yaml#/not_acceptable"
+
+  /surveys/{survey_id}/questions/{question_id}/answers/{answer_id}:
+    get:
+      summary: Get an answer of a survey question
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+        - $ref: "./components/parameters.yaml#/question_id"
+        - $ref: "./components/parameters.yaml#/answer_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./components/schemas/question.yaml#/question"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+        "406":
+          $ref: "./components/responses.yaml#/not_acceptable"
+
+    put:
+      summary: Updates an answer of a survey question
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+        - $ref: "./components/parameters.yaml#/question_id"
+        - $ref: "./components/parameters.yaml#/answer_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./components/schemas/answer.yaml#/answer"
+      responses:
+        "204":
+          $ref: "./components/responses.yaml#/empty_ok"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+        "406":
+          $ref: "./components/responses.yaml#/not_acceptable"
+
+    delete:
+      summary: Deletes an answer of a survey question
+      parameters:
+        - $ref: "./components/parameters.yaml#/survey_id"
+        - $ref: "./components/parameters.yaml#/question_id"
+        - $ref: "./components/parameters.yaml#/answer_id"
+      responses:
+        "204":
+          $ref: "./components/responses.yaml#/empty_ok"
+        "401":
+          $ref: "./components/responses.yaml#/unauthorized"
+        "403":
+          $ref: "./components/responses.yaml#/permission_denied"
+        "404":
+          $ref: "./components/responses.yaml#/not_found"
+        "406":
+          $ref: "./components/responses.yaml#/not_acceptable"

@@ -1,0 +1,36 @@
+permission:
+  type: object
+  properties:
+    id:
+      type: integer
+      description: ''
+    entity:
+      type: string
+      description: ''
+    entity_id:
+      type: integer
+      description: ''
+    user_id:
+      type: integer
+      description: ''
+    permission:
+      type: string
+      description: ''
+    create_perm:
+      type: integer
+      description: ''
+    read_perm:
+      type: integer
+      description: ''
+    update_perm:
+      type: integer
+      description: ''
+    delete_perm:
+      type: integer
+      description: ''
+    import_perm:
+      type: integer
+      description: ''
+    export_perm:
+      type: integer
+      description: ''
