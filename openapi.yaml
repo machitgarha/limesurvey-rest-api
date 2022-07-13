@@ -29,7 +29,8 @@ paths:
       summary: Create a new survey
       responses:
         "201":
-          header:
+          description: Created
+          headers:
             Location:
               description: URL of the new survey
               required: true
@@ -106,7 +107,7 @@ paths:
               schema:
                 type: array
                 items:
-                  - $ref: "#/components/schemas/question_group"
+                  $ref: "#/components/schemas/question_group"
         "401":
           $ref: "#/components/responses/unauthorized"
         "403":
@@ -119,7 +120,7 @@ paths:
       responses:
         "201":
           description: Created
-          header:
+          headers:
             Location:
               description: URL of the new question group
               required: true
@@ -199,7 +200,7 @@ paths:
               schema:
                 type: array
                 items:
-                  - $ref: "#/components/schemas/question"
+                  $ref: "#/components/schemas/question"
         "401":
           $ref: "#/components/responses/unauthorized"
         "403":
@@ -223,7 +224,7 @@ paths:
       responses:
         "201":
           description: Created
-          header:
+          headers:
             Location:
               description: URL of the new question
               required: true
