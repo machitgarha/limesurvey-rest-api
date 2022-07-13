@@ -291,8 +291,121 @@ paths:
         "404":
           $ref: "#/components/responses/not_found"
 
+  /surveys/{survey_id}/questions/{question_id}/answers:
+    get:
+      summary: List answers of a survey question (if supported)
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/answer"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "406":
+          $ref: "#/components/responses/not_acceptable"
+
+    post:
+      summary: Adds a new answer to a survey question (if supported)
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_id"
+      responses:
+        "201":
+          description: Created
+          headers:
+            Location:
+              description: URL of the new answer
+              required: true
+              schema:
+                type: string
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "406":
+          $ref: "#/components/responses/not_acceptable"
+
+  /surveys/{survey_id}/questions/{question_id}/answers/{answer_id}:
+    get:
+      summary: Get an answer of a survey question
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_id"
+        - $ref: "#/components/parameters/answer_id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/question"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+        "406":
+          $ref: "#/components/responses/not_acceptable"
+
+    put:
+      summary: Updates an answer of a survey question
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_id"
+        - $ref: "#/components/parameters/answer_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/answer"
+      responses:
+        "204":
+          $ref: "#/components/responses/empty_ok"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+        "406":
+          $ref: "#/components/responses/not_acceptable"
+
+    delete:
+      summary: Deletes an answer of a survey question
+      parameters:
+        - $ref: "#/components/parameters/survey_id"
+        - $ref: "#/components/parameters/question_id"
+        - $ref: "#/components/parameters/answer_id"
+      responses:
+        "204":
+          $ref: "#/components/responses/empty_ok"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/permission_denied"
+        "404":
+          $ref: "#/components/responses/not_found"
+        "406":
+          $ref: "#/components/responses/not_acceptable"
+
 components:
   parameters:
+    answer_id:
+      name: answer_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/answer_id"
     question_id:
       name: question_id
       in: path
@@ -315,6 +428,8 @@ components:
   responses:
     empty_ok:
       description: OK
+    not_acceptable:
+      description: Not acceptable
     not_found:
       description: Resource not found
     permission_denied:
@@ -327,8 +442,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          description: PK
+          $ref: "#/components/schemas/answer_id"
         question_id:
           type: integer
           description: 'Question id'
@@ -344,6 +458,9 @@ components:
         scale_id:
           type: integer
           description: ''
+    answer_id:
+      type: integer
+      description: Answer ID
     answer_l10n:
       type: object
       properties:
