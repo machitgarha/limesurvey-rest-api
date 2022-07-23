@@ -1,7 +1,6 @@
 access_token:
-  type:
-    type: string
-    description: Bearer access token value.
+  type: string
+  description: Bearer access token value.
 
 token_info:
   type: object
@@ -9,5 +8,5 @@ token_info:
     access_token:
       $ref: "#/access_token"
     expire_time:
-      type: int
+      type: integer
       description: The absolute Unix time in which the token expires.
