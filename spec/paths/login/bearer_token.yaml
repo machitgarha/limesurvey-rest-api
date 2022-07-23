@@ -1,0 +1,19 @@
+post:
+  summary: Create a new access token
+  responses:
+    "201":
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/bearer_token.yaml#/token_info"
+    "401":
+      $ref: "../components/responses.yaml#/unauthorized"
+
+delete:
+  summary: Deletes a survey
+  responses:
+    "204":
+      $ref: "../components/responses.yaml#/empty_ok"
+    "401":
+      $ref: "../components/responses.yaml#/unauthorized"
