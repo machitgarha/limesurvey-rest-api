@@ -9,5 +9,10 @@
             "email": "machitgarha@outlook.com"
         }
     ],
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "MAChitgarha\\LimeSurveyRestApi\\": "src/"
+        }
+    }
 }
