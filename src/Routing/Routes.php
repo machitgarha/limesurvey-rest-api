@@ -2,6 +2,10 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Routing;
 
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Login\BearerTokenController;
+
+use MAChitgarha\LimeSurveyRestApi\Utility\HttpMethod;
+
 class Routes
 {
     /**
@@ -9,6 +13,15 @@ class Routes
      * @var array[]
      */
     public const VERSION_0 = [
+        [
+            'path' => BearerTokenController::PATH,
+            'http_method' => HttpMethod::GET,
+            'name' => BearerTokenController::class . '.new',
+        ], [
+            'path' => BearerTokenController::PATH,
+            'http_method' => HttpMethod::DELETE,
+            'name' => BearerTokenController::class . '.delete',
+        ],
     ];
 
     /**
