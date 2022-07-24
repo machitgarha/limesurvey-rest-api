@@ -77,7 +77,12 @@ class Router
         ];
     }
 
-    private static function makeRoute(array $routeData): Route
+    /**
+     * Make a Route class from route data.
+     *
+     * @return Route
+     */
+    private static function makeRoute(array $route): Route
     {
         return new Route(
             $route['path'],

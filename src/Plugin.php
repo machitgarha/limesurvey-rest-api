@@ -2,6 +2,7 @@
 
 namespace MAChitgarha\LimeSurveyRestApi;
 
+use CLogger;
 use LSHttpRequest;
 use PluginBase;
 
@@ -42,13 +43,25 @@ class Plugin extends PluginBase
         // Disable default request handling
         $this->event->set('run', false);
 
-        [$controllerClass, $method] = (new Router($this->request))
-            ->route($path);
+        $this->log("New request caught: $path", CLogger::LEVEL_INFO);
 
-        $controller = new $controllerClass();
-        echo $controller->$method();
+        try {
+            [$controllerClass, $method] = (new Router($this->request))->route($path);
+
+            $controller = new $controllerClass();
+            $controller->setRequest($this->request);
+            echo $controller->$method();
+
+        } catch (\Throwable $e) {
+            $this->log("{$e->getMessage()} (code: {$e->getCode()})", CLogger::LEVEL_ERROR);
+            // TODO: Return a 500 error
+        }
     }
 
+    /**
+     * Returns the path after the script url.
+     * @return string
+     */
     private function getBasePath(): string
     {
         return \str_replace(
