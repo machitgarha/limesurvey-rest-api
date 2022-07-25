@@ -1,6 +1,20 @@
 empty_ok:
   description: OK
 
+invalid_credentials:
+  description: Invalid username or password
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          errors:
+            type: array
+            minItems: 1
+            maxItems: 1
+            items:
+              $ref: "./schemas/error.yaml#/invalid_credentials"
+
 method_not_allowed:
   description: Method not allowed
 
@@ -12,3 +26,15 @@ permission_denied:
 
 unauthorized:
   description: Unauthorized request
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          errors:
+            type: array
+            minItems: 1
+            # TODO:
+            # maxItems: 1
+            items:
+              $ref: "./schemas/error.yaml#/unauthorized_error"

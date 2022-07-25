@@ -1,6 +1,7 @@
 access_token:
   type: string
   description: Bearer access token value.
+  # TODO: Add real example (secure)?
 
 token_info:
   type: object
@@ -10,3 +11,4 @@ token_info:
     expire_time:
       type: integer
       description: The absolute Unix time in which the token expires.
+      example: 1658791438

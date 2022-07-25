@@ -1,0 +1,20 @@
+invalid_credentials_error:
+  type: object
+  properties:
+    id:
+      type: string
+      enum:
+        - invalid_credentials
+
+unauthorized_error:
+  type: object
+  properties:
+    id:
+      type: string
+      enum:
+        - access_token_expired
+        - access_token_invalid
+        # TODO:
+        # authorization_header_malformed
+        - authorization_header_missing
+        - authorization_header_unsupported

@@ -1,17 +1,39 @@
 post:
   summary: Create a new access token
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - username
+            - password
+          properties:
+            data:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
   responses:
     "201":
       description: Created
       content:
         application/json:
           schema:
-            $ref: "../../components/schemas/bearer_token.yaml#/token_info"
+            type: object
+            properties:
+              data:
+                $ref: "../../components/schemas/bearer_token.yaml#/token_info"
     "401":
       $ref: "../../components/responses.yaml#/unauthorized"
+  # Disable global authorization
+  security: []
 
 delete:
-  summary: Deletes a survey
+  summary: Deletes an existing access token
   responses:
     "204":
       $ref: "../../components/responses.yaml#/empty_ok"
