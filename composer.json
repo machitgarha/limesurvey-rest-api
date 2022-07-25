@@ -12,7 +12,8 @@
     "require": {
         "php": "^7.2|^8.0",
         "symfony/polyfill-php80": "^1.26",
-        "symfony/routing": "^6.1"
+        "symfony/routing": "^6.1",
+        "symfony/http-foundation": "^6.1"
     },
     "require-dev": {
         "cebe/php-openapi": "^1.0"
