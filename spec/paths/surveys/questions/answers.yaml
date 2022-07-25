@@ -2,6 +2,7 @@ get:
   summary: List answers of a survey question (if supported)
   parameters:
     - $ref: "../../../components/parameters.yaml#/survey_id"
+    - $ref: "../../../components/parameters.yaml#/question_id"
   responses:
     "200":
       description: OK
