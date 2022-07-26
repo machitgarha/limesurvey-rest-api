@@ -1,5 +1,7 @@
 invalid_credentials_error:
   type: object
+  required:
+    - id
   properties:
     id:
       type: string
@@ -8,6 +10,8 @@ invalid_credentials_error:
 
 unauthorized_error:
   type: object
+  required:
+    - id
   properties:
     id:
       type: string

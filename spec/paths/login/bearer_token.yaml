@@ -6,12 +6,13 @@ post:
       application/json:
         schema:
           type: object
-          required:
-            - username
-            - password
+          required: [data]
           properties:
             data:
               type: object
+              required:
+                - username
+                - password
               properties:
                 username:
                   type: string
@@ -24,11 +25,12 @@ post:
         application/json:
           schema:
             type: object
+            required: [data]
             properties:
               data:
                 $ref: "../../components/schemas/bearer_token.yaml#/token_info"
     "401":
-      $ref: "../../components/responses.yaml#/unauthorized"
+      $ref: "../../components/responses.yaml#/invalid_credentials"
   # Disable global authorization
   security: []
 
