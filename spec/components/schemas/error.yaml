@@ -22,3 +22,13 @@ unauthorized_error:
         # authorization_header_malformed
         - authorization_header_missing
         - authorization_header_unsupported
+
+unsupported_media_type_error:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+      enum:
+        - unsupported_media_type
