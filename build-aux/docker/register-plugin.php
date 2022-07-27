@@ -40,7 +40,7 @@ function mysqlConnect(array $argv)
         $host,
         $argv[2],
         $argv[3],
-        $argv[4],
+        '',
         $port,
         $socket,
         MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT
@@ -56,7 +56,17 @@ function mysqlConnect(array $argv)
     return $mysql;
 }
 
-function makeTableName(string $tablePrefix)
+function isDatabaseExists(\mysqli $mysql, string $databaseName): bool
+{
+    $result = $mysql->query(<<<SQL
+        SHOW DATABASES LIKE '$databaseName'
+SQL
+);
+
+    return $result->num_rows === 1;
+}
+
+function makeTableName(string $tablePrefix): string
 {
     if (!preg_match('/^[a-z0-9_$]*$/i', $tablePrefix)) {
         error('Table prefix contains invalid characters');
@@ -65,7 +75,7 @@ function makeTableName(string $tablePrefix)
     return $tablePrefix . 'plugins';
 }
 
-function isPluginsTableExists(\mysqli $mysql, string $tableName): bool
+function isTableExists(\mysqli $mysql, string $tableName): bool
 {
     $result = $mysql->query(<<<SQL
         SHOW TABLES LIKE '$tableName'
@@ -100,20 +110,29 @@ function main(array $argv)
 
     $mysql = mysqlConnect($argv);
 
-    $tableName = $mysql->real_escape_string($argv[5] . 'plugins');
+    $databaseName = $mysql->real_escape_string($argv[4]);
 
-    while (!isPluginsTableExists($mysql, $tableName)) {
-        echo 'Waiting for the plugins table to be created...' . PHP_EOL;
-        sleep(2);
+    while (!isDatabaseExists($mysql, $databaseName)) {
+        echo 'Waiting for the database to be created...' . PHP_EOL;
+        sleep(3);
     }
 
-    if (isPluginAlreadyInserted($mysql, $tableName)) {
+    $mysql->select_db($databaseName);
+
+    $pluginsTableName = makeTableName($argv[5]);
+
+    while (!isTableExists($mysql, $pluginsTableName)) {
+        echo "Waiting for the $pluginsTableName table to be created..." . PHP_EOL;
+        sleep(3);
+    }
+
+    if (isPluginAlreadyInserted($mysql, $pluginsTableName)) {
         echo 'Plugin already registered, nothing to do.' . PHP_EOL;
         return;
     }
 
-    if (!insertPlugin($mysql, $tableName)) {
-        error("Cannot insert a new record to $tableName table!");
+    if (!insertPlugin($mysql, $pluginsTableName)) {
+        error("Cannot insert a new record to $pluginsTableName table!");
     }
 
     echo 'Plugin registered and activated successfully...!' . PHP_EOL;
