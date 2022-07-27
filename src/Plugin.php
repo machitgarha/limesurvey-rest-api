@@ -3,7 +3,6 @@
 namespace MAChitgarha\LimeSurveyRestApi;
 
 use CLogger;
-use LSHttpRequest;
 use PluginBase;
 
 use LimeSurvey\PluginManager\PluginManager;
@@ -12,19 +11,21 @@ use MAChitgarha\LimeSurveyRestApi\Api\Config;
 
 use MAChitgarha\LimeSurveyRestApi\Routing\Router;
 
+use Symfony\Component\HttpFoundation\Request;
+
 class Plugin extends PluginBase
 {
     protected static $name = 'LimeSurveyRestApi';
     protected static $description = 'LimeSurvey REST API provider';
 
-    /** @var \LSHttpRequest */
+    /** @var Request */
     private $request;
 
     public function __construct(PluginManager $pluginManager, $id)
     {
         parent::__construct($pluginManager, $id);
 
-        $this->request = $this->api->getRequest();
+        $this->request = Request::createFromGlobals();
     }
 
     public function init(): void
@@ -34,7 +35,7 @@ class Plugin extends PluginBase
 
     public function beforeControllerAction(): void
     {
-        $path = $this->getBasePath();
+        $path = $this->request->getPathInfo();
 
         if (!\str_starts_with($path, '/' . Config::PATH_PREFIX)) {
             return;
@@ -56,18 +57,7 @@ class Plugin extends PluginBase
             $this->log("{$e->getMessage()} (code: {$e->getCode()})", CLogger::LEVEL_ERROR);
             // TODO: Return a 500 error
         }
-    }
 
-    /**
-     * Returns the path after the script url.
-     * @return string
-     */
-    private function getBasePath(): string
-    {
-        return \str_replace(
-            $this->request->getScriptUrl(),
-            '',
-            $this->request->getUrl(),
-        );
+        App()->end();
     }
 }

@@ -2,14 +2,14 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Traits;
 
-use LSHttpRequest;
+use Symfony\Component\HttpFoundation\Request;
 
 trait RequestProperty
 {
-    /** @var LSHttpRequest */
+    /** @var Request */
     private $request;
 
-    public function getRequest(): LSHttpRequest
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -17,7 +17,7 @@ trait RequestProperty
     /**
      * @return $this
      */
-    public function setRequest(LSHttpRequest $request)
+    public function setRequest(Request $request)
     {
         $this->request = $request;
         return $this;

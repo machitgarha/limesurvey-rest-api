@@ -2,9 +2,9 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Routing;
 
-use LSHttpRequest;
-
 use MAChitgarha\LimeSurveyRestApi\Api\Config;
+
+use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 
@@ -16,10 +16,10 @@ use Symfony\Component\Routing\RouteCollection;
 
 class Router
 {
-    /** @var LSHttpRequest */
+    /** @var Request */
     private $request;
 
-    public function __construct(LSHttpRequest $request)
+    public function __construct(Request $request)
     {
         $this->request = $request;
     }
@@ -98,7 +98,7 @@ class Router
     private function getContext(): RequestContext
     {
         return (new RequestContext())
-            ->setMethod($this->request->getRequestType());
+            ->setMethod($this->request->getMethod());
     }
 
     private static function getControllerMethodPair(string $routeName): array
