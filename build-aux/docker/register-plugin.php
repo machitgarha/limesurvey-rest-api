@@ -75,6 +75,16 @@ SQL
     return $result->num_rows === 1;
 }
 
+function isPluginAlreadyInserted(\mysqli $mysql, string $tableName): bool
+{
+    $result = $mysql->query(<<<SQL
+        SELECT `id` FROM `$tableName` WHERE `name` = 'LimeSurveyRestApi'
+SQL
+);
+
+    return $result->num_rows > 0;
+}
+
 function insertPlugin(\mysqli $mysql, string $tableName): bool
 {
     return $mysql->query(<<<SQL
@@ -97,8 +107,13 @@ function main(array $argv)
         sleep(2);
     }
 
+    if (isPluginAlreadyInserted($mysql, $tableName)) {
+        echo 'Plugin already registered, nothing to do.' . PHP_EOL;
+        return;
+    }
+
     if (!insertPlugin($mysql, $tableName)) {
-        error('Cannot insert a new record to plugins table');
+        error("Cannot insert a new record to $tableName table!");
     }
 
     echo 'Plugin registered and activated successfully...!' . PHP_EOL;

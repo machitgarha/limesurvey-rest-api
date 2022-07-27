@@ -12,7 +12,7 @@ insertPluginToDatabase() {
             "$LIMESURVEY_DB_PASSWORD" \
             "$LIMESURVEY_DB_NAME" \
             "$LIMESURVEY_TABLE_PREFIX" \
-            "$MYSQL_SSL_CA_CONTENTS" && \
+            "$MYSQL_SSL_CA_CONTENTS"
 }
 
 main() {
