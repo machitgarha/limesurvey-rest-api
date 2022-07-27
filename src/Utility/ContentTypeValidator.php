@@ -11,7 +11,7 @@ class ContentTypeValidator
 {
     public static function validateIsJson(Request $request): void
     {
-        if ($request->getContentType() !== ContentType::APPLICATION_JSON) {
+        if ($request->getContentType() !== ContentType::JSON) {
             throw new UnsupportedMediaTypeError();
         }
     }

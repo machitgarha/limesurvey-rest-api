@@ -4,5 +4,5 @@ namespace MAChitgarha\LimeSurveyRestApi\Utility;
 
 class ContentType
 {
-    public const APPLICATION_JSON = 'application/json';
+    public const JSON = 'json';
 }

@@ -15,7 +15,7 @@ class Routes
     public const VERSION_0 = [
         [
             'path' => BearerTokenController::PATH,
-            'http_method' => HttpMethod::GET,
+            'http_method' => HttpMethod::POST,
             'name' => BearerTokenController::class . '.new',
         ], [
             'path' => BearerTokenController::PATH,
