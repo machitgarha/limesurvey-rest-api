@@ -52,7 +52,6 @@ unsupported_media_type:
           errors:
             type: array
             minItems: 1
-            # TODO:
-            # maxItems: 1
+            maxItems: 1
             items:
               $ref: "./schemas/error.yaml#/unsupported_media_type_error"
