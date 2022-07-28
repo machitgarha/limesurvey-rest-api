@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Symfony\Component\Serializer\Serializer;
 
+use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
+
 class BearerTokenController
 {
     use Traits\RequestProperty;
@@ -47,10 +49,10 @@ class BearerTokenController
         $session->save();
 
         return new JsonResponse(
-            [
+            data([
                 'access_token' => $session->id,
                 'expire_time' => $session->expire,
-            ],
+            ]),
             JsonResponse::HTTP_CREATED
         );
     }

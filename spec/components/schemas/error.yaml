@@ -1,3 +1,13 @@
+internal_server_error:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+      enum:
+        - internal_server_error
+
 invalid_credentials_error:
   type: object
   required:

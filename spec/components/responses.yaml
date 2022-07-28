@@ -1,6 +1,21 @@
 empty_ok:
   description: OK
 
+internal_server_error:
+  description: Unknown internal server error
+  content:
+    application/json:
+      schema:
+        type: object
+        required: [errors]
+        properties:
+          errors:
+            type: array
+            minItems: 1
+            maxItems: 1
+            items:
+              $ref: "./schemas/error.yaml#/internal_server_error"
+
 invalid_credentials:
   description: Invalid username or password
   content:
