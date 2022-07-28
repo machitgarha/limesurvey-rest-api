@@ -5,7 +5,6 @@ namespace MAChitgarha\LimeSurveyRestApi\Utility;
 use MAChitgarha\LimeSurveyRestApi\Error\UnsupportedMediaTypeError;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class ContentTypeValidator
 {

@@ -72,7 +72,7 @@ class Plugin extends PluginBase
                 ->$method();
         } catch (Error $error) {
             $response = $this->makeJsonErrorResponse($error);
-        } catch (Throwable $e) {
+        } catch (Throwable $error) {
             $this->log(
                 \get_class($error) . ": {$error->getMessage()}",
                 Logger::LEVEL_ERROR
@@ -111,7 +111,7 @@ class Plugin extends PluginBase
 
         return new JsonResponse(
             error($errorData),
-            $error->getCode()
+            $error->getHttpStatusCode()
         );
     }
 }

@@ -11,7 +11,7 @@ class UnsupportedMediaTypeError extends Error
         return 'unsupported_media_type';
     }
 
-    public function getCode(): int
+    public function getHttpStatusCode(): int
     {
         return Response::HTTP_UNSUPPORTED_MEDIA_TYPE;
     }

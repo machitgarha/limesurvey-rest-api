@@ -11,7 +11,7 @@ class InternalServerError extends Error
         return 'internal_server_error';
     }
 
-    public function getCode(): int
+    public function getHttpStatusCode(): int
     {
         return Response::HTTP_INTERNAL_SERVER_ERROR;
     }

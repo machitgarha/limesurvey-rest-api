@@ -11,7 +11,7 @@ class InvalidCredentialsError extends Error
         return 'invalid_credentails';
     }
 
-    public function getCode(): int
+    public function getHttpStatusCode(): int
     {
         return Response::HTTP_UNAUTHORIZED;
     }

@@ -11,7 +11,7 @@ class TooManyAuthenticationFailuresError extends Error
         return 'too_many_authentication_failures';
     }
 
-    public function getCode(): int
+    public function getHttpStatusCode(): int
     {
         return Response::HTTP_TOO_MANY_REQUESTS;
     }

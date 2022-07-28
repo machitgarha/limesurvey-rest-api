@@ -18,8 +18,6 @@ use Respect\Validation\Validator as v;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use Symfony\Component\Serializer\Serializer;
-
 use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
 
 class BearerTokenController
@@ -93,7 +91,7 @@ class BearerTokenController
     {
         $session = new Session();
         $session->id = $sessionKey;
-        $session->expire = \time() + (int) Yii::app()->getConfig(
+        $session->expire = \time() + (int) App()->getConfig(
             'iSessionExpirationTime',
             \ini_get('session.gc_maxlifetime')
         );
