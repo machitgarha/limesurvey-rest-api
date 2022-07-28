@@ -8,6 +8,16 @@ invalid_credentials_error:
       enum:
         - invalid_credentials
 
+too_many_authentication_failures_error:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+      enum:
+        - too_many_authentication_failures
+
 unauthorized_error:
   type: object
   required:
