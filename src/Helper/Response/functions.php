@@ -19,12 +19,3 @@ function error(array $errorData): array
 {
     return ['errors' => [$errorData]];
 }
-
-/**
- * Wraps a set of errors information inside an 'errors' key.
- * @return array
- */
-function errorSet(array $errorsData): array
-{
-    return ['errors' => $errorsData];
-}

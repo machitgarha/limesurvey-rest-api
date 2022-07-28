@@ -27,15 +27,13 @@ class Router
     /**
      * Returns pair of controller name and its method name to handle the request.
      *
-     * @param string $path Must start with a forward slash, followed by
-     * the API version.
      * @return string[] The pair of controller's fully-qualified name and its method name.
      */
-    public function route(string $path): array
+    public function route(): array
     {
         $routeCollection = new RouteCollection();
 
-        [$apiVersion, $path] = self::splitPathApiVersion($path);
+        [$apiVersion, $path] = self::splitPathApiVersion($this->request->getPathInfo());
 
         foreach (Routes::VALUE[$apiVersion] as $route) {
             $routeCollection->add(

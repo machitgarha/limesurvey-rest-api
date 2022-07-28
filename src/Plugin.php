@@ -2,16 +2,27 @@
 
 namespace MAChitgarha\LimeSurveyRestApi;
 
-use CLogger;
+use CLogger as Logger;
+use Throwable;
 use PluginBase;
 
 use LimeSurvey\PluginManager\PluginManager;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Config;
 
+use MAChitgarha\LimeSurveyRestApi\Error\Error;
+use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
+
 use MAChitgarha\LimeSurveyRestApi\Routing\Router;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+
+use Symfony\Component\Serializer\Serializer;
+
+use function MAChitgarha\LimeSurveyRestApi\Helper\Response\error;
 
 class Plugin extends PluginBase
 {
@@ -44,20 +55,63 @@ class Plugin extends PluginBase
         // Disable default request handling
         $this->event->set('run', false);
 
-        $this->log("New request caught: $path", CLogger::LEVEL_INFO);
-
-        try {
-            [$controllerClass, $method] = (new Router($this->request))->route($path);
-
-            $controller = new $controllerClass();
-            $controller->setRequest($this->request);
-            echo $controller->$method();
-
-        } catch (\Throwable $e) {
-            $this->log("{$e->getMessage()} (code: {$e->getCode()})", CLogger::LEVEL_ERROR);
-            // TODO: Return a 500 error
-        }
+        $this->log("New request caught: $path", Logger::LEVEL_INFO);
+        $this->handleRequest();
 
         App()->end();
+    }
+
+    private function handleRequest(): void
+    {
+        try {
+            [$controllerClass, $method] = (new Router($this->request))->route();
+
+            /** @var JsonResponse */
+            $response = $this
+                ->makeController($controllerClass)
+                ->$method();
+        } catch (Error $error) {
+            $response = $this->makeJsonErrorResponse($error);
+        } catch (Throwable $e) {
+            $this->log(
+                \get_class($error) . ": {$error->getMessage()}",
+                Logger::LEVEL_ERROR
+            );
+
+            $response = $this->makeJsonErrorResponse(new InternalServerError());
+        }
+
+        echo $response;
+    }
+
+    private function makeController(string $controllerClass): object
+    {
+        $controller = new $controllerClass();
+
+        $controller->setRequest($this->request);
+        $controller->setSerializer($this->makeSerializer());
+
+        return $controller;
+    }
+
+    private function makeSerializer(): Serializer
+    {
+        return new Serializer([], [
+            new JsonEncoder()
+        ]);
+    }
+
+    private function makeJsonErrorResponse(Error $error): JsonResponse
+    {
+        $errorData = ['id' => $error->getId()];
+
+        if (!empty($error->getMessage())) {
+            $errorData['message'] = $error->getMessage();
+        }
+
+        return new JsonResponse(
+            error($errorData),
+            $error->getCode()
+        );
     }
 }
