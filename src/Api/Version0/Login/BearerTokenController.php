@@ -7,6 +7,8 @@ use LSUserIdentity as UserIdentity;
 use PluginEvent;
 use Session;
 
+use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
+
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 
 use MAChitgarha\LimeSurveyRestApi\Error\AccessTokenExpiredError;
@@ -22,11 +24,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
 
-class BearerTokenController
+class BearerTokenController implements Controller
 {
-    use Traits\AuthorizerProperty;
-    use Traits\RequestProperty;
-    use Traits\SerializerProperty;
+    use Traits\ContainerProperty;
+    use Traits\AuthorizerGetter;
+    use Traits\RequestGetter;
+    use Traits\SerializerGetter;
     use Traits\RequestBodyDecoder;
 
     public const PATH = '/login/bearer_token';
@@ -132,13 +135,15 @@ class BearerTokenController
     {
         ContentTypeValidator::validateIsJson($this->getRequest());
 
+        $authorizer = $this->getAuthorizer();
+
         try {
-            $accessToken = $this->getAuthorizer()->authorize()->getAccessToken();
+            $accessToken = $authorizer->authorize(false)->getAccessToken();
+            Session::model()->deleteByPk($accessToken);
+
         } catch (AccessTokenExpiredError $_) {
             // Deletion doesn't care about expiration
         }
-
-        Session::model()->deleteByPk($accessToken);
 
         return new Response('', Response::HTTP_NO_CONTENT);
     }

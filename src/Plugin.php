@@ -9,6 +9,9 @@ use PluginBase;
 use LimeSurvey\PluginManager\PluginManager;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Config;
+use MAChitgarha\LimeSurveyRestApi\Api\ControllerDependencyContainer;
+
+use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Authorization\BearerTokenAuthorizer;
 
@@ -81,30 +84,37 @@ class Plugin extends PluginBase
         try {
             [$controllerClass, $method] = (new Router($this->request))->route();
 
-            /** @var JsonResponse */
+            /** @var JsonResponse $response */
             $response = $this
                 ->makeController($controllerClass)
                 ->$method();
+
         } catch (Error $error) {
             $response = $this->makeJsonErrorResponse($error);
+
         } catch (ResourceNotFoundException $_) {
             $response = $this->makeJsonErrorResponse(new PathNotFoundError());
+
         } catch (MethodNotAllowedException $exception) {
             $response = $this->makeJsonErrorResponse(new MethodNotAllowedError());
             $response->headers->set(
                 'Allow',
                 \implode(', ', $exception->getAllowedMethods())
             );
+
         } catch (NotEncodableValueException $_) {
             $response = $this->makeJsonErrorResponse(new MalformedRequestBodyError());
+
         } catch (KeyException $exception) {
             $response = $this->makeJsonErrorResponse(
                 new RequiredKeyMissingError($exception->getMessage())
             );
+
         } catch (ValidationException $exception) {
             $response = $this->makeJsonErrorResponse(
                 new InvalidKeyValueError($exception->getMessage())
             );
+
         } catch (Throwable $error) {
             $this->log(
                 \get_class($error) . ": {$error->getMessage()}",
@@ -117,22 +127,19 @@ class Plugin extends PluginBase
         echo $response;
     }
 
-    private function makeController(string $controllerClass): object
+    private function makeController(string $controllerClass): Controller
     {
+        /** @var Controller $controller */
         $controller = new $controllerClass();
 
-        $controller->setRequest($this->request);
-        $controller->setSerializer($this->makeSerializer());
-        $controller->setAuthorizer(new BearerTokenAuthorizer($this->request));
+        $container = new ControllerDependencyContainer(
+            $this->request,
+            new Serializer([], [new JsonEncoder()]),
+            new BearerTokenAuthorizer($this->request)
+        );
 
-        return $controller;
-    }
-
-    private function makeSerializer(): Serializer
-    {
-        return new Serializer([], [
-            new JsonEncoder()
-        ]);
+        return $controller
+            ->setContainer($container);
     }
 
     private function makeJsonErrorResponse(Error $error): JsonResponse

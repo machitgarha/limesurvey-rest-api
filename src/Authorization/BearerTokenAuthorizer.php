@@ -31,7 +31,7 @@ class BearerTokenAuthorizer implements Authorizer
     /**
      * @inheritDoc
      */
-    public function authorize(): self
+    public function authorize(bool $errorOnExpiration = true): self
     {
         if (!$this->request->headers->has(self::HEADER_AUTHORIZATION)) {
             throw new AuthorizationHeaderMissingError();
@@ -48,7 +48,9 @@ class BearerTokenAuthorizer implements Authorizer
 
         if ($session->expire > \time()) {
             $session->delete();
-            throw new AccessTokenExpiredError();
+            if ($errorOnExpiration) {
+                throw new AccessTokenExpiredError();
+            }
         }
 
         return $this;
