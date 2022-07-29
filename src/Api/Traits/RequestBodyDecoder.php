@@ -34,6 +34,6 @@ trait RequestBodyDecoder
             ::key('data', v::arrayType())
             ->check($body);
 
-        return $body;
+        return $body['data'];
     }
 }
