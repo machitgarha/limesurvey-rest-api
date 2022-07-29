@@ -58,7 +58,7 @@ class Router
      */
     private static function splitPathApiVersion(string $path)
     {
-        $pattern = '/^\/(v\d+)(\/.+)$/';
+        $pattern = '/^\/(v\d+)(\/.*)?$/';
         $path = \str_replace('/' . Config::PATH_PREFIX, '', $path);
 
         if (!\preg_match($pattern, $path, $matches)) {
@@ -67,7 +67,7 @@ class Router
 
         return [
             $matches[1],
-            $matches[2],
+            $matches[2] ?? '/',
         ];
     }
 

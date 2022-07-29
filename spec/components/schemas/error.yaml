@@ -50,7 +50,17 @@ invalid_credentials_error:
       enum:
         - InvalidCredentials
 
-path_not_found:
+method_not_allowed_error:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+      enum:
+        - MethodNotAllowed
+
+path_not_found_error:
   type: object
   required:
     - id
