@@ -29,4 +29,6 @@ get:
       $ref: "../components/responses.yaml#/unsupported_media_type"
     "500":
       $ref: "../components/responses.yaml#/internal_server_error"
+    "501":
+      $ref: "../components/responses.yaml#/not_implemented_error"
   security: []

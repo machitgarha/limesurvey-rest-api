@@ -60,6 +60,16 @@ method_not_allowed_error:
       enum:
         - MethodNotAllowed
 
+not_implemented_error:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+      enum:
+        - NotImplemented
+
 path_not_found_error:
   type: object
   required:
