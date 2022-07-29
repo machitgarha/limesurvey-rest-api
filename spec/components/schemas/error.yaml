@@ -6,7 +6,7 @@ internal_server_error:
     id:
       type: string
       enum:
-        - internal_server_error
+        - InternalServerError
 
 invalid_credentials_error:
   type: object
@@ -16,7 +16,7 @@ invalid_credentials_error:
     id:
       type: string
       enum:
-        - invalid_credentials
+        - InvalidCredentials
 
 too_many_authentication_failures_error:
   type: object
@@ -26,7 +26,7 @@ too_many_authentication_failures_error:
     id:
       type: string
       enum:
-        - too_many_authentication_failures
+        - TooManyAuthenticationFailures
 
 unauthorized_error:
   type: object
@@ -36,12 +36,12 @@ unauthorized_error:
     id:
       type: string
       enum:
-        - access_token_expired
-        - access_token_invalid
+        - AccessTokenExpired
+        - AccessTokenInvalid
         # TODO:
-        # authorization_header_malformed
-        - authorization_header_missing
-        - authorization_header_unsupported
+        # AuthorizationHeaderMalformed
+        - AuthorizationHeaderMissing
+        - AuthorizationHeaderUnsupported
 
 unsupported_media_type_error:
   type: object
@@ -51,4 +51,4 @@ unsupported_media_type_error:
     id:
       type: string
       enum:
-        - unsupported_media_type
+        - UnsupportedMediaType

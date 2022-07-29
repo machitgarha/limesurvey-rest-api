@@ -5,5 +5,9 @@ namespace MAChitgarha\LimeSurveyRestApi\Error;
 abstract class Error extends \Exception
 {
     abstract public function getHttpStatusCode(): int;
-    abstract public function getId(): string;
+
+    public function getId(): string
+    {
+        return \str_replace('Error', '', static::class);
+    }
 }
