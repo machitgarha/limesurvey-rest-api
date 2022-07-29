@@ -9,6 +9,7 @@ use Session;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 
+use MAChitgarha\LimeSurveyRestApi\Error\AccessTokenExpiredError;
 use MAChitgarha\LimeSurveyRestApi\Error\InvalidCredentialsError;
 use MAChitgarha\LimeSurveyRestApi\Error\TooManyAuthenticationFailuresError;
 
@@ -24,6 +25,7 @@ use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
 
 class BearerTokenController
 {
+    use Traits\AuthorizerProperty;
     use Traits\RequestProperty;
     use Traits\SerializerProperty;
     use Traits\RequestBodyDecoder;
@@ -131,6 +133,15 @@ class BearerTokenController
     {
         ContentTypeValidator::validateIsJson($this->getRequest());
 
-        return '{}';
+        try {
+            $accessToken = $this->getAuthorizer()->authorize()->getAccessToken();
+        } catch (AccessTokenExpiredError $_) {
+            // Deletion doesn't care about expiration
+        }
+
+        Session::model()->deleteByPk($accessToken);
+
+        return '';
     }
+
 }

@@ -2,15 +2,20 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Traits;
 
+use LogicException;
+
 use Symfony\Component\Serializer\Serializer;
 
 trait SerializerProperty
 {
-    /** @var Serializer */
-    private $serializer;
+    /** @var Serializer|null */
+    private $serializer = null;
 
     public function getSerializer(): Serializer
     {
+        if ($this->serializer === null) {
+            throw new LogicException('Serializer is not set');
+        }
         return $this->serializer;
     }
 
