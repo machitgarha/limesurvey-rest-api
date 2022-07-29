@@ -10,6 +10,8 @@ use LimeSurvey\PluginManager\PluginManager;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Config;
 
+use MAChitgarha\LimeSurveyRestApi\Authorization\BearerTokenAuthorizer;
+
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
 use MAChitgarha\LimeSurveyRestApi\Error\PathNotFoundError;
 use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
@@ -121,6 +123,7 @@ class Plugin extends PluginBase
 
         $controller->setRequest($this->request);
         $controller->setSerializer($this->makeSerializer());
+        $controller->setAuthorizer(new BearerTokenAuthorizer($this->request));
 
         return $controller;
     }

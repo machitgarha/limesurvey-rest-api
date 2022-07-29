@@ -17,6 +17,7 @@ use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
 use Respect\Validation\Validator as v;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
@@ -127,7 +128,7 @@ class BearerTokenController
         return $session;
     }
 
-    public function delete(): string
+    public function delete(): Response
     {
         ContentTypeValidator::validateIsJson($this->getRequest());
 
@@ -139,7 +140,7 @@ class BearerTokenController
 
         Session::model()->deleteByPk($accessToken);
 
-        return '';
+        return new Response('', Response::HTTP_NO_CONTENT);
     }
 
 }
