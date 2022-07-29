@@ -2,8 +2,10 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Login;
 
-use Session;
+use AuthPluginBase;
 use LSUserIdentity as UserIdentity;
+use PluginEvent;
+use Session;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 
@@ -65,26 +67,51 @@ class BearerTokenController
 
     private function login(string $username, string $password): void
     {
-        $identity = new UserIdentity($username, $password);
-        $identity->setPlugin(Plugin::getName());
+        $authPlugin = 'Authdb';
 
-        // Dispatching remoteControlLogin is redundant unlike _doLogin()
+        $identity = new UserIdentity($username, $password);
+        $identity->setPlugin($authPlugin);
+
+        $this->dispatchRemoteControlLoginEventToAuthPlugin(
+            $identity,
+            $username,
+            $password,
+            $authPlugin
+        );
 
         if (!$identity->authenticate()) {
             switch ($identity->errorCode) {
-                case UserIdentity::ERROR_IP_LOCKED_OUT:
-                    throw new TooManyAuthenticationFailuresError();
+                case AuthPluginBase::ERROR_IP_LOCKED_OUT:
+                    throw new TooManyAuthenticationFailuresError($identity->errorMessage);
                     // No break
 
-                case UserIdentity::ERROR_UNKNOWN_IDENTITY:
+                case AuthPluginBase::ERROR_USERNAME_INVALID:
+                case AuthPluginBase::ERROR_PASSWORD_INVALID:
+                case AuthPluginBase::ERROR_UNKNOWN_IDENTITY:
                     throw new InvalidCredentialsError();
                     // No break
 
                 default:
-                    // TODO: Error message
-                    throw new \Exception();
+                    throw new \Exception(
+                        "{$identity->errorMessage} (code: {$identity->errorCode}"
+                    );
             }
         }
+    }
+
+    private function dispatchRemoteControlLoginEventToAuthPlugin(
+        UserIdentity $identity,
+        string $username,
+        string $password,
+        string $authPlugin,
+    ): void {
+        $event = new PluginEvent('remoteControlLogin');
+        $event->set('identity', $identity);
+        $event->set('plugin', $authPlugin);
+        $event->set('username', $username);
+        $event->set('password', $password);
+
+        App()->getPluginManager()->dispatchEvent($event, [$authPlugin]);
     }
 
     private function makeNewSession(string $username, string $sessionKey): Session
