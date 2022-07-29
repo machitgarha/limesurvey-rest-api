@@ -39,7 +39,7 @@ post:
   security: []
 
 delete:
-  summary: Deletes an existing access token
+  summary: Delete an existing access token
   responses:
     "204":
       $ref: "../../components/responses.yaml#/empty_ok"

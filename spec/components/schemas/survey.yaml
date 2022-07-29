@@ -10,7 +10,6 @@ survey:
       description: 'Survey administrator email address'
     fax_to:
       type: string
-      description: ''
     template:
       type: string
       description: 'Template name'
@@ -19,43 +18,32 @@ survey:
       description: 'Survey base language'
     auto_number_start:
       type: integer
-      description: ''
     use_captcha:
       type: string
-      description: ''
     use_tokens:
       type: string
-      description: ''
     bounce_email:
       type: string
       description: 'Bounce email address'
     attribute_descriptions:
       type: string
-      description: ''
     email_notification_to:
       type: string
       description: 'Email address to send basic admin notification email to'
     bounce_time:
       type: integer
-      description: ''
     bounce_processing:
       type: string
-      description: ''
     bounce_account_type:
       type: string
-      description: ''
-    bounce_accounthost:
+    bounce_account_host:
       type: string
-      description: ''
     bounce_account_password:
       type: string
-      description: ''
     bounce_account_encryption:
       type: string
-      description: ''
     bounce_account_user:
       type: string
-      description: ''
     google_analytics_api_key:
       type: string
       description: 'Google Analytics Tracking ID'
@@ -90,10 +78,7 @@ survey_language_setting:
       description: 'Survey description in this language'
     date_format:
       type: string
-      description: ''
     attribute_captions:
       type: string
-      description: ''
     attachments:
       type: string
-      description: ''

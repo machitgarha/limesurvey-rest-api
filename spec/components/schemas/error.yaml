@@ -70,6 +70,16 @@ path_not_found_error:
       enum:
         - PathNotFound
 
+permission_denied_error:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+      enum:
+        - PermissionDenied
+
 too_many_authentication_failures_error:
   type: object
   required:
