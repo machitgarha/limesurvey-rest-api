@@ -14,10 +14,15 @@ use MAChitgarha\LimeSurveyRestApi\Error\Error;
 use MAChitgarha\LimeSurveyRestApi\Error\BadRequestError;
 use MAChitgarha\LimeSurveyRestApi\Error\PathNotFoundError;
 use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
+use MAChitgarha\LimeSurveyRestApi\Error\InvalidKeyValueError;
 use MAChitgarha\LimeSurveyRestApi\Error\MethodNotAllowedError;
+use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
 use MAChitgarha\LimeSurveyRestApi\Error\MalformedRequestBodyError;
 
 use MAChitgarha\LimeSurveyRestApi\Routing\Router;
+
+use Respect\Validation\Exceptions\KeyException;
+use Respect\Validation\Exceptions\ValidationException;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -81,12 +86,20 @@ class Plugin extends PluginBase
                 ->$method();
         } catch (Error $error) {
             $response = $this->makeJsonErrorResponse($error);
-        } catch (ResourceNotFoundException $error) {
+        } catch (ResourceNotFoundException $_) {
             $response = $this->makeJsonErrorResponse(new PathNotFoundError());
-        } catch (MethodNotAllowedException $error) {
+        } catch (MethodNotAllowedException $_) {
             $response = $this->makeJsonErrorResponse(new MethodNotAllowedError());
-        } catch (NotEncodableValueException $error) {
+        } catch (NotEncodableValueException $_) {
             $response = $this->makeJsonErrorResponse(new MalformedRequestBodyError());
+        } catch (KeyException $exception) {
+            $response = $this->makeJsonErrorResponse(
+                new RequiredKeyMissingError($exception->getMessage())
+            );
+        } catch (ValidationException $exception) {
+            $response = $this->makeJsonErrorResponse(
+                new InvalidKeyValueError($exception->getMessage())
+            );
         } catch (Throwable $error) {
             $this->log(
                 \get_class($error) . ": {$error->getMessage()}",
