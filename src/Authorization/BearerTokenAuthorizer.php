@@ -46,7 +46,7 @@ class BearerTokenAuthorizer implements Authorizer
             throw new AccessTokenInvalidError();
         }
 
-        if ($session->expire > \time()) {
+        if ($session->expire < \time()) {
             $session->delete();
             if ($errorOnExpiration) {
                 throw new AccessTokenExpiredError();
