@@ -4,6 +4,10 @@ namespace MAChitgarha\LimeSurveyRestApi\Routing;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Config;
 
+use MAChitgarha\LimeSurveyRestApi\Error\BadRequestError;
+use MAChitgarha\LimeSurveyRestApi\Error\ApiVersionMissingError;
+use MAChitgarha\LimeSurveyRestApi\Error\ApiVersionNotFoundError;
+
 use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -33,7 +37,7 @@ class Router
 
         [$apiVersion, $path] = self::splitPathApiVersion($this->request->getPathInfo());
 
-        foreach (Routes::VALUE[$apiVersion] as $route) {
+        foreach ($this->getRoutesForApiVersion($apiVersion) as $route) {
             $routeCollection->add(
                 $route['name'],
                 self::makeRoute($route)
@@ -50,21 +54,30 @@ class Router
      * Splits a path into its API version and the remaining part.
      *
      * @return string[] A pair of API version (without replacing 'v' prefix, e.g. 'v0') and
-     * the rest of the path as string.
+     * the rest of the path (i.e. the path relative to the version).
      */
     private static function splitPathApiVersion(string $path)
     {
-        $pattern = '/^\/' . Config::PATH_PREFIX . '\/(v\d+)(\/.+)$/';
+        $pattern = '/^\/(v\d+)(\/.+)$/';
+        $path = \str_replace('/' . Config::PATH_PREFIX, '', $path);
 
         if (!\preg_match($pattern, $path, $matches)) {
-            // TODO: Make this a 404 error code
-            throw new \Exception();
+            throw new ApiVersionMissingError();
         }
 
         return [
             $matches[1],
             $matches[2],
         ];
+    }
+
+    private static function getRoutesForApiVersion(string $version): array
+    {
+        if (!\array_key_exists($version, Routes::VALUE)) {
+            throw new ApiVersionNotFoundError();
+        }
+
+        return Routes::VALUE[$version];
     }
 
     /**

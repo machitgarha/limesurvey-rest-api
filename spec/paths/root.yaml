@@ -3,8 +3,24 @@ get:
   description: >
     You can see a list of all possible general responses that any endpoint may return.
   responses:
+    "400":
+      $ref: "../components/responses.yaml#/api_version_missing"
     "404":
-      $ref: "../components/responses.yaml#/path_not_found"
+      description: Requested path not found
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errors]
+            properties:
+              errors:
+                type: array
+                minItems: 1
+                maxItems: 1
+                items:
+                  oneOf:
+                    $ref: "./schemas/error.yaml#/path_not_found_error"
+                    $ref: "./schemas/error.yaml#/api_version_not_found_error"
     "415":
       $ref: "../components/responses.yaml#/unsupported_media_type"
     "500":

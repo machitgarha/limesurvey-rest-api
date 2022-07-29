@@ -1,4 +1,14 @@
-bad_request_error:
+api_version_missing_error:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+      enum:
+        - ApiVersionMissing
+
+api_version_not_found_error:
     type: object
     required:
       - id
@@ -6,9 +16,19 @@ bad_request_error:
       id:
         type: string
         enum:
-          - MalformedRequestBody
-          - RequiredKeyMissing
-          - InvalidKeyValue
+          - ApiVersionNotFound
+
+bad_request_error:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+      enum:
+        - MalformedRequestBody
+        - RequiredKeyMissing
+        - InvalidKeyValue
 
 internal_server_error:
   type: object
