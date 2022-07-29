@@ -16,8 +16,6 @@ get:
       $ref: "../../../components/responses.yaml#/unauthorized"
     "403":
       $ref: "../../../components/responses.yaml#/permission_denied"
-    "405":
-      $ref: "../../../components/responses.yaml#/method_not_allowed"
 
 post:
   summary: Adds a new answer to a survey question (if supported)
@@ -37,5 +35,3 @@ post:
       $ref: "../../../components/responses.yaml#/unauthorized"
     "403":
       $ref: "../../../components/responses.yaml#/permission_denied"
-    "405":
-      $ref: "../../../components/responses.yaml#/method_not_allowed"

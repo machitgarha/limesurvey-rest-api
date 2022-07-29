@@ -17,8 +17,6 @@ get:
       $ref: "../../../components/responses.yaml#/permission_denied"
     "404":
       $ref: "../../../components/responses.yaml#/not_found"
-    "405":
-      $ref: "../../../components/responses.yaml#/method_not_allowed"
 
 put:
   summary: Updates an answer of a survey question
@@ -41,8 +39,6 @@ put:
       $ref: "../../../components/responses.yaml#/permission_denied"
     "404":
       $ref: "../../../components/responses.yaml#/not_found"
-    "405":
-      $ref: "../../../components/responses.yaml#/method_not_allowed"
 
 delete:
   summary: Deletes an answer of a survey question
@@ -59,5 +55,3 @@ delete:
       $ref: "../../../components/responses.yaml#/permission_denied"
     "404":
       $ref: "../../../components/responses.yaml#/not_found"
-    "405":
-      $ref: "../../../components/responses.yaml#/method_not_allowed"
