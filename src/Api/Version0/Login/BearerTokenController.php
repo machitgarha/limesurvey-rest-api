@@ -57,10 +57,10 @@ class BearerTokenController
 
     private function validateDataForNew(array $bodyData): void
     {
-        v::
-            key('username', v::stringType())->
-            key('password', v::stringType())->
-            check($bodyData);
+        v
+            ::key('username', v::stringType())
+            ->key('password', v::stringType())
+            ->check($bodyData);
     }
 
     private function login(string $username, string $password): void

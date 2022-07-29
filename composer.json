@@ -25,6 +25,8 @@
         "psr-4": {
             "MAChitgarha\\LimeSurveyRestApi\\": "src/"
         },
-        "files": "src/Helper/Response/functions.php"
+        "files": [
+            "src/Helper/Response/functions.php"
+        ]
     }
 }

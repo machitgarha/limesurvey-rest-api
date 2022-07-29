@@ -30,7 +30,8 @@ trait RequestBodyDecoder
     {
         $body = $this->decodeJsonRequestBody();
 
-        v::key('data', v::arrayType())
+        v
+            ::key('data', v::arrayType())
             ->check($body);
 
         return $body;
