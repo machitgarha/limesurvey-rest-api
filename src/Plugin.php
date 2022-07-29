@@ -88,8 +88,12 @@ class Plugin extends PluginBase
             $response = $this->makeJsonErrorResponse($error);
         } catch (ResourceNotFoundException $_) {
             $response = $this->makeJsonErrorResponse(new PathNotFoundError());
-        } catch (MethodNotAllowedException $_) {
+        } catch (MethodNotAllowedException $exception) {
             $response = $this->makeJsonErrorResponse(new MethodNotAllowedError());
+            $response->headers->set(
+                'Allow',
+                \implode(', ', $exception->getAllowedMethods())
+            );
         } catch (NotEncodableValueException $_) {
             $response = $this->makeJsonErrorResponse(new MalformedRequestBodyError());
         } catch (KeyException $exception) {
