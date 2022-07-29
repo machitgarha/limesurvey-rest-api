@@ -4,6 +4,8 @@ namespace MAChitgarha\LimeSurveyRestApi\Routing;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Login\BearerTokenController;
 
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
+
 use MAChitgarha\LimeSurveyRestApi\Utility\HttpMethod;
 
 class Routes
@@ -21,6 +23,26 @@ class Routes
             'path' => BearerTokenController::PATH,
             'http_method' => HttpMethod::DELETE,
             'name' => BearerTokenController::class . '.delete',
+        ], [
+            'path' => SurveyController::PATH,
+            'http_method' => HttpMethod::GET,
+            'name' => SurveyController::class . '.list',
+        ], [
+            'path' => SurveyController::PATH,
+            'http_method' => HttpMethod::POST,
+            'name' => SurveyController::class . '.new',
+        ], [
+            'path' => SurveyController::PATH_BY_ID,
+            'http_method' => HttpMethod::GET,
+            'name' => SurveyController::class . '.get',
+        ], [
+            'path' => SurveyController::PATH_BY_ID,
+            'http_method' => HttpMethod::PUT,
+            'name' => SurveyController::class . '.update',
+        ], [
+            'path' => SurveyController::PATH_BY_ID,
+            'http_method' => HttpMethod::DELETE,
+            'name' => SurveyController::class . '.delete',
         ],
     ];
 
