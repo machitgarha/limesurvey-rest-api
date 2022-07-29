@@ -8,7 +8,7 @@ class InternalServerError extends Error
 {
     public function getId(): string
     {
-        return __CLASS__;
+        return 'InternalServerError';
     }
 
     public function getHttpStatusCode(): int
