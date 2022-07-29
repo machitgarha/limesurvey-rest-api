@@ -70,7 +70,7 @@ class Plugin extends PluginBase
         // Disable default request handling
         $this->event->set('run', false);
 
-        $this->log("New request caught: $path", Logger::LEVEL_INFO);
+        $this->log("New request caught: {$this->request->getMethod()} $path", Logger::LEVEL_INFO);
         $this->handleRequest();
 
         App()->end();
