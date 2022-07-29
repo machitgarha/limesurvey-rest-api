@@ -30,6 +30,16 @@ invalid_credentials_error:
       enum:
         - InvalidCredentials
 
+path_not_found:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+      enum:
+        - PathNotFound
+
 too_many_authentication_failures_error:
   type: object
   required:

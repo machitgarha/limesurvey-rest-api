@@ -3,6 +3,8 @@ get:
   description: >
     You can see a list of all possible general responses that any endpoint may return.
   responses:
+    "404":
+      $ref: "../components/responses.yaml#/path_not_found"
     "415":
       $ref: "../components/responses.yaml#/unsupported_media_type"
     "500":

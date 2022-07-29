@@ -6,8 +6,6 @@ use MAChitgarha\LimeSurveyRestApi\Api\Config;
 
 use Symfony\Component\HttpFoundation\Request;
 
-use Symfony\Component\Routing\Exception\NoConfigurationException;
-
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 
 use Symfony\Component\Routing\Route;
@@ -43,13 +41,7 @@ class Router
         }
 
         $matcher = new UrlMatcher($routeCollection, $this->getContext());
-
-        try {
-            $params = $matcher->match($path);
-        } catch (NoConfigurationException $e) {
-            // TODO: Make this a 404 status code
-            throw new \Exception();
-        }
+        $params = $matcher->match($path);
 
         return self::getControllerMethodPair($params['_route']);
     }
