@@ -10,12 +10,12 @@
         }
     ],
     "require": {
-        "php": "^7.2|^8.0",
+        "php": "^7.2.5|^8.0",
         "symfony/polyfill-php80": "^1.26",
         "symfony/routing": "^5.4|^6.0",
         "symfony/http-foundation": "^5.4|^6.0",
-        "respect/validation": "^2.2",
-        "symfony/serializer": "^6.1"
+        "respect/validation": "^2.0.17",
+        "symfony/serializer": "^5.4|^6.0"
     },
     "require-dev": {
         "cebe/php-openapi": "^1.0",
@@ -28,5 +28,10 @@
         "files": [
             "src/Helper/Response/functions.php"
         ]
+    },
+    "config": {
+        "platform": {
+            "php": "7.2.5"
+        }
     }
 }
