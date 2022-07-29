@@ -11,12 +11,15 @@ use LimeSurvey\PluginManager\PluginManager;
 use MAChitgarha\LimeSurveyRestApi\Api\Config;
 
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
+use MAChitgarha\LimeSurveyRestApi\Error\BadRequestError;
 use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
+use MAChitgarha\LimeSurveyRestApi\Error\MalformedRequestBodyError;
 
 use MAChitgarha\LimeSurveyRestApi\Routing\Router;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
@@ -72,6 +75,8 @@ class Plugin extends PluginBase
                 ->$method();
         } catch (Error $error) {
             $response = $this->makeJsonErrorResponse($error);
+        } catch (NotEncodableValueException $error) {
+            $response = $this->makeJsonErrorResponse(new MalformedRequestBodyError());
         } catch (Throwable $error) {
             $this->log(
                 \get_class($error) . ": {$error->getMessage()}",
