@@ -1,3 +1,17 @@
+bad_request:
+  description: Bad request, mostly malformed or invalid request body
+  content:
+    application/json:
+      schema:
+        type: object
+        required: [errors]
+        properties:
+          errors:
+            type: array
+            minItems: 1
+            items:
+              $ref: "./schemas/error.yaml#/bad_request_error"
+
 empty_ok:
   description: OK
 

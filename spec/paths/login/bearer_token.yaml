@@ -29,6 +29,8 @@ post:
             properties:
               data:
                 $ref: "../../components/schemas/bearer_token.yaml#/token_info"
+    "400":
+      $ref: "../../components/responses.yaml#/bad_request"
     "401":
       $ref: "../../components/responses.yaml#/invalid_credentials"
     "429":

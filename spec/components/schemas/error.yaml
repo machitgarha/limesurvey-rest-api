@@ -1,3 +1,15 @@
+bad_request_error:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        enum:
+          - MalformedRequestBody
+          - RequiredKeyMissing
+          - InvalidKeyValue
+
 internal_server_error:
   type: object
   required:
