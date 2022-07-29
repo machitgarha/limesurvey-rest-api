@@ -63,17 +63,17 @@ invalid_credentials:
 method_not_allowed:
   description: Method not allowed
   content:
-  application/json:
-    schema:
-      type: object
-      required: [errors]
-      properties:
-        errors:
-          type: array
-          minItems: 1
-          maxItems: 1
-          items:
-            $ref: "./schemas/error.yaml#/method_not_allowed_error"
+    application/json:
+      schema:
+        type: object
+        required: [errors]
+        properties:
+          errors:
+            type: array
+            minItems: 1
+            maxItems: 1
+            items:
+              $ref: "./schemas/error.yaml#/method_not_allowed_error"
 
 not_found:
   description: Resource not found

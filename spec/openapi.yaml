@@ -9,6 +9,9 @@ info:
 # TODO: Add 409 Conflict to POSTs
 # TODO: Support pagination
 paths:
+  /:
+    $ref: "./paths/root.yaml"
+
   /login/bearer_token:
     $ref: "./paths/login/bearer_token.yaml"
 
