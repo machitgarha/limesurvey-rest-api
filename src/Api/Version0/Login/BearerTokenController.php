@@ -13,8 +13,6 @@ use MAChitgarha\LimeSurveyRestApi\Error\AccessTokenExpiredError;
 use MAChitgarha\LimeSurveyRestApi\Error\InvalidCredentialsError;
 use MAChitgarha\LimeSurveyRestApi\Error\TooManyAuthenticationFailuresError;
 
-use MAChitgarha\LimeSurveyRestApi\Plugin;
-
 use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
 use Respect\Validation\Validator as v;

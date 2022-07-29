@@ -15,6 +15,7 @@ abstract class Error extends \Exception
 
     public function getId(): string
     {
+        // @phan-suppress-next-line PhanParamSuspiciousOrder
         return \str_replace([__NAMESPACE__ . '\\', 'Error'], '', static::class);
     }
 }

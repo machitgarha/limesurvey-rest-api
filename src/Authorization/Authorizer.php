@@ -5,9 +5,9 @@ namespace MAChitgarha\LimeSurveyRestApi\Authorization;
 interface Authorizer
 {
     /**
-     * @return $this
+     * @return static
      */
-    public function authorize(): self;
+    public function authorize();
 
     public function getAccessToken(): string;
 }

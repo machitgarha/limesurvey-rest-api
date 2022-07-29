@@ -11,7 +11,6 @@ use LimeSurvey\PluginManager\PluginManager;
 use MAChitgarha\LimeSurveyRestApi\Api\Config;
 
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
-use MAChitgarha\LimeSurveyRestApi\Error\BadRequestError;
 use MAChitgarha\LimeSurveyRestApi\Error\PathNotFoundError;
 use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
 use MAChitgarha\LimeSurveyRestApi\Error\InvalidKeyValueError;

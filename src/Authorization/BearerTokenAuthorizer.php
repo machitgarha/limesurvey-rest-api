@@ -50,6 +50,8 @@ class BearerTokenAuthorizer implements Authorizer
             $session->delete();
             throw new AccessTokenExpiredError();
         }
+
+        return $this;
     }
 
     /**
