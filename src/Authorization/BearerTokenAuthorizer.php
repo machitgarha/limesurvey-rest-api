@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 class BearerTokenAuthorizer implements Authorizer
 {
     private const HEADER_AUTHORIZATION = 'Authorization';
-    private const REGEX_HEADER_AUTHORIZATION = '/Bearer ([\w~]+)/';
+    private const REGEX_HEADER_AUTHORIZATION = '/(Bearer|bearer) ([\w~]+)/';
 
     /** @var Request */
     private $request;
