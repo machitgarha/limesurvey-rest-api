@@ -1,68 +1,34 @@
-survey:
+survey_list_item:
   type: object
+  required:
+    - id
+    - is_active
+    - creation_time
+    - owner_id
+    - l10n
   properties:
     id:
       $ref: "#/survey_id"
+    is_active:
+      type: boolean
+      description: Whether the survey is active or not
+    creation_time:
+      type: integer
+      description: Creation time in Unix time format
     owner_id:
       type: integer
-    admin_email:
-      type: string
-      description: 'Survey administrator email address'
-    fax_to:
-      type: string
-    template:
-      type: string
-      description: 'Template name'
-    language:
-      type: string
-      description: 'Survey base language'
-    auto_number_start:
-      type: integer
-    use_captcha:
-      type: string
-    use_tokens:
-      type: string
-    bounce_email:
-      type: string
-      description: 'Bounce email address'
-    attribute_descriptions:
-      type: string
-    email_notification_to:
-      type: string
-      description: 'Email address to send basic admin notification email to'
-    bounce_time:
-      type: integer
-    bounce_processing:
-      type: string
-    bounce_account_type:
-      type: string
-    bounce_account_host:
-      type: string
-    bounce_account_password:
-      type: string
-    bounce_account_encryption:
-      type: string
-    bounce_account_user:
-      type: string
-    google_analytics_api_key:
-      type: string
-      description: 'Google Analytics Tracking ID'
-    token_encryption_options:
-      type: string
-      description: 'Token encryption options'
-    creation_date:
-      type: string
-      description: 'Creation date formatted according to user format'
-    start_date:
-      type: string
-      description: 'Start date formatted according to user format'
-    expiry_date:
-      type: string
-      description: 'Expiry date formatted according to user format'
+      description: Owner user ID
+    l10n:
+      type: object
+      required:
+        - title
+      description: Localized texts
+      properties:
+        title:
+          type: string
 
 survey_id:
   type: integer
-  description: Survey ID
 
 survey_language_setting:
   type: object

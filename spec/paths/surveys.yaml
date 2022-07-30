@@ -11,7 +11,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: "../components/schemas/survey.yaml#/survey"
+                  $ref: "../components/schemas/survey.yaml#/survey_list_item"
     "401":
       $ref: "../components/responses.yaml#/unauthorized"
     "403":

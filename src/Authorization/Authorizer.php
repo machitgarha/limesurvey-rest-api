@@ -2,6 +2,8 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Authorization;
 
+use Session;
+
 interface Authorizer
 {
     /**
@@ -13,5 +15,6 @@ interface Authorizer
      */
     public function authorize(bool $errorOnExpiration = true);
 
+    public function getUsername(): string;
     public function getAccessToken(): string;
 }

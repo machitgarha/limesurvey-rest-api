@@ -20,17 +20,15 @@ class BearerTokenAuthorizer implements Authorizer
     /** @var Request */
     private $request;
 
-    /** @var ?string */
-    private $accessToken = null;
+    /** @var Session|null */
+    private $session = null;
 
     public function __construct(Request $request)
     {
         $this->request = $request;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function authorize(bool $errorOnExpiration = true): self
     {
         if (!$this->request->headers->has(self::HEADER_AUTHORIZATION)) {
@@ -38,16 +36,15 @@ class BearerTokenAuthorizer implements Authorizer
         }
 
         $authorizationHeader = $this->request->headers->get(self::HEADER_AUTHORIZATION);
-        $this->accessToken = self::extractAccessTokenIfValid($authorizationHeader);
+        $accessToken = self::extractAccessTokenIfValid($authorizationHeader);
 
-        /** @var Session */
-        $session = Session::model()->findByPk($this->accessToken);
-        if ($session === null) {
+        $this->session = Session::model()->findByPk($accessToken);
+        if ($this->session === null) {
             throw new AccessTokenInvalidError();
         }
 
-        if ($session->expire < \time()) {
-            $session->delete();
+        if ($this->session->expire < \time()) {
+            $this->session->delete();
             if ($errorOnExpiration) {
                 throw new AccessTokenExpiredError();
             }
@@ -70,16 +67,23 @@ class BearerTokenAuthorizer implements Authorizer
         return $matches[1];
     }
 
-    /**
-     * @inheritDoc
-     */
+    private function getSession(): Session
+    {
+        if ($this->session === null) {
+            throw new LogicException('authorize() must be called before this function');
+        }
+        return $this->session;
+    }
+
+    /** @inheritDoc */
+    public function getUsername(): string
+    {
+        return $this->getSession()->data;
+    }
+
+    /** @inheritDoc */
     public function getAccessToken(): string
     {
-        if ($this->accessToken === null) {
-            throw new LogicException(
-                'authorize() must be called before this function to extract access token'
-            );
-        }
-        return $this->accessToken;
+        return $this->getSession()->id;
     }
 }
