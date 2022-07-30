@@ -1,3 +1,7 @@
+survey:
+  allOf:
+    - $ref: "#/survey_list_item"
+
 survey_list_item:
   type: object
   required:
