@@ -16,7 +16,7 @@ class PermissionChecker
     ): void {
         if (!$survey->hasPermission('survey', $permission, $userId)) {
             throw new PermissionDeniedError(
-                "No $permission permission on survey with id '$surveyId'"
+                "No $permission permission on survey with id '$survey->sid'"
             );
         }
     }
