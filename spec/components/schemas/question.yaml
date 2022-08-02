@@ -15,6 +15,14 @@ question:
     order_in_group:
       type: integer
       description: Question order in group
+    l10n:
+      type: object
+      properties:
+        question:
+          type: string
+          description: Question text
+        help:
+          type: string
 
 question_attribute:
   type: object
