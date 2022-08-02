@@ -29,6 +29,7 @@ class ResponseController implements Controller
     use Traits\AuthorizerGetter;
     use Traits\PathParameterGetter;
     use Traits\RequestGetter;
+    use Traits\SerializerGetter;
     use Traits\RequestBodyDecoder;
 
     public const PATH = '/surveys/{survey_id}/responses';
