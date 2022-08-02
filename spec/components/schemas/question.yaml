@@ -3,8 +3,6 @@ question:
   properties:
     id:
       $ref: "#/question_id"
-    survey_id:
-      $ref: "./survey.yaml#/survey_id"
     group_id:
       type: integer
       description: Question group ID where question is displayed
