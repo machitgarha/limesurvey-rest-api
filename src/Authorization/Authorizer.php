@@ -17,4 +17,5 @@ interface Authorizer
 
     public function getUsername(): string;
     public function getAccessToken(): string;
+    public function getId(): int;
 }

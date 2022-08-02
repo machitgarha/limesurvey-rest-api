@@ -2,6 +2,7 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Authorization;
 
+use User;
 use Session;
 use LogicException;
 
@@ -67,6 +68,7 @@ class BearerTokenAuthorizer implements Authorizer
         return $matches[2];
     }
 
+    // TODO: Make all the below functions a trait
     private function getSession(): Session
     {
         if ($this->session === null) {
@@ -85,5 +87,18 @@ class BearerTokenAuthorizer implements Authorizer
     public function getAccessToken(): string
     {
         return $this->getSession()->id;
+    }
+
+    public function getId(): int
+    {
+        $userData = User::model()->findByAttributes([
+            'users_name' => $username = $this->getUsername()
+        ]);
+
+        if ($userData === null) {
+            throw new RuntimeException("Cannot find user with username '$username'");
+        }
+
+        return $userData->uid;
     }
 }

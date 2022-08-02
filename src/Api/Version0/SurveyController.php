@@ -16,6 +16,7 @@ use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
 use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
 use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
+use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
@@ -38,11 +39,11 @@ class SurveyController implements Controller
     {
         ContentTypeValidator::validateIsJson($this->getRequest());
 
-        $username = $this->getAuthorizer()->authorize()->getUsername();
+        $userId = $this->getAuthorizer()->authorize()->getId();
 
         $survey = new Survey();
+        $survey->permission($userId);
 
-        $this->setSurveyPermissionByUsername($survey, $username);
         $userSurveys = $survey->findAll();
 
         $data = [];
@@ -62,15 +63,6 @@ class SurveyController implements Controller
             data($data),
             JsonResponse::HTTP_OK
         );
-    }
-
-    private function setSurveyPermissionByUsername(Survey $survey, string $username): void
-    {
-        $userData = User::model()->findByAttributes(['users_name' => $username]);
-        if ($userData === null) {
-            throw new RuntimeException("Cannot find user with username '$username'");
-        }
-        $survey->permission($userData->uid);
     }
 
     public function new(): Response
