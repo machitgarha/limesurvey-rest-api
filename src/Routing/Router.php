@@ -28,7 +28,10 @@ class Router
     /**
      * Returns pair of controller name and its method name to handle the request.
      *
-     * @return string[] The pair of controller's fully-qualified name and its method name.
+     * @return string[] A pair of the handler function information, and the parameters extracted
+     * from the path (e.g. /survey/{survey_id} transforms to the key 'survey_id'). The first
+     * element of the pair is another pair of the controller's fully-qualified name and its method
+     * name.
      */
     public function route(): array
     {
@@ -46,7 +49,7 @@ class Router
         $matcher = new UrlMatcher($routeCollection, $this->getContext());
         $params = $matcher->match($path);
 
-        return self::getControllerMethodPair($params['_route']);
+        return [self::getControllerMethodPair($params['_route']), $params];
     }
 
     /**
@@ -100,7 +103,7 @@ class Router
     private function getContext(): RequestContext
     {
         return (new RequestContext())
-            ->setMethod($this->request->getMethod());
+            ->fromRequest($this->request);
     }
 
     private static function getControllerMethodPair(string $routeName): array

@@ -82,11 +82,12 @@ class Plugin extends PluginBase
     private function handleRequest(): void
     {
         try {
-            [$controllerClass, $method] = (new Router($this->request))->route();
+            [[$controllerClass, $method], $params] =
+                (new Router($this->request))->route();
 
             /** @var JsonResponse $response */
             $response = $this
-                ->makeController($controllerClass)
+                ->makeController($controllerClass, $params)
                 ->$method();
 
         } catch (Error $error) {
@@ -127,10 +128,12 @@ class Plugin extends PluginBase
         echo $response;
     }
 
-    private function makeController(string $controllerClass): Controller
+    private function makeController(string $controllerClass, array $params): Controller
     {
         /** @var Controller $controller */
         $controller = new $controllerClass();
+
+        $this->request->attributes->replace($params);
 
         $container = new ControllerDependencyContainer(
             $this->request,
