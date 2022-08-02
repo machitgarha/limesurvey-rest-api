@@ -1,5 +1,5 @@
 get:
-  summary: List questions of the survey
+  summary: List questions of a survey
   parameters:
     - $ref: "../../components/parameters.yaml#/survey_id"
   responses:
@@ -8,9 +8,12 @@ get:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: "../../components/schemas/question.yaml#/question"
+            type: object
+            required: [data]
+            properties:
+              type: array
+              items:
+                $ref: "../../components/schemas/question.yaml#/question"
     "401":
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":
