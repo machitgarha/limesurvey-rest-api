@@ -39,6 +39,11 @@ class Router
 
         [$apiVersion, $path] = self::splitPathApiVersion($this->request->getPathInfo());
 
+        // Remove trailing slash
+        if (\str_ends_with($path, '/')) {
+            $path = \rtrim($path, '/');
+        }
+
         foreach ($this->getRoutesForApiVersion($apiVersion) as $route) {
             $routeCollection->add(
                 $route['name'],
