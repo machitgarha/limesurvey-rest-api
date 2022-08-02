@@ -70,6 +70,17 @@ class SurveyController implements Controller
         throw new NotImplementedError();
     }
 
+    public static function getSurvey(int $id): Survey
+    {
+        $survey = Survey::model()->findByPk($id);
+
+        if ($survey === null) {
+            throw new ResourceIdNotFoundError('survey', $id);
+        }
+
+        return $survey;
+    }
+
     public function get(): JsonResponse
     {
         throw new NotImplementedError();
