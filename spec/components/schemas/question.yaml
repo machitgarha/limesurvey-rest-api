@@ -9,18 +9,12 @@ question:
     type:
       type: string
       description: Question type
-    title:
+    code:
       type: string
       description: The unique code of the question
-    question_order:
+    order_in_group:
       type: integer
       description: Question order in group
-    parent_question_id:
-      type: integer
-      description: Questions parent question ID eg for subquestions
-    relevance:
-      type: string
-      description: Questions relevance equation
 
 question_attribute:
   type: object
