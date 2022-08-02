@@ -5,6 +5,7 @@ namespace MAChitgarha\LimeSurveyRestApi\Authorization;
 use User;
 use Session;
 use LogicException;
+use RuntimeException;
 
 use MAChitgarha\LimeSurveyRestApi\Error\AccessTokenExpiredError;
 use MAChitgarha\LimeSurveyRestApi\Error\AccessTokenInvalidError;

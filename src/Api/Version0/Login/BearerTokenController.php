@@ -63,8 +63,7 @@ class BearerTokenController implements Controller
 
     private function validateDataForNew(array $bodyData): void
     {
-        v
-            ::key('username', v::stringType())
+        v   ::key('username', v::stringType())
             ->key('password', v::stringType())
             ->check($bodyData);
     }
@@ -135,10 +134,8 @@ class BearerTokenController implements Controller
     {
         ContentTypeValidator::validateIsJson($this->getRequest());
 
-        $authorizer = $this->getAuthorizer();
-
         try {
-            $accessToken = $authorizer->authorize(false)->getAccessToken();
+            $accessToken = $this->getAuthorizer()->authorize(false)->getAccessToken();
             Session::model()->deleteByPk($accessToken);
 
         } catch (AccessTokenExpiredError $_) {
