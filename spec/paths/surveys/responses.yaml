@@ -1,0 +1,47 @@
+get:
+  summary: List responses of a survey
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              type: array
+              items:
+                $ref: "../../components/schemas/response.yaml#/response"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"
+
+post:
+  summary: Pushes a new response to a survey
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              properties:
+                $ref: "../../components/schemas/response.yaml#/response"
+  responses:
+    "201":
+      description: Created
+      # TODO: Return the URL of the new response in a Location header
+    "400":
+      $ref: "../../components/responses.yaml#/bad_request"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"

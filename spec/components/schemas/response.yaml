@@ -1,0 +1,33 @@
+response:
+  submit_date:
+    type: integer
+    description: Submission date in unix time format
+  answers:
+    type: object
+    description: Mappings of question IDs to the answers
+    additionalProperties:
+      oneOf:
+        - type: string
+          description: |
+            For question types of:
+
+            - 5 point choice
+            - Bootstrap options
+            - Bootstrap dropdown
+            - Image select list (radio)
+            - List (radio)
+            - List (dropdown)
+            - Short free text
+            - Long free text
+            - Huge free text
+            - Language switch
+            - Yes/no
+            - Gender
+
+        - type: object
+          description: For list with comment question type
+          properties:
+            choice:
+              type: string
+            comment:
+              type: string
