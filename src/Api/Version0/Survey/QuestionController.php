@@ -2,6 +2,8 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey;
 
+use Question;
+
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
@@ -64,6 +66,15 @@ class QuestionController implements Controller
             data($data),
             JsonResponse::HTTP_OK
         );
+    }
+
+    /**
+     * @return Question[]
+     */
+    public static function getQuestionList(int $surveyId): array
+    {
+        $survey = SurveyController::getSurvey($surveyId);
+        return $survey->allQuestions;
     }
 
     public function new(): Response

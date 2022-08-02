@@ -14,4 +14,9 @@ trait AuthorizerGetter
     {
         return $this->getContainer()->getAuthorizer();
     }
+
+    public function authorize(): Authorizer
+    {
+        return $this->getContainer()->getAuthorizer()->authorize();
+    }
 }
