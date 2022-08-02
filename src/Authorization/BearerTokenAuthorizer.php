@@ -64,7 +64,7 @@ class BearerTokenAuthorizer implements Authorizer
             throw new AuthorizationHeaderUnsupportedError();
         }
 
-        return $matches[1];
+        return $matches[2];
     }
 
     private function getSession(): Session
