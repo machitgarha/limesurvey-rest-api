@@ -7,11 +7,15 @@ response:
     description: Mappings of question IDs to the answers
     additionalProperties:
       oneOf:
+        - type: integer
+          description: Specific to '5 point choice' question type. Zero means no answer
+          minimum: 0
+          maximum: 5
+
         - type: string
           description: |
             For question types of:
 
-            - 5 point choice
             - Bootstrap options
             - Bootstrap dropdown
             - Image select list (radio)
@@ -25,7 +29,7 @@ response:
             - Gender
 
         - type: object
-          description: For list with comment question type
+          description: Specific to 'List with comment' question type
           properties:
             choice:
               type: string
