@@ -18,6 +18,8 @@ get:
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":
       $ref: "../../components/responses.yaml#/permission_denied"
+    "404":
+      $ref: "../../components/responses.yaml#/resouce_not_found"
 
 post:
   summary: Create a new question in the survey
