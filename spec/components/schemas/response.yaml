@@ -2,17 +2,17 @@ response:
   required:
     - answers
   submit_time:
-    type: integer
-    description: >
-      Submission time in unix time format; defaults to current server time
+    allOf:
+      - $ref: "./types.yaml#/date_time"
+      - description: Submission time; defaults to current server time
   start_time:
-    type: integer
-    description: >
-      The time responding has been started in unix time format; defaults to current server time
+    allOf:
+      - $ref: "./types.yaml#/date_time"
+      - description: The time responding has been started; defaults to current server time
   end_time:
-    type: integer
-    description: >
-      The time responder did the last action in unix time format; defaults to current server time
+    allOf:
+      - $ref: "./types.yaml#/date_time"
+      - description: The time responder did the last action; defaults to current server time
   answers:
     type: object
     description: Mappings of question IDs to the answers

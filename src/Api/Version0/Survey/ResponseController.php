@@ -81,10 +81,12 @@ class ResponseController implements Controller
 
     private function validateResponseData(array $responseData, Survey $survey): void
     {
+        $dateTimeFormat = 'Y-m-d H:i:s';
+
         v::create()
-            ->key('submit_time', v::intType(), false)
-            ->key('start_time', v::intType(), false)
-            ->key('end_time', v::intType(), false)
+            ->key('submit_time', v::dateTime($dateTimeFormat), false)
+            ->key('start_time', v::dateTime($dateTimeFormat), false)
+            ->key('end_time', v::dateTime($dateTimeFormat), false)
             ->key('answers', AnswerValidatorBuilder::buildForAll($survey))
             ->check($responseData);
     }
@@ -102,7 +104,7 @@ use Respect\Validation\Validator as v;
  */
 class AnswerValidatorBuilder
 {
-    public const BUILDER_METHODS_MAP = [
+    private const BUILDER_METHOD_MAP = [
         Question::QT_5_POINT_CHOICE => 'buildFor5PointChoice',
     ];
 
@@ -123,7 +125,7 @@ class AnswerValidatorBuilder
 
     private static function build(Question $question): Validator
     {
-        $method = self::BUILDER_METHODS_MAP[$question->type] ?? 'buildForDummy';
+        $method = self::BUILDER_METHOD_MAP[$question->type] ?? 'buildForDummy';
         $keyName = "answers.$question->qid";
 
         /** @var Validator $validator */
