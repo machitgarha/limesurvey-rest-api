@@ -18,6 +18,8 @@ get:
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":
       $ref: "../../components/responses.yaml#/permission_denied"
+    "409":
+      $ref: "../../components/responses.yaml#/survey_not_active"
 
 post:
   summary: Pushes a new response to a survey
@@ -45,3 +47,5 @@ post:
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":
       $ref: "../../components/responses.yaml#/permission_denied"
+    "409":
+      $ref: "../../components/responses.yaml#/survey_not_active"
