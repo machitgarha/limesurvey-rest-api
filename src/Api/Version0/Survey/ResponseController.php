@@ -165,6 +165,7 @@ class AnswerValidatorBuilder
     private const BUILDER_METHOD_MAP = [
         Question::QT_5_POINT_CHOICE => 'build5PointChoice',
         Question::QT_L_LIST => 'buildList',
+        Question::QT_O_LIST_WITH_COMMENT => 'buildListWithComment',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildList',
     ];
 
@@ -212,11 +213,18 @@ class AnswerValidatorBuilder
 
     private static function buildList(Question $question): Validator
     {
-        $answersCode = \array_column($question, 'code');
+        $answersCode = \array_column($question->answers, 'code');
 
         return v::create()
             ->stringType()
             ->in($answersCode);
+    }
+
+    private static function buildListWithComment(Question $question): Validator
+    {
+        return v::create()
+            ->key('code', self::buildList($question))
+            ->key('comment', v::stringType());
     }
 }
 
@@ -228,6 +236,7 @@ class AnswerFieldGenerator
     private const GENERATOR_METHOD_MAP = [
         Question::QT_5_POINT_CHOICE => 'generate',
         Question::QT_L_LIST => 'generate',
+        Question::QT_O_LIST_WITH_COMMENT => 'generateListWithComment',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'generate',
     ];
 
@@ -251,5 +260,11 @@ class AnswerFieldGenerator
     private static function generate(Question $question, $answer): Generator
     {
         yield self::makeFieldName($question) => $answer;
+    }
+
+    private static function generateListWithComment(Question $question, array $answer): Generator
+    {
+        yield from self::generate($question, $answer['code']);
+        yield self::makeFieldName($question) . 'comment' => $answer['comment'];
     }
 }

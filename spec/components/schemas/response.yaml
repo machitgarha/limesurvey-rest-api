@@ -48,7 +48,10 @@ response:
         - type: object
           description: Specific to 'List with comment' question type
           properties:
-            choice:
+            code:
               type: string
+              description: The answer code
+              minLength: 5
+              maxLength: 5
             comment:
               type: string
