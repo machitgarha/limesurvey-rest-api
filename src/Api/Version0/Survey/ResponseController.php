@@ -163,10 +163,10 @@ use Respect\Validation\Validator as v;
 class AnswerValidatorBuilder
 {
     private const BUILDER_METHOD_MAP = [
-        Question::QT_5_POINT_CHOICE => 'build5PointChoice',
-        Question::QT_L_LIST => 'buildList',
-        Question::QT_O_LIST_WITH_COMMENT => 'buildListWithComment',
-        Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildList',
+        Question::QT_5_POINT_CHOICE => 'buildFor5PointChoice',
+        Question::QT_L_LIST => 'buildForList',
+        Question::QT_O_LIST_WITH_COMMENT => 'buildForListWithComment',
+        Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildForList',
     ];
 
     public static function buildAll(Survey $survey): Validator
@@ -190,7 +190,7 @@ class AnswerValidatorBuilder
         $keyName = "answers.$question->qid";
 
         /** @var Validator $validator */
-        $validator = self::{$method}();
+        $validator = self::{$method}($question);
         $validator->setName($keyName);
 
         return $question->mandatory === 'Y'
@@ -204,14 +204,14 @@ class AnswerValidatorBuilder
         return v::create();
     }
 
-    private static function build5PointChoice(): Validator
+    private static function buildFor5PointChoice(): Validator
     {
         return v::create()
             ->intType()
             ->between(1, 5);
     }
 
-    private static function buildList(Question $question): Validator
+    private static function buildForList(Question $question): Validator
     {
         $answersCode = \array_column($question->answers, 'code');
 
@@ -220,10 +220,10 @@ class AnswerValidatorBuilder
             ->in($answersCode);
     }
 
-    private static function buildListWithComment(Question $question): Validator
+    private static function buildForListWithComment(Question $question): Validator
     {
         return v::create()
-            ->key('code', self::buildList($question))
+            ->key('code', self::buildForList($question))
             ->key('comment', v::stringType());
     }
 }
@@ -262,9 +262,9 @@ class AnswerFieldGenerator
         yield self::makeFieldName($question) => $answer;
     }
 
-    private static function generateListWithComment(Question $question, array $answer): Generator
+    private static function generateListWithComment(Question $question, ?array $answer): Generator
     {
-        yield from self::generate($question, $answer['code']);
-        yield self::makeFieldName($question) . 'comment' => $answer['comment'];
+        yield from self::generate($question, $answer['code'] ?? null);
+        yield self::makeFieldName($question) . 'comment' => $answer['comment'] ?? null;
     }
 }
