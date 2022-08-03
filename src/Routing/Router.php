@@ -28,10 +28,10 @@ class Router
     /**
      * Returns pair of controller name and its method name to handle the request.
      *
-     * @return string[] A pair of the handler function information, and the parameters extracted
-     * from the path (e.g. /survey/{survey_id} transforms to the key 'survey_id'). The first
-     * element of the pair is another pair of the controller's fully-qualified name and its method
-     * name.
+     * @return array{0:array{0:string,1:string},1:array} A pair of the handler function
+     * information, and the parameters extracted from the path (e.g. /survey/{survey_id}
+     * transforms to the key 'survey_id'). The first element of the pair is another pair of the
+     * controller's fully-qualified name and its method name.
      */
     public function route(): array
     {
@@ -60,10 +60,10 @@ class Router
     /**
      * Splits a path into its API version and the remaining part.
      *
-     * @return string[] A pair of API version (without replacing 'v' prefix, e.g. 'v0') and
-     * the rest of the path (i.e. the path relative to the version).
+     * @return array{0:string,1:string} A pair of API version (without replacing 'v' prefix, e.g.
+     * 'v0') and the rest of the path (i.e. the path relative to the version).
      */
-    private static function splitPathApiVersion(string $path)
+    private static function splitPathApiVersion(string $path): array
     {
         $pattern = '/^\/(v\d+)(\/.*)?$/';
         $path = \str_replace('/' . Config::PATH_PREFIX, '', $path);
