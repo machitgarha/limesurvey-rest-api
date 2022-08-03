@@ -55,7 +55,7 @@ class ResponseController implements Controller
         $userId = $this->authorize()->getId();
 
         $data = $this->decodeJsonRequestBodyInnerData();
-        $this->validateDataForNew($data);
+        $this->validateResponseData($data);
 
         $survey = SurveyController::getSurvey(
             $surveyId = (int) $this->getPathParameter('survey_id')
@@ -68,20 +68,28 @@ class ResponseController implements Controller
             'responses'
         );
 
+        if (!App()->db->schema->getTable($survey->responsesTableName)) {
+            if ($survey->active !== 'N') {
+                throw new LogicException('Survey responses table name is not created');
+            } else {
+                throw new SurveyNotActiveError();
+            }
+        }
+
         throw new NotImplementedError();
     }
 
-    private function validateDataForNew(array $data): void
+    private function validateResponseData(array $responseData): void
     {
         v::create()
             ->key('submit_time', v::intType(), false)
             ->key('start_time', v::intType(), false)
             ->key('end_time', v::intType(), false)
-            ->key('answers', $this->buildAnswersValidators())
-            ->check($data);
+            ->key('answers', $this->buildAnswersValidator())
+            ->check($responseData);
     }
 
-    private function buildAnswersValidators(): Validator
+    private function buildAnswersValidator(): Validator
     {
         $validator = v::create();
 
