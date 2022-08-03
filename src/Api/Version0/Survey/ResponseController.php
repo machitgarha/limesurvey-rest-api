@@ -296,7 +296,7 @@ class AnswerFieldGenerator
     public static function generateAll(Survey $survey, array $answersData): Generator
     {
         foreach ($survey->allQuestions as $question) {
-            $method = self::GENERATOR_METHOD_MAP[$question->type] ?? 'generate';
+            $method = self::GENERATOR_METHOD_MAP[$question->type] ?? 'generateDummy';
 
             yield from self::{$method}(
                 $question,
@@ -316,6 +316,11 @@ class AnswerFieldGenerator
     ): string {
         return self::makeQuestionFieldName($question) .
             \implode('_', $subQuestionCodes);
+    }
+
+    private static function generateDummy(Question $question): Generator
+    {
+        yield from [];
     }
 
     private static function generate(Question $question, $answer): Generator
