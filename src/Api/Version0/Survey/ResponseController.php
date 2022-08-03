@@ -108,15 +108,19 @@ class ResponseController implements Controller
     {
         $result = [
             'submitdate' => $responseData['submit_time'],
-            'startdate' => $responseData['start_time'],
-            'datestamp' => $responseData['end_time'],
-
             // TODO: Add support for specifying it in the request
             'startlanguage' => $survey->language,
 
         ] + \iterator_to_array(
             AnswerFieldGenerator::generateForAll($survey, $responseData)
         );
+
+        if ($survey->isDateStamp) {
+            $result += [
+                'startdate' => $responseData['start_time'],
+                'datestamp' => $responseData['end_time'],
+            ];
+        }
 
         return $result;
     }
