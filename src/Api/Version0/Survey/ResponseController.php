@@ -169,6 +169,7 @@ class AnswerValidatorBuilder
         Question::QT_5_POINT_CHOICE => 'buildFor5PointChoice',
         Question::QT_A_ARRAY_5_POINT => 'buildForArray5PointChoice',
         Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'buildForArray10PointChoice',
+        Question::QT_C_ARRAY_YES_UNCERTAIN_NO => 'buildForArrayYesNoUncertain',
         Question::QT_E_ARRAY_INC_SAME_DEC => 'buildForArrayIncreaseSameDecrease',
         Question::QT_F_ARRAY => 'buildForArrayUsingFlexibleLabels',
         Question::QT_L_LIST => 'buildForList',
@@ -276,24 +277,37 @@ class AnswerValidatorBuilder
         return self::buildForArraySomePointChoice($question, 10);
     }
 
-    private static function buildForArrayIncreaseSameDecrease(Question $question): Validator
-    {
-        return self::buildForArray($question, function () {
+    /**
+     * @param string[] $allowedValues
+     * @return Validator
+     */
+    private static function buildForArrayOfAllowedStrings(
+        Question $question,
+        array $allowedValues
+    ): Validator {
+        return self::buildForArray($question, function () use ($allowedValues) {
             return v::create()
                 ->stringType()
-                ->in(['I', 'S', 'D']);
+                ->in($allowedValues);
         });
+    }
+
+    private static function buildForArrayIncreaseSameDecrease(Question $question): Validator
+    {
+        return self::buildForArrayOfAllowedStrings($question, ['I', 'S', 'D']);
     }
 
     private static function buildForArrayUsingFlexibleLabels(Question $question): Validator
     {
-        return self::buildForArray($question, function () use ($question) {
-            return v::create()
-                ->stringType()
-                ->in(
-                    \array_column($question->answers, 'code')
-                );
-        });
+        return self::buildForArrayOfAllowedStrings(
+            $question,
+            \array_column($question->answers, 'code')
+        );
+    }
+
+    private static function buildForArrayYesNoUncertain(Question $question): Validator
+    {
+        return self::buildForArrayOfAllowedStrings($question, ['Y', 'N', 'U']);
     }
 }
 
@@ -306,6 +320,7 @@ class AnswerFieldGenerator
         Question::QT_5_POINT_CHOICE => 'generate',
         Question::QT_A_ARRAY_5_POINT => 'generateArray',
         Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'generateArray',
+        Question::QT_C_ARRAY_YES_UNCERTAIN_NO => 'generateArray',
         Question::QT_E_ARRAY_INC_SAME_DEC => 'generateArray',
         Question::QT_F_ARRAY => 'generateArray',
         Question::QT_L_LIST => 'generate',
