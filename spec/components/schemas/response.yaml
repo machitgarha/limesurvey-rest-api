@@ -55,3 +55,37 @@ response:
               maxLength: 5
             comment:
               type: string
+
+        - type: object
+          description: |
+            Mapping of each subquestion code to its answer. Specific to following question types:
+
+            - Array (5 point choice)
+            - Array (10 point choice)
+            - Array (Increase/Same/Decrease)
+
+          additionalProperties:
+            oneOf:
+              - type: 'null'
+                description: >
+                  If the question's mandatory property set to No or Soft, giving a null value means
+                  the question was leaved unanswered.
+
+              - type: integer
+                description: Specific to 'Array (5 point choice)' question type
+                minimum: 1
+                maximum: 5
+
+              - type: integer
+                description: Specific to 'Array (10 point choice)' question type
+                minimum: 1
+                maximum: 10
+
+              - type: string
+                description: Specific to 'Array (Increase/Same/Decrease)' question type
+                minLength: 1
+                maxLength: 1
+                enum:
+                  - I
+                  - S
+                  - D
