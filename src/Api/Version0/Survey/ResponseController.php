@@ -108,7 +108,7 @@ class AnswerValidatorBuilder
 
         return $question->mandatory === 'Y'
             ? $validator
-            : v::optional($answerValidator)->setName($keyName);
+            : v::nullable($validator)->setName($keyName);
     }
 
     // TODO: Get rid of it
