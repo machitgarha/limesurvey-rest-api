@@ -177,14 +177,20 @@ class AnswerValidatorBuilder
     {
         return v::keySet(...\array_map(
             // TODO: How nice it would look if we were able to use arrow functions! :)
-            function (Question $question) {
+            function (Question $question): Validator {
                 return v::key(
                     $question->qid,
                     self::build($question),
                     false
                 );
             },
-            $survey->allQuestions
+            // Strip out sub-questions, they will be handled by their parents
+            \array_filter(
+                $survey->allQuestions,
+                function (Question $question): bool {
+                    return $question->parent_qid === 0;
+                }
+            )
         ));
     }
 
