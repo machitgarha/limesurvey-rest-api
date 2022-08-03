@@ -10,6 +10,8 @@ use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 use MAChitgarha\LimeSurveyRestApi\Api\Permission;
 use MAChitgarha\LimeSurveyRestApi\Api\PermissionChecker;
 
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerValidatorBuilder;
+
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
 
 use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
@@ -17,6 +19,9 @@ use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
+use Respect\Validation\Exceptions\ValidatorException;
+
+use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -53,35 +58,69 @@ class ResponseController implements Controller
 
     private function validateDataForNew(array $data): void
     {
-        v   ::key('submit_date', v::intType())
-            ->key('answers', v::arrayType())
+        v::create()
+            ->key('submit_date', v::intType())
+            ->key('answers', $this->buildAnswersValidators())
             ->check($data);
+    }
 
-        $validationMethodList = [
-            Question::QT_5_POINT_CHOICE => 'validate5PointChoiceAnswer',
-        ];
+    private function buildAnswersValidators(): Validator
+    {
+        $validator = v::create();
 
         $questionList = QuestionController::getQuestionList(
             $this->getPathParameter('survey_id')
         );
 
         foreach ($questionList as $question) {
-            $answer = $data['answers'][$question->qid] ?? null;
-
-            if (isset($answer)) {
-                throw new RequiredKeyMissingError(
-                    "Answer for question with ID '$question->qid' missing"
-                );
-            }
-
-            $validationMethod = $validationMethodList[$question->type];
-            $this->$validationMethod($answer);
+            $validator->key(
+                $question->qid,
+                AnswerValidatorBuilder::build($question),
+                false
+            );
         }
+
+        return $validator;
+    }
+}
+
+namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
+
+use Question;
+
+use Respect\Validation\Validator;
+use Respect\Validation\Validator as v;
+
+class AnswerValidatorBuilder
+{
+    public const BUILDER_METHODS_MAP = [
+        Question::QT_5_POINT_CHOICE => 'buildFor5PointChoice',
+    ];
+
+    public static function build(Question $question): Validator
+    {
+        $method = self::BUILDER_METHODS_MAP[$question->type] ?? 'buildForDummy';
+        $keyName = "answers.$question->qid";
+
+        /** @var Validator $validator */
+        $validator = self::{$method}();
+        $validator->setName($keyName);
+
+        return $question->mandatory === 'Y'
+            ? $validator
+            : v::optional($answerValidator)->setName($keyName);
     }
 
-    private function validate5PointChoiceQuestionType(int $answer): void
+    // TODO: Get rid of it
+    public static function buildForDummy(): Validator
     {
-        v   ::between(0, 5)
-            ->check($answer);
+        return v::create();
+    }
+
+    public static function buildFor5PointChoice(): Validator
+    {
+        return v::create()
+            ->intType()
+            ->between(1, 5);
     }
 }
