@@ -59,7 +59,9 @@ class ResponseController implements Controller
     private function validateDataForNew(array $data): void
     {
         v::create()
-            ->key('submit_date', v::intType())
+            ->key('submit_time', v::intType(), false)
+            ->key('start_time', v::intType(), false)
+            ->key('end_time', v::intType(), false)
             ->key('answers', $this->buildAnswersValidators())
             ->check($data);
     }

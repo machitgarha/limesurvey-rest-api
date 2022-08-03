@@ -1,7 +1,18 @@
 response:
-  submit_date:
+  required:
+    - answers
+  submit_time:
     type: integer
-    description: Submission date in unix time format
+    description: >
+      Submission time in unix time format; defaults to current server time
+  start_time:
+    type: integer
+    description: >
+      The time responding has been started in unix time format; defaults to current server time
+  end_time:
+    type: integer
+    description: >
+      The time responder did the last action in unix time format; defaults to current server time
   answers:
     type: object
     description: Mappings of question IDs to the answers
