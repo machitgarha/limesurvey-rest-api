@@ -13,6 +13,7 @@ response:
     allOf:
       - $ref: "./types.yaml#/date_time"
       - description: The time responder did the last action; defaults to current server time
+
   answers:
     type: object
     description: Mappings of question IDs to the answers
@@ -24,15 +25,15 @@ response:
             question was leaved unanswered.
 
         - type: integer
-          description: Specific to '5 point choice' question type. Zero means no answer
-          minimum: 0
+          description: Specific to '5 point choice' question type. Zero means no answer.
+          minimum: 1
           maximum: 5
 
         - type: string
           description: |
-            For question types of:
+            The answer code (not the value). Specific to following question types:
 
-            - Bootstrap options
+            - Bootstrap options (buttons)
             - Bootstrap dropdown
             - Image select list (radio)
             - List (radio)

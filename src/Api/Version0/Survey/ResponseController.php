@@ -99,7 +99,7 @@ class ResponseController implements Controller
             ->key('submit_time', v::dateTime($dateTimeFormat), false)
             ->key('start_time', v::dateTime($dateTimeFormat), false)
             ->key('end_time', v::dateTime($dateTimeFormat), false)
-            ->key('answers', AnswerValidatorBuilder::buildForAll($survey))
+            ->key('answers', AnswerValidatorBuilder::buildAll($survey))
             ->check($responseData);
     }
 
@@ -111,7 +111,7 @@ class ResponseController implements Controller
             'startlanguage' => $survey->language,
 
         ] + \iterator_to_array(
-            AnswerFieldGenerator::generateForAll($survey, $responseData)
+            AnswerFieldGenerator::generateAll($survey, $responseData)
         );
 
         if ($survey->isDateStamp) {
@@ -163,10 +163,12 @@ use Respect\Validation\Validator as v;
 class AnswerValidatorBuilder
 {
     private const BUILDER_METHOD_MAP = [
-        Question::QT_5_POINT_CHOICE => 'buildFor5PointChoice',
+        Question::QT_5_POINT_CHOICE => 'build5PointChoice',
+        Question::QT_L_LIST => 'buildList',
+        Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildList',
     ];
 
-    public static function buildForAll(Survey $survey): Validator
+    public static function buildAll(Survey $survey): Validator
     {
         $validator = v::create();
 
@@ -183,7 +185,7 @@ class AnswerValidatorBuilder
 
     private static function build(Question $question): Validator
     {
-        $method = self::BUILDER_METHOD_MAP[$question->type] ?? 'buildForDummy';
+        $method = self::BUILDER_METHOD_MAP[$question->type] ?? 'buildDummy';
         $keyName = "answers.$question->qid";
 
         /** @var Validator $validator */
@@ -196,16 +198,25 @@ class AnswerValidatorBuilder
     }
 
     // TODO: Get rid of it
-    private static function buildForDummy(): Validator
+    private static function buildDummy(): Validator
     {
         return v::create();
     }
 
-    private static function buildFor5PointChoice(): Validator
+    private static function build5PointChoice(): Validator
     {
         return v::create()
             ->intType()
             ->between(1, 5);
+    }
+
+    private static function buildList(Question $question): Validator
+    {
+        $answersCode = \array_column($question, 'code');
+
+        return v::create()
+            ->stringType()
+            ->in($answersCode);
     }
 }
 
@@ -215,13 +226,15 @@ class AnswerValidatorBuilder
 class AnswerFieldGenerator
 {
     private const GENERATOR_METHOD_MAP = [
-        Question::QT_5_POINT_CHOICE => 'generateFor5PointChoice',
+        Question::QT_5_POINT_CHOICE => 'generate',
+        Question::QT_L_LIST => 'generate',
+        Question::QT_EXCLAMATION_LIST_DROPDOWN => 'generate',
     ];
 
-    public static function generateForAll(Survey $survey, array $answersData): Generator
+    public static function generateAll(Survey $survey, array $answersData): Generator
     {
         foreach ($survey->allQuestions as $question) {
-            $method = self::GENERATOR_METHOD_MAP[$question->type] ?? 'generateForDummy';
+            $method = self::GENERATOR_METHOD_MAP[$question->type] ?? 'generate';
 
             yield from self::{$method}(
                 $question,
@@ -235,12 +248,7 @@ class AnswerFieldGenerator
         return "{$question->sid}X{$question->gid}X{$question->qid}";
     }
 
-    private static function generateForDummy(): Generator
-    {
-        yield from [];
-    }
-
-    private static function generateFor5PointChoice(Question $question, ?int $answer): Generator
+    private static function generate(Question $question, $answer): Generator
     {
         yield self::makeFieldName($question) => $answer;
     }
