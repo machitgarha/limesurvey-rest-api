@@ -175,17 +175,17 @@ class AnswerValidatorBuilder
 
     public static function buildAll(Survey $survey): Validator
     {
-        $validator = v::create();
-
-        foreach ($survey->allQuestions as $question) {
-            $validator->key(
-                $question->qid,
-                self::build($question),
-                false
-            );
-        }
-
-        return $validator;
+        return v::keySet(...\array_map(
+            // TODO: How nice it would look if we were able to use arrow functions! :)
+            function (Question $question) {
+                return v::key(
+                    $question->qid,
+                    self::build($question),
+                    false
+                );
+            },
+            $survey->allQuestions
+        ));
     }
 
     private static function build(Question $question): Validator
@@ -235,18 +235,17 @@ class AnswerValidatorBuilder
         Question $question,
         callable $valueValidatorBuilder
     ): Validator {
-        $validator = v::create()->arrayType();
-
-        foreach ($question->subquestions as $subQuestion) {
-            $validator->key(
-                $subQuestion->title,
-                $valueValidatorBuilder(),
-                // TODO: Add a case for soft mandatories (e.g. query parameter to bypass it)
-                $question->mandatory === 'Y'
-            );
-        }
-
-        return $validator;
+        return v::keySet(...\array_map(
+            function (Question $subQuestion) use ($valueValidatorBuilder, $question) {
+                return v::key(
+                    $subQuestion->title,
+                    $valueValidatorBuilder(),
+                    // TODO: Add a case for soft mandatories (e.g. query parameter to bypass it)
+                    $question->mandatory === 'Y'
+                );
+            },
+            $question->subquestions
+        ));
     }
 
     private static function buildForArraySomePointChoice(Question $question, int $count): Validator
