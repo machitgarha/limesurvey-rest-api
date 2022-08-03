@@ -235,18 +235,18 @@ class AnswerValidatorBuilder
         Question $question,
         callable $valueValidatorBuilder
     ): Validator {
-        return \array_reduce(
-            $question->subquestions,
-            function (
-                Validator $carry,
-                Question $subQuestion
-            ) use ($valueValidatorBuilder, $question): Validator {
+        $validator = v::create()->arrayType();
+
+        foreach ($question->subquestions as $subQuestion) {
+            $validator->key(
+                $subQuestion->title,
+                $valueValidatorBuilder(),
                 // TODO: Add a case for soft mandatories (e.g. query parameter to bypass it)
-                $mandatory = $question->mandatory === 'Y';
-                return $carry->key($subQuestion->title, $valueValidatorBuilder(), $mandatory);
-            },
-            v::create()
-        );
+                $question->mandatory === 'Y'
+            );
+        }
+
+        return $validator;
     }
 
     private static function buildForArraySomePointChoice(Question $question, int $count): Validator
