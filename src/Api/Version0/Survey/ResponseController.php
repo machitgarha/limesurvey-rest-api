@@ -106,8 +106,10 @@ class ResponseController implements Controller
 
     private static function generateResponseRecord(array $responseData, Survey $survey): array
     {
+        $currentTime = \date('Y-m-d H:i:s');
+
         $result = [
-            'submitdate' => $responseData['submit_time'],
+            'submitdate' => $responseData['submit_time'] ?? $currentTime,
             // TODO: Add support for specifying it in the request
             'startlanguage' => $survey->language,
 
@@ -117,8 +119,8 @@ class ResponseController implements Controller
 
         if ($survey->isDateStamp) {
             $result += [
-                'startdate' => $responseData['start_time'],
-                'datestamp' => $responseData['end_time'],
+                'startdate' => $responseData['start_time'] ?? $currentTime,
+                'datestamp' => $responseData['end_time'] ?? $currentTime,
             ];
         }
 
