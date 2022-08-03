@@ -3,6 +3,9 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey;
 
 use Question;
+use SurveyDynamic;
+use LogicException;
+use RuntimeException;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
@@ -15,6 +18,7 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerV
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
 
 use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
+use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotActiveError;
 use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
@@ -48,10 +52,21 @@ class ResponseController implements Controller
     {
         ContentTypeValidator::validateIsJson($this->getRequest());
 
-        $this->authorize();
+        $userId = $this->authorize()->getId();
 
         $data = $this->decodeJsonRequestBodyInnerData();
         $this->validateDataForNew($data);
+
+        $survey = SurveyController::getSurvey(
+            $surveyId = (int) $this->getPathParameter('survey_id')
+        );
+
+        PermissionChecker::assertHasSurveyPermission(
+            $survey,
+            Permission::CREATE,
+            $userId,
+            'responses'
+        );
 
         throw new NotImplementedError();
     }

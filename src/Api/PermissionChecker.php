@@ -11,12 +11,13 @@ class PermissionChecker
 {
     public static function assertHasSurveyPermission(
         Survey $survey,
-        string $permission,
-        int $userId
+        string $operation,
+        int $userId,
+        string $target = 'survey'
     ): void {
-        if (!$survey->hasPermission('survey', $permission, $userId)) {
+        if (!$survey->hasPermission($target, $operation, $userId)) {
             throw new PermissionDeniedError(
-                "No $permission permission on survey with id '$survey->sid'"
+                "No $operation permission on survey with id '$survey->sid'"
             );
         }
     }
