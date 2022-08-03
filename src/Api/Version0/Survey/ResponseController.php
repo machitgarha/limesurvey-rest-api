@@ -80,16 +80,15 @@ class ResponseController implements Controller
         }
 
         $recordData = $this->generateResponseRecord($data, $survey);
+
         $response = $this->makeResponse($recordData, $survey);
+        $response->encryptSave();
 
         if (!$response->id) {
             throw new RuntimeException('Cannot create response');
         }
 
-        return new Response(
-            data(),
-            Response::HTTP_CREATED
-        );
+        return new Response('', Response::HTTP_CREATED);
     }
 
     private function validateResponseData(array $responseData, Survey $survey): void
@@ -134,7 +133,7 @@ class ResponseController implements Controller
         /*
          * Make sure the data doesn't have extra attributes (i.e. fields). Having less attributes
          * than expected should not be a problem, as it finally will be caught by the active
-         * record itself if answer for a mandatory question isn't provided. 
+         * record itself if answer for a mandatory question isn't provided.
          */
         \assert(
             [] === \array_diff(
@@ -226,7 +225,7 @@ class AnswerFieldGenerator
 
             yield from self::{$method}(
                 $question,
-                $answersData[$question->qid]
+                $answersData['answers'][$question->qid]
             );
         }
     }
