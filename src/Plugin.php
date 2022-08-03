@@ -118,7 +118,7 @@ class Plugin extends PluginBase
 
         } catch (Throwable $error) {
             $this->log(
-                \get_class($error) . ": {$error->getMessage()}",
+                $error->__toString(),
                 Logger::LEVEL_ERROR
             );
 
