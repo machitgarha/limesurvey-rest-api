@@ -95,6 +95,7 @@ class ResponseController implements Controller
     {
         $dateTimeFormat = 'Y-m-d H:i:s';
 
+        // TODO: Use a custom key rule to generate full indexes in exception messages
         v::create()
             ->key('submit_time', v::dateTime($dateTimeFormat), false)
             ->key('start_time', v::dateTime($dateTimeFormat), false)
@@ -164,6 +165,9 @@ class AnswerValidatorBuilder
 {
     private const BUILDER_METHOD_MAP = [
         Question::QT_5_POINT_CHOICE => 'buildFor5PointChoice',
+        Question::QT_A_ARRAY_5_POINT => 'buildForArray5PointChoice',
+        Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'buildForArray10PointChoice',
+        Question::QT_E_ARRAY_INC_SAME_DEC => 'buildForArrayIncreaseSameDecrease',
         Question::QT_L_LIST => 'buildForList',
         Question::QT_O_LIST_WITH_COMMENT => 'buildForListWithComment',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildForList',
@@ -226,6 +230,52 @@ class AnswerValidatorBuilder
             ->key('code', self::buildForList($question))
             ->key('comment', v::stringType());
     }
+
+    private static function buildForArray(
+        Question $question,
+        callable $valueValidatorBuilder
+    ): Validator {
+        return \array_reduce(
+            $question->subquestions,
+            function (
+                Validator $carry,
+                Question $subQuestion
+            ) use ($valueValidatorBuilder, $question): Validator {
+                // TODO: Add a case for soft mandatories (e.g. query parameter to bypass it)
+                $mandatory = $question->mandatory === 'Y';
+                return $carry->key($subQuestion->title, $valueValidatorBuilder(), $mandatory);
+            },
+            v::create()
+        );
+    }
+
+    private static function buildForArraySomePointChoice(Question $question, int $count): Validator
+    {
+        return self::buildForArray($question, function () use ($count) {
+            return v::create()
+                ->intType()
+                ->between(1, $count);
+        });
+    }
+
+    private static function buildForArray5PointChoice(Question $question): Validator
+    {
+        return self::buildForArraySomePointChoice($question, 5);
+    }
+
+    private static function buildForArray10PointChoice(Question $question): Validator
+    {
+        return self::buildForArraySomePointChoice($question, 10);
+    }
+
+    private static function buildForArrayIncreaseSameDecrease(Question $question): Validator
+    {
+        return self::buildForArray($question, function () use ($count) {
+            return v::create()
+                ->stringType()
+                ->in(['I', 'S', 'D']);
+        });
+    }
 }
 
 /**
@@ -235,6 +285,9 @@ class AnswerFieldGenerator
 {
     private const GENERATOR_METHOD_MAP = [
         Question::QT_5_POINT_CHOICE => 'generate',
+        Question::QT_A_ARRAY_5_POINT => 'generateArray',
+        Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'generateArray',
+        Question::QT_E_ARRAY_INC_SAME_DEC => 'generateArray',
         Question::QT_L_LIST => 'generate',
         Question::QT_O_LIST_WITH_COMMENT => 'generateListWithComment',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'generate',
@@ -252,19 +305,34 @@ class AnswerFieldGenerator
         }
     }
 
-    private static function makeFieldName(Question $question)
+    private static function makeQuestionFieldName(Question $question): string
     {
         return "{$question->sid}X{$question->gid}X{$question->qid}";
     }
 
+    private static function makeSubQuestionFieldName(
+        Question $question,
+        string ...$subQuestionCodes
+    ): string {
+        return self::makeQuestionFieldName($question) .
+            \implode('_', $subQuestionCodes);
+    }
+
     private static function generate(Question $question, $answer): Generator
     {
-        yield self::makeFieldName($question) => $answer;
+        yield self::makeQuestionFieldName($question) => $answer;
     }
 
     private static function generateListWithComment(Question $question, ?array $answer): Generator
     {
         yield from self::generate($question, $answer['code'] ?? null);
-        yield self::makeFieldName($question) . 'comment' => $answer['comment'] ?? null;
+        yield self::makeQuestionFieldName($question) . 'comment' => $answer['comment'] ?? null;
+    }
+
+    private static function generateArray(Question $question, ?array $answer): Generator
+    {
+        foreach ($answer as $subQuestionCode => $subAnswer) {
+            yield self::makeSubQuestionFieldName($question, $subQuestionCode) => $subAnswer;
+        }
     }
 }
