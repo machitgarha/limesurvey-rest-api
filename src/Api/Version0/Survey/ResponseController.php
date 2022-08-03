@@ -131,10 +131,16 @@ class ResponseController implements Controller
 
         $response = new SurveyDynamic();
 
-        // Make sure the record data
+        /*
+         * Make sure the data doesn't have extra attributes (i.e. fields). Having less attributes
+         * than expected should not be a problem, as it finally will be caught by the active
+         * record itself if answer for a mandatory question isn't provided. 
+         */
         \assert(
-            \array_keys($response->tableSchema->columnNames) ==
-                \array_keys($recordData)
+            [] === \array_diff(
+                \array_keys($recordData),
+                $response->tableSchema->columnNames
+            )
         );
 
         $response->setAttributes($recordData, false);
