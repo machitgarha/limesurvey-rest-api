@@ -68,15 +68,6 @@ class QuestionController implements Controller
         );
     }
 
-    /**
-     * @return Question[]
-     */
-    public static function getQuestionList(int $surveyId): array
-    {
-        $survey = SurveyController::getSurvey($surveyId);
-        return $survey->allQuestions;
-    }
-
     public function new(): Response
     {
         throw new NotImplementedError();

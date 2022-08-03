@@ -54,9 +54,6 @@ class ResponseController implements Controller
 
         $userId = $this->authorize()->getId();
 
-        $data = $this->decodeJsonRequestBodyInnerData();
-        $this->validateResponseData($data);
-
         $survey = SurveyController::getSurvey(
             $surveyId = (int) $this->getPathParameter('survey_id')
         );
@@ -67,6 +64,9 @@ class ResponseController implements Controller
             $userId,
             'responses'
         );
+
+        $data = $this->decodeJsonRequestBodyInnerData();
+        $this->validateResponseData($data, $survey);
 
         if (!App()->db->schema->getTable($survey->responsesTableName)) {
             if ($survey->active !== 'N') {
@@ -79,33 +79,14 @@ class ResponseController implements Controller
         throw new NotImplementedError();
     }
 
-    private function validateResponseData(array $responseData): void
+    private function validateResponseData(array $responseData, Survey $survey): void
     {
         v::create()
             ->key('submit_time', v::intType(), false)
             ->key('start_time', v::intType(), false)
             ->key('end_time', v::intType(), false)
-            ->key('answers', $this->buildAnswersValidator())
+            ->key('answers', AnswerValidatorBuilder::buildForAll($survey))
             ->check($responseData);
-    }
-
-    private function buildAnswersValidator(): Validator
-    {
-        $validator = v::create();
-
-        $questionList = QuestionController::getQuestionList(
-            $this->getPathParameter('survey_id')
-        );
-
-        foreach ($questionList as $question) {
-            $validator->key(
-                $question->qid,
-                AnswerValidatorBuilder::build($question),
-                false
-            );
-        }
-
-        return $validator;
     }
 }
 
@@ -116,13 +97,31 @@ use Question;
 use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
 
+/**
+ * @internal
+ */
 class AnswerValidatorBuilder
 {
     public const BUILDER_METHODS_MAP = [
         Question::QT_5_POINT_CHOICE => 'buildFor5PointChoice',
     ];
 
-    public static function build(Question $question): Validator
+    public static function buildForAll(Survey $survey): Validator
+    {
+        $validator = v::create();
+
+        foreach ($survey->allQuestions as $question) {
+            $validator->key(
+                $question->qid,
+                self::build($question),
+                false
+            );
+        }
+
+        return $validator;
+    }
+
+    private static function build(Question $question): Validator
     {
         $method = self::BUILDER_METHODS_MAP[$question->type] ?? 'buildForDummy';
         $keyName = "answers.$question->qid";
@@ -137,12 +136,12 @@ class AnswerValidatorBuilder
     }
 
     // TODO: Get rid of it
-    public static function buildForDummy(): Validator
+    private static function buildForDummy(): Validator
     {
         return v::create();
     }
 
-    public static function buildFor5PointChoice(): Validator
+    private static function buildFor5PointChoice(): Validator
     {
         return v::create()
             ->intType()
