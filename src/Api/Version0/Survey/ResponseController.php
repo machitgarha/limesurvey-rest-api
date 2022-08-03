@@ -2,7 +2,9 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey;
 
+use Survey;
 use Question;
+use Response;
 use SurveyDynamic;
 use LogicException;
 use RuntimeException;
@@ -13,6 +15,7 @@ use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 use MAChitgarha\LimeSurveyRestApi\Api\Permission;
 use MAChitgarha\LimeSurveyRestApi\Api\PermissionChecker;
 
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerFieldGenerator;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerValidatorBuilder;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
@@ -76,6 +79,8 @@ class ResponseController implements Controller
             }
         }
 
+        $record = $this->generateResponseRecord($data, $survey);
+
         throw new NotImplementedError();
     }
 
@@ -90,11 +95,30 @@ class ResponseController implements Controller
             ->key('answers', AnswerValidatorBuilder::buildForAll($survey))
             ->check($responseData);
     }
+
+    private static function generateResponseRecord(array $responseData, Survey $survey): array
+    {
+        $result = [
+            'submitdate' => $responseData['submit_time'],
+            'startdate' => $responseData['start_time'],
+            'datestamp' => $responseData['end_time'],
+
+            // TODO: Add support for specifying it in the request
+            'startlanguage' => $survey->language,
+
+        ] + \iterator_to_array(
+            AnswerFieldGenerator::generateForAll($survey, $responseData)
+        );
+
+        return $result;
+    }
 }
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 
+use Survey;
 use Question;
+use Generator;
 
 use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
@@ -148,5 +172,42 @@ class AnswerValidatorBuilder
         return v::create()
             ->intType()
             ->between(1, 5);
+    }
+}
+
+/**
+ * @internal
+ */
+class AnswerFieldGenerator
+{
+    private const GENERATOR_METHOD_MAP = [
+        Question::QT_5_POINT_CHOICE => 'generateFor5PointChoice',
+    ];
+
+    public static function generateForAll(Survey $survey, array $answersData): Generator
+    {
+        foreach ($survey->allQuestions as $question) {
+            $method = self::GENERATOR_METHOD_MAP[$question->type] ?? 'generateForDummy';
+
+            yield from self::{$method}(
+                $question,
+                $answersData[$question->qid]
+            );
+        }
+    }
+
+    private static function makeFieldName(Question $question)
+    {
+        return "{$question->sid}X{$question->gid}X{$question->qid}";
+    }
+
+    private static function generateForDummy(): Generator
+    {
+        yield from [];
+    }
+
+    private static function generateFor5PointChoice(Question $question, ?int $answer): Generator
+    {
+        yield self::makeFieldName($question) => $answer;
     }
 }
