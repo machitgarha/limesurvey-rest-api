@@ -53,6 +53,7 @@ class QuestionController implements Controller
                 'id' => $question->qid,
                 'group_id' => $question->gid,
                 'type' => $question->type,
+                'mandatory' => $question->mandatory,
                 'code' => $question->title,
                 'order_in_group' => $question->question_order,
                 'l10n' => [

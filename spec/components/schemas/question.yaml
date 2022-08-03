@@ -9,6 +9,15 @@ question:
     type:
       type: string
       description: Question type
+    mandatory:
+      type: string
+      description: Y means mandatory, S means soft, and N means not mandatory
+      minLength: 1
+      maxLength: 1
+      enum:
+        - Y
+        - S
+        - N
     code:
       type: string
       description: The unique code of the question
