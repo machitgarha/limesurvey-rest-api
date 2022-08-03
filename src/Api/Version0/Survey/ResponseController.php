@@ -4,7 +4,6 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey;
 
 use Survey;
 use Question;
-use Response;
 use SurveyDynamic;
 use LogicException;
 use RuntimeException;
@@ -32,6 +31,7 @@ use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
 
@@ -79,9 +79,17 @@ class ResponseController implements Controller
             }
         }
 
-        $record = $this->generateResponseRecord($data, $survey);
+        $recordData = $this->generateResponseRecord($data, $survey);
+        $response = $this->makeResponse($recordData, $survey);
 
-        throw new NotImplementedError();
+        if (!$response->id) {
+            throw new RuntimeException('Cannot create response');
+        }
+
+        return new Response(
+            data(),
+            Response::HTTP_CREATED
+        );
     }
 
     private function validateResponseData(array $responseData, Survey $survey): void
@@ -111,6 +119,23 @@ class ResponseController implements Controller
         );
 
         return $result;
+    }
+
+    private static function makeResponse(array $recordData, Survey $survey): SurveyDynamic
+    {
+        SurveyDynamic::sid($survey->sid);
+
+        $response = new SurveyDynamic();
+
+        // Make sure the record data
+        \assert(
+            \array_keys($response->tableSchema->columnNames) ==
+                \array_keys($recordData)
+        );
+
+        $response->setAttributes($recordData, false);
+
+        return $response;
     }
 }
 
