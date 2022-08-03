@@ -170,6 +170,7 @@ class AnswerValidatorBuilder
         Question::QT_A_ARRAY_5_POINT => 'buildForArray5PointChoice',
         Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'buildForArray10PointChoice',
         Question::QT_E_ARRAY_INC_SAME_DEC => 'buildForArrayIncreaseSameDecrease',
+        Question::QT_F_ARRAY => 'buildForArrayUsingFlexibleLabels',
         Question::QT_L_LIST => 'buildForList',
         Question::QT_O_LIST_WITH_COMMENT => 'buildForListWithComment',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildForList',
@@ -225,11 +226,11 @@ class AnswerValidatorBuilder
 
     private static function buildForList(Question $question): Validator
     {
-        $answersCode = \array_column($question->answers, 'code');
-
         return v::create()
             ->stringType()
-            ->in($answersCode);
+            ->in(
+                \array_column($question->answers, 'code')
+            );
     }
 
     private static function buildForListWithComment(Question $question): Validator
@@ -277,10 +278,21 @@ class AnswerValidatorBuilder
 
     private static function buildForArrayIncreaseSameDecrease(Question $question): Validator
     {
-        return self::buildForArray($question, function () use ($count) {
+        return self::buildForArray($question, function () {
             return v::create()
                 ->stringType()
                 ->in(['I', 'S', 'D']);
+        });
+    }
+
+    private static function buildForArrayUsingFlexibleLabels(Question $question): Validator
+    {
+        return self::buildForArray($question, function () use ($question) {
+            return v::create()
+                ->stringType()
+                ->in(
+                    \array_column($question->answers, 'code')
+                );
         });
     }
 }
@@ -295,6 +307,7 @@ class AnswerFieldGenerator
         Question::QT_A_ARRAY_5_POINT => 'generateArray',
         Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'generateArray',
         Question::QT_E_ARRAY_INC_SAME_DEC => 'generateArray',
+        Question::QT_F_ARRAY => 'generateArray',
         Question::QT_L_LIST => 'generate',
         Question::QT_O_LIST_WITH_COMMENT => 'generateListWithComment',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'generate',

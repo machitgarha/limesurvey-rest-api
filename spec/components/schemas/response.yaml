@@ -51,7 +51,7 @@ response:
             code:
               type: string
               description: The answer code
-              minLength: 5
+              minLength: 1
               maxLength: 5
             comment:
               type: string
@@ -63,6 +63,7 @@ response:
             - Array (5 point choice)
             - Array (10 point choice)
             - Array (Increase/Same/Decrease)
+            - Array (using flexible labels)
 
           additionalProperties:
             oneOf:
@@ -89,3 +90,9 @@ response:
                   - I
                   - S
                   - D
+
+              - type: string
+                description: >
+                  The answer code specific to 'Array (using flexible labels)' question type
+                minLength: 1
+                maxLength: 5
