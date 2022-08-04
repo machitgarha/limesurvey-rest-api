@@ -374,15 +374,12 @@ class AnswerValidatorBuilder
         callable $valueValidatorBuilder
     ): Validator {
         $filterSubQuestions = function (int $scaleId) use ($question) {
-            $subQuestionList = [];
-
-            foreach ($question->subquestions as $subQuestion) {
-                if ($subQuestion->scale_id === $scaleId) {
-                    $subQuestionList[] = $subQuestion->title;
+            return \array_filter(
+                $question->subquestions,
+                function (Question $subQuestion) use ($scaleId) {
+                    return $subQuestion->scale_id === $scaleId;
                 }
-            }
-
-            return $subQuestionList;
+            );
         };
 
         return $this->buildForArray(
