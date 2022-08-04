@@ -100,7 +100,7 @@ class ResponseController implements Controller
             ->key('submit_time', v::dateTime($dateTimeFormat), false)
             ->key('start_time', v::dateTime($dateTimeFormat), false)
             ->key('end_time', v::dateTime($dateTimeFormat), false)
-            ->key('answers', AnswerValidatorBuilder::buildAll($survey))
+            ->key('answers', (new AnswerValidatorBuilder())->buildAll($survey))
             ->check($responseData);
     }
 
@@ -179,14 +179,35 @@ class AnswerValidatorBuilder
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildForList',
     ];
 
-    public static function buildAll(Survey $survey): Validator
+    /** @var bool */
+    private $skipSoftMandatoryQuestions = true;
+
+    public function __construct(bool $skipSoftMandatoryQuestions = true)
+    {
+        $this->skipSoftMandatoryQuestions = $skipSoftMandatoryQuestions;
+    }
+
+    private function isMandatory(Question $question): bool
+    {
+        $mandatory = $question->mandatory;
+
+        if ($mandatory === 'Y') {
+            return true;
+        }
+        if ($mandatory === 'S') {
+            return !$this->skipSoftMandatoryQuestions;
+        }
+        return false;
+    }
+
+    public function buildAll(Survey $survey): Validator
     {
         return v::keySet(...\array_map(
             // TODO: How nice it would look if we were able to use arrow functions! :)
             function (Question $question): Validator {
                 return v::key(
                     $question->qid,
-                    self::build($question),
+                    $this->build($question),
                     false
                 );
             },
@@ -200,34 +221,34 @@ class AnswerValidatorBuilder
         ));
     }
 
-    private static function build(Question $question): Validator
+    private function build(Question $question): Validator
     {
         $method = self::BUILDER_METHOD_MAP[$question->type] ?? 'buildDummy';
         $keyName = "answers.$question->qid";
 
         /** @var Validator $validator */
-        $validator = self::{$method}($question);
+        $validator = $this->$method($question);
         $validator->setName($keyName);
 
-        return $question->mandatory === 'Y'
+        return $this->isMandatory($question)
             ? $validator
             : v::nullable($validator)->setName($keyName);
     }
 
     // TODO: Get rid of it
-    private static function buildDummy(): Validator
+    private function buildDummy(): Validator
     {
         return v::create();
     }
 
-    private static function buildFor5PointChoice(): Validator
+    private function buildFor5PointChoice(): Validator
     {
         return v::create()
             ->intType()
             ->between(1, 5);
     }
 
-    private static function buildForList(Question $question): Validator
+    private function buildForList(Question $question): Validator
     {
         return v::create()
             ->stringType()
@@ -236,14 +257,14 @@ class AnswerValidatorBuilder
             );
     }
 
-    private static function buildForListWithComment(Question $question): Validator
+    private function buildForListWithComment(Question $question): Validator
     {
         return v::create()
             ->key('code', self::buildForList($question))
             ->key('comment', v::stringType());
     }
 
-    private static function buildForArray(
+    private function buildForArray(
         Question $question,
         callable $valueValidatorBuilder
     ): Validator {
@@ -252,15 +273,14 @@ class AnswerValidatorBuilder
                 return v::key(
                     $subQuestion->title,
                     $valueValidatorBuilder(),
-                    // TODO: Add a case for soft mandatories (e.g. query parameter to bypass it)
-                    $question->mandatory === 'Y'
+                    $this->isMandatory($question)
                 );
             },
             $question->subquestions
         ));
     }
 
-    private static function buildForArraySomePointChoice(Question $question, int $count): Validator
+    private function buildForArraySomePointChoice(Question $question, int $count): Validator
     {
         return self::buildForArray($question, function () use ($count) {
             return v::create()
@@ -269,12 +289,12 @@ class AnswerValidatorBuilder
         });
     }
 
-    private static function buildForArray5PointChoice(Question $question): Validator
+    private function buildForArray5PointChoice(Question $question): Validator
     {
         return self::buildForArraySomePointChoice($question, 5);
     }
 
-    private static function buildForArray10PointChoice(Question $question): Validator
+    private function buildForArray10PointChoice(Question $question): Validator
     {
         return self::buildForArraySomePointChoice($question, 10);
     }
@@ -283,7 +303,7 @@ class AnswerValidatorBuilder
      * @param string[] $allowedValues
      * @return Validator
      */
-    private static function buildForArrayOfAllowedStrings(
+    private function buildForArrayOfAllowedStrings(
         Question $question,
         array $allowedValues
     ): Validator {
@@ -294,12 +314,12 @@ class AnswerValidatorBuilder
         });
     }
 
-    private static function buildForArrayIncreaseSameDecrease(Question $question): Validator
+    private function buildForArrayIncreaseSameDecrease(Question $question): Validator
     {
         return self::buildForArrayOfAllowedStrings($question, ['I', 'S', 'D']);
     }
 
-    private static function buildForArrayUsingFlexibleLabels(Question $question): Validator
+    private function buildForArrayUsingFlexibleLabels(Question $question): Validator
     {
         return self::buildForArrayOfAllowedStrings(
             $question,
@@ -307,12 +327,12 @@ class AnswerValidatorBuilder
         );
     }
 
-    private static function buildForArrayYesNoUncertain(Question $question): Validator
+    private function buildForArrayYesNoUncertain(Question $question): Validator
     {
         return self::buildForArrayOfAllowedStrings($question, ['Y', 'N', 'U']);
     }
 
-    private static function buildForArrayDual(Question $question): Validator
+    private function buildForArrayDual(Question $question): Validator
     {
         $filterPossibleAnswers = function (int $scaleId) use ($question) {
             $possibleAnswers = [];
@@ -326,14 +346,19 @@ class AnswerValidatorBuilder
             return $possibleAnswers;
         };
 
-        return self::buildForArray($question, function () use ($filterPossibleAnswers, $question) {
+        $makeKey = function (int $keyName) use ($filterPossibleAnswers, $question) {
+            return v::key(
+                $keyName,
+                v::in($filterPossibleAnswers($keyName)),
+                $this->isMandatory($question)
+            );
+        };
+
+        return self::buildForArray($question, function () use ($makeKey) {
             return v::nullable(
                 v::arrayType()
-                    ->length(2, 2, true)
-                    ->keySet(
-                        v::key(0, v::in($filterPossibleAnswers(0))),
-                        v::key(1, v::in($filterPossibleAnswers(1)))
-                    )
+                    ->length(0, 2, true)
+                    ->keySet($makeKey(0), $makeKey(1))
             );
         });
     }

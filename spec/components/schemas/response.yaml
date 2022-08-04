@@ -106,8 +106,10 @@ response:
 
               - type: array
                 description: >
-                  A pair of answer codes; specific to 'Array, dual scale' question type
-                minItems: 2
+                  A pair of answer codes; specific to 'Array, dual scale' question type. If the
+                  related question is not mandatory, then passing an array with one or even zero
+                  item(s) is possible.
+                minItems: 0
                 maxItems: 2
                 items:
                   $ref: "./answer.yaml#/answer_code"
