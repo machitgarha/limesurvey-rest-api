@@ -176,7 +176,9 @@ class AnswerValidatorBuilder
         Question::QT_F_ARRAY => 'buildForArrayWithPredefinedChoices',
         Question::QT_H_ARRAY_COLUMN => 'buildForArrayWithPredefinedChoices',
         Question::QT_L_LIST => 'buildForList',
+        Question::QT_M_MULTIPLE_CHOICE => 'buildForMultipleChoice',
         Question::QT_O_LIST_WITH_COMMENT => 'buildForListWithComment',
+        Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS => 'buildForMultipleChoiceWithComments',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildForList',
         Question::QT_COLON_ARRAY_NUMBERS => 'buildForArray2dNumbers',
         Question::QT_SEMICOLON_ARRAY_TEXT => 'buildForArray2dTexts',
@@ -264,7 +266,7 @@ class AnswerValidatorBuilder
     {
         return v::create()
             ->key('code', $this->buildForList($question))
-            ->key('comment', v::stringType());
+            ->key('comment', v::stringType(), false);
     }
 
     private function buildForArray(
@@ -411,6 +413,43 @@ class AnswerValidatorBuilder
                 ->stringType();
         });
     }
+
+    private function buildForMultipleChoice(Question $question): Validator
+    {
+        $validator = $this->buildForArray($question, function () {
+            return v::boolType();
+        });
+
+        if ($this->isMandatory($question)) {
+            // One choice must be at least selected
+            $validator->contains(true);
+        }
+
+        return $validator;
+    }
+
+    private function buildForMultipleChoiceWithComments(Question $question): Validator
+    {
+        $validator = $this->buildForArray($question, function () {
+            return v::create()
+                ->key('is_selected', v::boolType())
+                ->key('comment', v::stringType(), false);
+        });
+
+        if ($this->isMandatory($question)) {
+            // One choice must be at least selected
+            $validator->callback(function (array $items) {
+                foreach ($items as $item) {
+                    if ($item['is_selected'] ?? null === true) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
+
+        return $validator;
+    }
 }
 
 /**
@@ -428,7 +467,9 @@ class AnswerFieldGenerator
         Question::QT_F_ARRAY => 'generateArray',
         Question::QT_H_ARRAY_COLUMN => 'generateArray',
         Question::QT_L_LIST => 'generate',
+        Question::QT_M_MULTIPLE_CHOICE => 'generateMultipleChoice',
         Question::QT_O_LIST_WITH_COMMENT => 'generateListWithComment',
+        Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS => 'generateMultipleChoiceWithComments',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'generate',
         Question::QT_COLON_ARRAY_NUMBERS => 'generateArray2d',
         Question::QT_SEMICOLON_ARRAY_TEXT => 'generateArray2d',
@@ -505,5 +546,18 @@ class AnswerFieldGenerator
                     => $answerValue;
             }
         }
+    }
+
+    private static function generateMultipleChoice(Question $question, ?bool $answer): Generator
+    {
+        yield self::makeQuestionFieldName($question) => $answer ? 'Y' : null;
+    }
+
+    private static function generateMultipleChoiceWithComments(
+        Question $question,
+        ?array $answer
+    ): Generator {
+        yield self::generateMultipleChoice($question, $answer['is_selected']);
+        yield self::makeQuestionFieldName($question) . 'comment' => $answer['comment'] ?? null;
     }
 }

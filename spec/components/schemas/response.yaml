@@ -19,10 +19,7 @@ response:
     description: Mappings of question IDs to the answers
     additionalProperties:
       oneOf:
-        - type: 'null'
-          description: >
-            If the question's mandatory property set to No or Soft, giving a null value means the
-            question was leaved unanswered.
+        - $ref: "#/response_answer_unanswered"
 
         - type: integer
           description: Specific to '5 point choice' question type. Zero means no answer.
@@ -60,10 +57,7 @@ response:
 
           additionalProperties:
             oneOf:
-              - type: 'null'
-                description: >
-                  If parent question's mandatory property set to No or Soft, giving a null value
-                  means the question was leaved unanswered.
+              - $ref: "#/response_answer_unanswered"
 
               - type: integer
                 description: Specific to 'Array, 5 point choice' question type
@@ -116,10 +110,7 @@ response:
 
                 additionalProperties:
                   oneOf:
-                    - type: 'null'
-                      description: >
-                        If parent question's mandatory property set to No or Soft, giving a null
-                        value means the question was leaved unanswered.
+                    - $ref: "#/response_answer_unanswered"
 
                     - type: integer
                       description: Specific to 'Array, numbers' question type
@@ -129,3 +120,33 @@ response:
                     - allOf:
                       - $ref: "./answer.yaml#/answer_code"
                       - description: The answer code; specific to 'Array, texts' question types
+
+        - type: object
+          description: >
+            Mapping of each subquestion to whether the subquestion (i.e. choice) is selected or
+            not, and other data. Specific to 'Multiple choices' question types.
+
+          additionalProperties:
+            oneOf:
+              - $ref: "#/response_answer_unanswered"
+
+              - type: boolean
+                description: >
+                  Whether the subquestion is selected or not. Specific to all 'Mutliple choice'
+                  question types except the 'Multiple choice with comments'.
+
+              - type: object
+                description: Specific to 'Multiple choice with comments' question type
+                required: [is_selected]
+                properties:
+                  is_selected:
+                    type: boolean
+                    description: Whether the subquestion is selected or not
+                  comment:
+                    type: string
+
+response_answer_unanswered:
+  type: 'null'
+  description: >
+    If the parent question's (i.e. the one containing this subquestion) mandatory property is *not*
+    set to Yes, giving a null value means the question was leaved unanswered.
