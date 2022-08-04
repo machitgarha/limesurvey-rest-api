@@ -60,8 +60,8 @@ response:
 
         - type: object
           description: >
-            Mapping of each subquestion code to its answer. Specific to 'Array' question types (
-            e.g. 'Array, Yes/No/Uncertain', 'Array, dual scale').
+            Mapping of each subquestion code to its answer. Specific question types having
+            subquestions (e.g. all Arrays', Multiple choices, Multiple free texts).
 
           additionalProperties:
             oneOf:
@@ -131,15 +131,6 @@ response:
                       description: The answer text; specific to 'Array, texts' question types
                       minLength: 1
 
-        - type: object
-          description: >
-            Mapping of each subquestion to whether the subquestion (i.e. choice) is selected or
-            not (along with other data). Specific to 'Multiple choice' question types.
-
-          additionalProperties:
-            oneOf:
-              - $ref: "#/response_answer_unanswered"
-
               - type: boolean
                 description: >
                   Whether the subquestion is selected or not. Specific to all 'Mutliple choice'
@@ -158,6 +149,10 @@ response:
                         description: When is_selected is false
                       - type: string
                         description: When is_selected is true
+
+              - type: string
+                description: Specific to 'Multiple short free texts' question type
+                minLength: 1
 
 response_answer_unanswered:
   type: 'null'

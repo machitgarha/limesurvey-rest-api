@@ -179,6 +179,7 @@ class AnswerValidatorBuilder
         Question::QT_M_MULTIPLE_CHOICE => 'buildForMultipleChoice',
         Question::QT_O_LIST_WITH_COMMENT => 'buildForListWithComment',
         Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS => 'buildForMultipleChoiceWithComments',
+        Question::QT_Q_MULTIPLE_SHORT_TEXT => 'buildForMultipleTexts',
         Question::QT_S_SHORT_FREE_TEXT => 'buildForText',
         Question::QT_T_LONG_FREE_TEXT => 'buildForText',
         Question::QT_U_HUGE_FREE_TEXT => 'buildForText',
@@ -272,7 +273,7 @@ class AnswerValidatorBuilder
             ->key('comment', v::stringType(), false);
     }
 
-    private function buildForArray(
+    private function buildForSubQuestions(
         Question $question,
         callable $valueValidatorBuilder,
         array $subQuestions = null
@@ -294,7 +295,7 @@ class AnswerValidatorBuilder
 
     private function buildForArraySomePointChoice(Question $question, int $count): Validator
     {
-        return $this->buildForArray($question, function () use ($count) {
+        return $this->buildForSubQuestions($question, function () use ($count) {
             return v::create()
                 ->intType()
                 ->between(1, $count);
@@ -319,7 +320,7 @@ class AnswerValidatorBuilder
         Question $question,
         array $allowedValues
     ): Validator {
-        return $this->buildForArray($question, function () use ($allowedValues) {
+        return $this->buildForSubQuestions($question, function () use ($allowedValues) {
             return v::create()
                 ->stringType()
                 ->in($allowedValues);
@@ -366,7 +367,7 @@ class AnswerValidatorBuilder
             );
         };
 
-        return $this->buildForArray($question, function () use ($makeKey) {
+        return $this->buildForSubQuestions($question, function () use ($makeKey) {
             return v::create()
                 ->arrayType()
                 ->length(1, 2, true)
@@ -387,10 +388,10 @@ class AnswerValidatorBuilder
             );
         };
 
-        return $this->buildForArray(
+        return $this->buildForSubQuestions(
             $question,
             function () use ($question, $valueValidatorBuilder, $filterSubQuestions) {
-                return $this->buildForArray(
+                return $this->buildForSubQuestions(
                     $question,
                     $valueValidatorBuilder,
                     $filterSubQuestions(1)
@@ -420,7 +421,7 @@ class AnswerValidatorBuilder
 
     private function buildForMultipleChoice(Question $question): Validator
     {
-        $validator = $this->buildForArray($question, function () {
+        $validator = $this->buildForSubQuestions($question, function () {
             return v::boolType();
         });
 
@@ -434,7 +435,7 @@ class AnswerValidatorBuilder
 
     private function buildForMultipleChoiceWithComments(Question $question): Validator
     {
-        $validator = $this->buildForArray($question, function () {
+        $validator = $this->buildForSubQuestions($question, function () {
             return v::oneOf(
                 v::create()
                     ->key('is_selected', v::identical(true))
@@ -466,6 +467,13 @@ class AnswerValidatorBuilder
             ->stringType()
             ->length(1, null, true);
     }
+
+    private function buildForMultipleTexts(Question $question): Validator
+    {
+        return $this->buildForSubQuestions($question, function () use ($question) {
+            return $this->buildForText($question);
+        });
+    }
 }
 
 /**
@@ -476,16 +484,17 @@ class AnswerFieldGenerator
     private const GENERATOR_METHOD_MAP = [
         Question::QT_1_ARRAY_DUAL => 'generateArrayDual',
         Question::QT_5_POINT_CHOICE => 'generate',
-        Question::QT_A_ARRAY_5_POINT => 'generateArray',
-        Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'generateArray',
-        Question::QT_C_ARRAY_YES_UNCERTAIN_NO => 'generateArray',
-        Question::QT_E_ARRAY_INC_SAME_DEC => 'generateArray',
-        Question::QT_F_ARRAY => 'generateArray',
-        Question::QT_H_ARRAY_COLUMN => 'generateArray',
+        Question::QT_A_ARRAY_5_POINT => 'generateSubQuestions',
+        Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'generateSubQuestions',
+        Question::QT_C_ARRAY_YES_UNCERTAIN_NO => 'generateSubQuestions',
+        Question::QT_E_ARRAY_INC_SAME_DEC => 'generateSubQuestions',
+        Question::QT_F_ARRAY => 'generateSubQuestions',
+        Question::QT_H_ARRAY_COLUMN => 'generateSubQuestions',
         Question::QT_L_LIST => 'generate',
         Question::QT_M_MULTIPLE_CHOICE => 'generateMultipleChoice',
         Question::QT_O_LIST_WITH_COMMENT => 'generateListWithComment',
         Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS => 'generateMultipleChoiceWithComments',
+        Question::QT_Q_MULTIPLE_SHORT_TEXT => 'generateSubQuestions',
         Question::QT_S_SHORT_FREE_TEXT => 'generate',
         Question::QT_T_LONG_FREE_TEXT => 'generate',
         Question::QT_U_HUGE_FREE_TEXT => 'generate',
@@ -535,7 +544,7 @@ class AnswerFieldGenerator
         yield self::makeQuestionFieldName($question) . 'comment' => $answer['comment'] ?? null;
     }
 
-    private static function generateArray(Question $question, ?array $answer): Generator
+    private static function generateSubQuestions(Question $question, ?array $answer): Generator
     {
         foreach ($answer as $subQuestionCode => $subAnswer) {
             yield self::makeSubQuestionFieldName($question, $subQuestionCode) => $subAnswer;
