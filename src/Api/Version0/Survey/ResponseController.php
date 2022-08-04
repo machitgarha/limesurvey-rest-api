@@ -366,7 +366,7 @@ class AnswerValidatorBuilder
         return $this->buildForArray($question, function () use ($makeKey) {
             return v::create()
                 ->arrayType()
-                ->length(0, 2, true)
+                ->length(1, 2, true)
                 ->keySet($makeKey(0), $makeKey(1));
         });
     }
@@ -410,7 +410,8 @@ class AnswerValidatorBuilder
     {
         return $this->buildForArray2d($question, function () {
             return v::create()
-                ->stringType();
+                ->stringType()
+                ->length(1, null, true);
         });
     }
 
@@ -421,7 +422,7 @@ class AnswerValidatorBuilder
         });
 
         if ($this->isMandatory($question)) {
-            // One choice must be at least selected
+            // At least one choice must have been selected
             $validator->contains(true);
         }
 
@@ -431,13 +432,18 @@ class AnswerValidatorBuilder
     private function buildForMultipleChoiceWithComments(Question $question): Validator
     {
         $validator = $this->buildForArray($question, function () {
-            return v::create()
-                ->key('is_selected', v::boolType())
-                ->key('comment', v::stringType(), false);
+            return v::oneOf(
+                v::create()
+                    ->key('is_selected', v::identical(true))
+                    ->key('comment', v::stringType()),
+                v::create()
+                    ->key('is_selected', v::identical(false))
+                    ->key('comment', v::nullType(), false)
+            );
         });
 
         if ($this->isMandatory($question)) {
-            // One choice must be at least selected
+            // At least one choice must have been selected
             $validator->callback(function (array $items) {
                 foreach ($items as $item) {
                     if ($item['is_selected'] ?? null === true) {

@@ -22,25 +22,26 @@ response:
         - $ref: "#/response_answer_unanswered"
 
         - type: integer
-          description: Specific to '5 point choice' question type. Zero means no answer.
+          description: Specific to '5 point choice' question type
           minimum: 1
           maximum: 5
 
-        - type: string
-          description: |
-            The answer code (not the value). Specific to following question types:
+        - allOf:
+          - $ref: "./answer.yaml#/answer_code"
+          - description: |
+              The answer code. Specific to following question types:
 
-            - Bootstrap options (buttons)
-            - Bootstrap dropdown
-            - Image select list (radio)
-            - List (radio)
-            - List (dropdown)
-            - Short free text
-            - Long free text
-            - Huge free text
-            - Language switch
-            - Yes/no
-            - Gender
+              - Bootstrap options (buttons)
+              - Bootstrap dropdown
+              - Image select list (radio)
+              - List (radio)
+              - List (dropdown)
+              - Short free text
+              - Long free text
+              - Huge free text
+              - Language switch
+              - Yes/no
+              - Gender
 
         - type: object
           description: Specific to 'List with comment' question type
@@ -96,12 +97,14 @@ response:
               - type: array
                 description: >
                   A pair of answer codes; specific to 'Array, dual scale' question type. If the
-                  related question is not mandatory, then passing an array with one or even zero
-                  item(s) is possible.
-                minItems: 0
+                  question is not mandatory, then passing the first or second element as null is
+                  possible.
+                minItems: 1
                 maxItems: 2
                 items:
-                  $ref: "./answer.yaml#/answer_code"
+                  oneOf:
+                    - $ref: "#/response_answer_unanswered"
+                    - $ref: "./answer.yaml#/answer_code"
 
               - type: object
                 description: >
@@ -117,14 +120,14 @@ response:
                       minimum: 1
                       maximum: 10
 
-                    - allOf:
-                      - $ref: "./answer.yaml#/answer_code"
-                      - description: The answer code; specific to 'Array, texts' question types
+                    - type: string
+                      description: The answer text; specific to 'Array, texts' question types
+                      minLength: 1
 
         - type: object
           description: >
             Mapping of each subquestion to whether the subquestion (i.e. choice) is selected or
-            not, and other data. Specific to 'Multiple choices' question types.
+            not (along with other data). Specific to 'Multiple choice' question types.
 
           additionalProperties:
             oneOf:
@@ -143,10 +146,14 @@ response:
                     type: boolean
                     description: Whether the subquestion is selected or not
                   comment:
-                    type: string
+                    oneOf:
+                      - type: 'null'
+                        description: When is_selected is false
+                      - type: string
+                        description: When is_selected is true
 
 response_answer_unanswered:
   type: 'null'
   description: >
-    If the parent question's (i.e. the one containing this subquestion) mandatory property is *not*
-    set to Yes, giving a null value means the question was leaved unanswered.
+    If question (i.e. parent question of the current subquestion) is *not* mandatory, giving a
+    null value means the question was leaved unanswered.
