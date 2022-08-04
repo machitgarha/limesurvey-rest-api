@@ -153,6 +153,7 @@ class ResponseController implements Controller
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 
+use Answer;
 use Survey;
 use Question;
 use Generator;
@@ -166,6 +167,7 @@ use Respect\Validation\Validator as v;
 class AnswerValidatorBuilder
 {
     private const BUILDER_METHOD_MAP = [
+        Question::QT_1_ARRAY_DUAL => 'buildForArrayDual',
         Question::QT_5_POINT_CHOICE => 'buildFor5PointChoice',
         Question::QT_A_ARRAY_5_POINT => 'buildForArray5PointChoice',
         Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'buildForArray10PointChoice',
@@ -309,6 +311,32 @@ class AnswerValidatorBuilder
     {
         return self::buildForArrayOfAllowedStrings($question, ['Y', 'N', 'U']);
     }
+
+    private static function buildForArrayDual(Question $question): Validator
+    {
+        $filterPossibleAnswers = function (int $scaleId) use ($question) {
+            $possibleAnswers = [];
+
+            foreach ($question->answers as $answer) {
+                if ($answer->scale_id === $scaleId) {
+                    $possibleAnswers[] = $answer->code;
+                }
+            }
+
+            return $possibleAnswers;
+        };
+
+        return self::buildForArray($question, function () use ($filterPossibleAnswers, $question) {
+            return v::nullable(
+                v::arrayType()
+                    ->length(2, 2, true)
+                    ->keySet(
+                        v::key(0, v::in($filterPossibleAnswers(0))),
+                        v::key(1, v::in($filterPossibleAnswers(1)))
+                    )
+            );
+        });
+    }
 }
 
 /**
@@ -317,6 +345,7 @@ class AnswerValidatorBuilder
 class AnswerFieldGenerator
 {
     private const GENERATOR_METHOD_MAP = [
+        Question::QT_1_ARRAY_DUAL => 'generateArrayDual',
         Question::QT_5_POINT_CHOICE => 'generate',
         Question::QT_A_ARRAY_5_POINT => 'generateArray',
         Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'generateArray',
@@ -373,6 +402,16 @@ class AnswerFieldGenerator
     {
         foreach ($answer as $subQuestionCode => $subAnswer) {
             yield self::makeSubQuestionFieldName($question, $subQuestionCode) => $subAnswer;
+        }
+    }
+
+    private static function generateArrayDual(Question $question, ?array $answer): Generator
+    {
+        foreach ($answer as $subQuestionCode => $subAnswerPair) {
+            foreach ($subAnswerPair as $key => $subAnswerPairItem) {
+                yield self::makeSubQuestionFieldName($question, $subQuestionCode) . "#$key"
+                    => $subAnswerPairItem;
+            }
         }
     }
 }

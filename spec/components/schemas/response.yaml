@@ -49,10 +49,7 @@ response:
           description: Specific to 'List with comment' question type
           properties:
             code:
-              type: string
-              description: The answer code
-              minLength: 1
-              maxLength: 5
+              $ref: "./answer.yaml#/answer_code"
             comment:
               type: string
 
@@ -60,11 +57,12 @@ response:
           description: |
             Mapping of each subquestion code to its answer. Specific to following question types:
 
-            - Array (5 point choice)
-            - Array (10 point choice)
-            - Array (Increase/Same/Decrease)
-            - Array (Yes/No/Uncertain)
-            - Array (using flexible labels)
+            - Array, 5 point choice
+            - Array, 10 point choice
+            - Array, Increase/Same/Decrease
+            - Array, Yes/No/Uncertain
+            - Array, using flexible labels
+            - Array, dual scale
 
           additionalProperties:
             oneOf:
@@ -74,17 +72,17 @@ response:
                   the question was leaved unanswered.
 
               - type: integer
-                description: Specific to 'Array (5 point choice)' question type
+                description: Specific to 'Array, 5 point choice' question type
                 minimum: 1
                 maximum: 5
 
               - type: integer
-                description: Specific to 'Array (10 point choice)' question type
+                description: Specific to 'Array, 10 point choice' question type
                 minimum: 1
                 maximum: 10
 
               - type: string
-                description: Specific to 'Array (Increase/Same/Decrease)' question type
+                description: Specific to 'Array, Increase/Same/Decrease' question type
                 minLength: 1
                 maxLength: 1
                 enum:
@@ -93,7 +91,7 @@ response:
                   - D
 
               - type: string
-                description: Specific to 'Array (Yes/No/Uncertain)' question type
+                description: Specific to 'Array, Yes/No/Uncertain' question type
                 minLength: 1
                 maxLength: 1
                 enum:
@@ -101,8 +99,15 @@ response:
                   - N
                   - U
 
-              - type: string
+              - allOf:
+                  - $ref: "./answer.yaml#/answer_code"
+                  - description: >
+                      The answer code; specific to 'Array, using flexible labels' question type
+
+              - type: array
                 description: >
-                  The answer code specific to 'Array (using flexible labels)' question type
-                minLength: 1
-                maxLength: 5
+                  A pair of answer codes; specific to 'Array, dual scale' question type
+                minItems: 2
+                maxItems: 2
+                items:
+                  $ref: "./answer.yaml#/answer_code"
