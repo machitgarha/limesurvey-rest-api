@@ -554,16 +554,24 @@ class AnswerFieldGenerator
         }
     }
 
-    private static function generateMultipleChoice(Question $question, ?bool $answer): Generator
+    private static function generateMultipleChoice(Question $question, ?array $answer): Generator
     {
-        yield self::makeQuestionFieldName($question) => $answer ? 'Y' : null;
+        foreach ($answer as $subQuestionCode => $answerValue) {
+            yield
+                self::makeSubQuestionFieldName($question, $subQuestionCode)
+                => $answerValue ? 'Y' : null;
+        }
     }
 
     private static function generateMultipleChoiceWithComments(
         Question $question,
         ?array $answer
     ): Generator {
-        yield self::generateMultipleChoice($question, $answer['is_selected']);
-        yield self::makeQuestionFieldName($question) . 'comment' => $answer['comment'] ?? null;
+        foreach ($answer as $subQuestionCode => $answerValue) {
+            $subQuestionFieldName = self::makeSubQuestionFieldName($question, $subQuestionCode);
+
+            yield $subQuestionFieldName => $answerValue['is_selected'] ? 'Y' : null;
+            yield $subQuestionFieldName . 'comment' => $answerValue['comment'] ?? null;
+        }
     }
 }
