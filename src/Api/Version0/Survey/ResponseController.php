@@ -508,10 +508,12 @@ class AnswerFieldGenerator
         foreach ($survey->allQuestions as $question) {
             $method = self::GENERATOR_METHOD_MAP[$question->type] ?? 'generateDummy';
 
-            yield from self::{$method}(
-                $question,
-                $answersData['answers'][$question->qid]
-            );
+            if ($question->parent_qid === 0) {
+                yield from self::{$method}(
+                    $question,
+                    $answersData['answers'][$question->qid]
+                );
+            }
         }
     }
 
