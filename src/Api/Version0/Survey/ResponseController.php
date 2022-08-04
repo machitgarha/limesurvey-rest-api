@@ -178,6 +178,8 @@ class AnswerValidatorBuilder
         Question::QT_L_LIST => 'buildForList',
         Question::QT_O_LIST_WITH_COMMENT => 'buildForListWithComment',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildForList',
+        Question::QT_COLON_ARRAY_NUMBERS => 'buildForArray2dNumbers',
+        Question::QT_SEMICOLON_ARRAY_TEXT => 'buildForArray2dTexts',
     ];
 
     /** @var bool */
@@ -261,13 +263,14 @@ class AnswerValidatorBuilder
     private function buildForListWithComment(Question $question): Validator
     {
         return v::create()
-            ->key('code', self::buildForList($question))
+            ->key('code', $this->buildForList($question))
             ->key('comment', v::stringType());
     }
 
     private function buildForArray(
         Question $question,
-        callable $valueValidatorBuilder
+        callable $valueValidatorBuilder,
+        array $subQuestions = null
     ): Validator {
         $mandatory = $this->isMandatory($question);
 
@@ -280,13 +283,13 @@ class AnswerValidatorBuilder
                     $mandatory
                 );
             },
-            $question->subquestions
+            $subQuestions ?? $question->subquestions
         ));
     }
 
     private function buildForArraySomePointChoice(Question $question, int $count): Validator
     {
-        return self::buildForArray($question, function () use ($count) {
+        return $this->buildForArray($question, function () use ($count) {
             return v::create()
                 ->intType()
                 ->between(1, $count);
@@ -295,12 +298,12 @@ class AnswerValidatorBuilder
 
     private function buildForArray5PointChoice(Question $question): Validator
     {
-        return self::buildForArraySomePointChoice($question, 5);
+        return $this->buildForArraySomePointChoice($question, 5);
     }
 
     private function buildForArray10PointChoice(Question $question): Validator
     {
-        return self::buildForArraySomePointChoice($question, 10);
+        return $this->buildForArraySomePointChoice($question, 10);
     }
 
     /**
@@ -311,7 +314,7 @@ class AnswerValidatorBuilder
         Question $question,
         array $allowedValues
     ): Validator {
-        return self::buildForArray($question, function () use ($allowedValues) {
+        return $this->buildForArray($question, function () use ($allowedValues) {
             return v::create()
                 ->stringType()
                 ->in($allowedValues);
@@ -320,12 +323,12 @@ class AnswerValidatorBuilder
 
     private function buildForArrayIncreaseSameDecrease(Question $question): Validator
     {
-        return self::buildForArrayOfAllowedStrings($question, ['I', 'S', 'D']);
+        return $this->buildForArrayOfAllowedStrings($question, ['I', 'S', 'D']);
     }
 
     private function buildForArrayWithPredefinedChoices(Question $question): Validator
     {
-        return self::buildForArrayOfAllowedStrings(
+        return $this->buildForArrayOfAllowedStrings(
             $question,
             \array_column($question->answers, 'code')
         );
@@ -333,7 +336,7 @@ class AnswerValidatorBuilder
 
     private function buildForArrayYesNoUncertain(Question $question): Validator
     {
-        return self::buildForArrayOfAllowedStrings($question, ['Y', 'N', 'U']);
+        return $this->buildForArrayOfAllowedStrings($question, ['Y', 'N', 'U']);
     }
 
     private function buildForArrayDual(Question $question): Validator
@@ -358,12 +361,57 @@ class AnswerValidatorBuilder
             );
         };
 
-        return self::buildForArray($question, function () use ($makeKey) {
-            return v::nullable(
-                v::arrayType()
-                    ->length(0, 2, true)
-                    ->keySet($makeKey(0), $makeKey(1))
-            );
+        return $this->buildForArray($question, function () use ($makeKey) {
+            return v::create()
+                ->arrayType()
+                ->length(0, 2, true)
+                ->keySet($makeKey(0), $makeKey(1));
+        });
+    }
+
+    private function buildForArray2d(
+        Question $question,
+        callable $valueValidatorBuilder
+    ): Validator {
+        $filterSubQuestions = function (int $scaleId) use ($question) {
+            $subQuestionList = [];
+
+            foreach ($question->subquestions as $subQuestion) {
+                if ($subQuestion->scale_id === $scaleId) {
+                    $subQuestionList[] = $subQuestion->title;
+                }
+            }
+
+            return $subQuestionList;
+        };
+
+        return $this->buildForArray(
+            $question,
+            function () use ($question, $valueValidatorBuilder, $filterSubQuestions) {
+                return $this->buildForArray(
+                    $question,
+                    $valueValidatorBuilder,
+                    $filterSubQuestions(1)
+                );
+            },
+            $filterSubQuestions(0)
+        );
+    }
+
+    private function buildForArray2dNumbers(Question $question): Validator
+    {
+        return $this->buildForArray2d($question, function () {
+            return v::create()
+                ->intType()
+                ->between(1, 10);
+        });
+    }
+
+    private function buildForArray2dTexts(Question $question): Validator
+    {
+        return $this->buildForArray2d($question, function () {
+            return v::create()
+                ->stringType();
         });
     }
 }
@@ -385,6 +433,8 @@ class AnswerFieldGenerator
         Question::QT_L_LIST => 'generate',
         Question::QT_O_LIST_WITH_COMMENT => 'generateListWithComment',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'generate',
+        Question::QT_COLON_ARRAY_NUMBERS => 'generateArray2d',
+        Question::QT_SEMICOLON_ARRAY_TEXT => 'generateArray2d',
     ];
 
     public static function generateAll(Survey $survey, array $answersData): Generator
@@ -441,6 +491,21 @@ class AnswerFieldGenerator
             foreach ($subAnswerPair as $key => $subAnswerPairItem) {
                 yield self::makeSubQuestionFieldName($question, $subQuestionCode) . "#$key"
                     => $subAnswerPairItem;
+            }
+        }
+    }
+
+    private static function generateArray2d(Question $question, ?array $answer): Generator
+    {
+        foreach ($answer as $yScaleSubQuestionCode => $yAnswer) {
+            foreach ($yAnswer as $xScaleSubQuestionCode => $answerValue) {
+                yield
+                    self::makeSubQuestionFieldName(
+                        $question,
+                        $yScaleSubQuestionCode,
+                        $xScaleSubQuestionCode
+                    )
+                    => $answerValue;
             }
         }
     }

@@ -54,22 +54,16 @@ response:
               type: string
 
         - type: object
-          description: |
-            Mapping of each subquestion code to its answer. Specific to following question types:
-
-            - Array, 5 point choice
-            - Array, 10 point choice
-            - Array, Increase/Same/Decrease
-            - Array, Yes/No/Uncertain
-            - Array, using flexible labels
-            - Array, dual scale
+          description: >
+            Mapping of each subquestion code to its answer. Specific to 'Array' question types (
+            e.g. 'Array, Yes/No/Uncertain', 'Array, dual scale').
 
           additionalProperties:
             oneOf:
               - type: 'null'
                 description: >
-                  If the question's mandatory property set to No or Soft, giving a null value means
-                  the question was leaved unanswered.
+                  If parent question's mandatory property set to No or Soft, giving a null value
+                  means the question was leaved unanswered.
 
               - type: integer
                 description: Specific to 'Array, 5 point choice' question type
@@ -102,7 +96,8 @@ response:
               - allOf:
                   - $ref: "./answer.yaml#/answer_code"
                   - description: >
-                      The answer code; specific to 'Array, using flexible labels' question type
+                      The answer code; specific to 'Array (using flexible labels)' and 'Array,
+                      column' question types
 
               - type: array
                 description: >
@@ -113,3 +108,24 @@ response:
                 maxItems: 2
                 items:
                   $ref: "./answer.yaml#/answer_code"
+
+              - type: object
+                description: >
+                  The key is the subquestion code with Y-scale. The value is a mapping of
+                  subquestion code with X-scale to their actual values (i.e. answers).
+
+                additionalProperties:
+                  oneOf:
+                    - type: 'null'
+                      description: >
+                        If parent question's mandatory property set to No or Soft, giving a null
+                        value means the question was leaved unanswered.
+
+                    - type: integer
+                      description: Specific to 'Array, numbers' question type
+                      minimum: 1
+                      maximum: 10
+
+                    - allOf:
+                      - $ref: "./answer.yaml#/answer_code"
+                      - description: The answer code; specific to 'Array, texts' question types
