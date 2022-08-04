@@ -125,7 +125,7 @@ class Plugin extends PluginBase
             $response = $this->makeJsonErrorResponse(new InternalServerError());
         }
 
-        echo $response;
+        $response->send();
     }
 
     private function makeController(string $controllerClass, array $params): Controller
