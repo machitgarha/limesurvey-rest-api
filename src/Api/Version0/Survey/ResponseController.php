@@ -173,7 +173,8 @@ class AnswerValidatorBuilder
         Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'buildForArray10PointChoice',
         Question::QT_C_ARRAY_YES_UNCERTAIN_NO => 'buildForArrayYesNoUncertain',
         Question::QT_E_ARRAY_INC_SAME_DEC => 'buildForArrayIncreaseSameDecrease',
-        Question::QT_F_ARRAY => 'buildForArrayUsingFlexibleLabels',
+        Question::QT_F_ARRAY => 'buildForArrayWithPredefinedChoices',
+        Question::QT_H_ARRAY_COLUMN => 'buildForArrayWithPredefinedChoices',
         Question::QT_L_LIST => 'buildForList',
         Question::QT_O_LIST_WITH_COMMENT => 'buildForListWithComment',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildForList',
@@ -268,12 +269,15 @@ class AnswerValidatorBuilder
         Question $question,
         callable $valueValidatorBuilder
     ): Validator {
+        $mandatory = $this->isMandatory($question);
+
         return v::keySet(...\array_map(
-            function (Question $subQuestion) use ($valueValidatorBuilder, $question) {
+            function (Question $subQuestion) use ($valueValidatorBuilder, $question, $mandatory) {
+                $validator = $valueValidatorBuilder();
                 return v::key(
                     $subQuestion->title,
-                    $valueValidatorBuilder(),
-                    $this->isMandatory($question)
+                    $mandatory ? $validator : v::nullable($validator),
+                    $mandatory
                 );
             },
             $question->subquestions
@@ -319,7 +323,7 @@ class AnswerValidatorBuilder
         return self::buildForArrayOfAllowedStrings($question, ['I', 'S', 'D']);
     }
 
-    private function buildForArrayUsingFlexibleLabels(Question $question): Validator
+    private function buildForArrayWithPredefinedChoices(Question $question): Validator
     {
         return self::buildForArrayOfAllowedStrings(
             $question,
@@ -377,6 +381,7 @@ class AnswerFieldGenerator
         Question::QT_C_ARRAY_YES_UNCERTAIN_NO => 'generateArray',
         Question::QT_E_ARRAY_INC_SAME_DEC => 'generateArray',
         Question::QT_F_ARRAY => 'generateArray',
+        Question::QT_H_ARRAY_COLUMN => 'generateArray',
         Question::QT_L_LIST => 'generate',
         Question::QT_O_LIST_WITH_COMMENT => 'generateListWithComment',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'generate',
