@@ -36,12 +36,19 @@ response:
               - Image select list (radio)
               - List (radio)
               - List (dropdown)
-              - Short free text
-              - Long free text
-              - Huge free text
               - Language switch
               - Yes/no
               - Gender
+
+        - type: string
+          description: |
+            The answer text. Specific to following question types:
+
+            - Browser detection
+            - Short free text
+            - Long free text
+            - Huge free text
+          minLength: 1
 
         - type: object
           description: Specific to 'List with comment' question type

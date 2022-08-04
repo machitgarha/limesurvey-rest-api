@@ -179,6 +179,9 @@ class AnswerValidatorBuilder
         Question::QT_M_MULTIPLE_CHOICE => 'buildForMultipleChoice',
         Question::QT_O_LIST_WITH_COMMENT => 'buildForListWithComment',
         Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS => 'buildForMultipleChoiceWithComments',
+        Question::QT_S_SHORT_FREE_TEXT => 'buildForText',
+        Question::QT_T_LONG_FREE_TEXT => 'buildForText',
+        Question::QT_U_HUGE_FREE_TEXT => 'buildForText',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildForList',
         Question::QT_COLON_ARRAY_NUMBERS => 'buildForArray2dNumbers',
         Question::QT_SEMICOLON_ARRAY_TEXT => 'buildForArray2dTexts',
@@ -456,6 +459,13 @@ class AnswerValidatorBuilder
 
         return $validator;
     }
+
+    private function buildForText(Question $question): Validator
+    {
+        return v::create()
+            ->stringType()
+            ->length(1, null, true);
+    }
 }
 
 /**
@@ -476,6 +486,9 @@ class AnswerFieldGenerator
         Question::QT_M_MULTIPLE_CHOICE => 'generateMultipleChoice',
         Question::QT_O_LIST_WITH_COMMENT => 'generateListWithComment',
         Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS => 'generateMultipleChoiceWithComments',
+        Question::QT_S_SHORT_FREE_TEXT => 'generate',
+        Question::QT_T_LONG_FREE_TEXT => 'generate',
+        Question::QT_U_HUGE_FREE_TEXT => 'generate',
         Question::QT_EXCLAMATION_LIST_DROPDOWN => 'generate',
         Question::QT_COLON_ARRAY_NUMBERS => 'generateArray2d',
         Question::QT_SEMICOLON_ARRAY_TEXT => 'generateArray2d',
