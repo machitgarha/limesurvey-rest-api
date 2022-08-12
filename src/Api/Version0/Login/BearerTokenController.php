@@ -15,6 +15,8 @@ use MAChitgarha\LimeSurveyRestApi\Error\AccessTokenExpiredError;
 use MAChitgarha\LimeSurveyRestApi\Error\InvalidCredentialsError;
 use MAChitgarha\LimeSurveyRestApi\Error\TooManyAuthenticationFailuresError;
 
+use MAChitgarha\LimeSurveyRestApi\Helper\Response\EmptyResponse;
+
 use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
 use Respect\Validation\Validator as v;
@@ -130,7 +132,7 @@ class BearerTokenController implements Controller
         return $session;
     }
 
-    public function delete(): Response
+    public function delete(): EmptyResponse
     {
         ContentTypeValidator::validateIsJson($this->getRequest());
 
@@ -142,7 +144,6 @@ class BearerTokenController implements Controller
             // Deletion doesn't care about expiration
         }
 
-        return new Response('', Response::HTTP_NO_CONTENT);
+        return new EmptyResponse();
     }
-
 }

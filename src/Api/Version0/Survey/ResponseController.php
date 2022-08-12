@@ -26,6 +26,8 @@ use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotActiveError;
 use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
 
+use MAChitgarha\LimeSurveyRestApi\Helper\Response\EmptyResponse;
+
 use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
 use Respect\Validation\Exceptions\ValidatorException;
@@ -34,7 +36,6 @@ use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
 
@@ -54,7 +55,7 @@ class ResponseController implements Controller
         throw new NotImplementedError();
     }
 
-    public function new(): Response
+    public function new(): EmptyResponse
     {
         ContentTypeValidator::validateIsJson($this->getRequest());
 
@@ -83,7 +84,7 @@ class ResponseController implements Controller
             throw new RuntimeException('Cannot create response');
         }
 
-        return new Response('', Response::HTTP_CREATED);
+        return new EmptyResponse(Response::HTTP_CREATED);
     }
 
     private function validateResponseData(array $responseData, Survey $survey): void

@@ -18,10 +18,10 @@ use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
 use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
 
-use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
+use MAChitgarha\LimeSurveyRestApi\Helper\Response\JsonResponse;
+use MAChitgarha\LimeSurveyRestApi\Helper\Response\EmptyResponse;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
 use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
 
@@ -65,7 +65,7 @@ class SurveyController implements Controller
         );
     }
 
-    public function new(): Response
+    public function new(): EmptyResponse
     {
         throw new NotImplementedError();
     }
@@ -86,12 +86,12 @@ class SurveyController implements Controller
         throw new NotImplementedError();
     }
 
-    public function update(): Response
+    public function update(): EmptyResponse
     {
         throw new NotImplementedError();
     }
 
-    public function delete(): Response
+    public function delete(): EmptyResponse
     {
         throw new NotImplementedError();
     }

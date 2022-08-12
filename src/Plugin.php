@@ -23,13 +23,14 @@ use MAChitgarha\LimeSurveyRestApi\Error\MethodNotAllowedError;
 use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
 use MAChitgarha\LimeSurveyRestApi\Error\MalformedRequestBodyError;
 
+use MAChitgarha\LimeSurveyRestApi\Helper\Response\JsonResponse;
+
 use MAChitgarha\LimeSurveyRestApi\Routing\Router;
 
 use Respect\Validation\Exceptions\KeyException;
 use Respect\Validation\Exceptions\ValidationException;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
