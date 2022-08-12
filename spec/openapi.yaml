@@ -31,8 +31,11 @@ paths:
     $ref: "./paths/surveys/questions/answers.yaml"
   /surveys/{survey_id}/questions/{question_id}/answers/{answer_id}:
     $ref: "./paths/surveys/questions/answers_by_id.yaml"
+
   /surveys/{survey_id}/responses:
     $ref: "./paths/surveys/responses.yaml"
+  /surveys/{survey_id}/responses/validation:
+    $ref: "./paths/surveys/responses/validation.yaml"
 
 components:
   securitySchemes:
