@@ -8,8 +8,10 @@ use Survey;
 use Question;
 use CController;
 use SurveyDynamic;
+use CHttpException;
 use LogicException;
 use RuntimeException;
+use LimeExpressionManager;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
@@ -22,9 +24,11 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerV
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
 
+use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
 use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotActiveError;
 use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
+use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\Response\EmptyResponse;
 
@@ -35,6 +39,7 @@ use Respect\Validation\Exceptions\ValidatorException;
 use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
@@ -61,9 +66,10 @@ class ResponseController implements Controller
 
         $userId = $this->authorize()->getId();
 
-        $survey = SurveyController::getSurvey(
-            $surveyId = (int) $this->getPathParameter('survey_id')
+        $surveyInfo = SurveyController::getSurveyInfo(
+            (int) $this->getPathParameter('survey_id')
         );
+        $survey = $surveyInfo['oSurvey'];
 
         PermissionChecker::assertHasSurveyPermission(
             $survey,
@@ -73,6 +79,8 @@ class ResponseController implements Controller
         );
 
         $data = $this->decodeJsonRequestBodyInnerData();
+        $this->validateResponseData($data, $survey);
+
         $recordData = $this->generateResponseRecord($data, $survey);
 
         $this->validateResponseData($recordData, $survey);
@@ -87,12 +95,33 @@ class ResponseController implements Controller
         return new EmptyResponse(Response::HTTP_CREATED);
     }
 
-    private function validateResponseData(array $responseData, Survey $survey): void
+    private function validateResponseData(array $responseData, array $surveyInfo): void
     {
         Yii::import('application.controllers.survey.index', true);
-
         $indexPage = new Index($this, 1);
-        $indexPage->action();
+
+        try {
+            $thissurvey = $surveyInfo;
+            $survey = $surveyInfo['oSurvey'];
+            $_POST += [
+                'sid' => $survey->sid,
+            ];
+
+            $indexPage->action();
+
+        } catch (CHttpException $exception) {
+            /**
+             * We know the survey exists, because no exceptions thrown before. So, in this case,
+             * it's an unexpected error instead.
+             */
+            if ($exception->statusCode === Response::HTTP_NOT_FOUND) {
+                throw new InternalServerError(
+                    $exception->getMessage(),
+                    $exception->getCode(),
+                    $exception
+                );
+            }
+        }
 
         if (!App()->db->schema->getTable($survey->responsesTableName)) {
             if ($survey->active !== 'N') {

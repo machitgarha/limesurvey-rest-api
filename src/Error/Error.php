@@ -2,15 +2,17 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Error;
 
+use Throwable;
+
 abstract class Error extends \Exception
 {
     protected const DEFAULT_MESSAGE = null;
 
     abstract public function getHttpStatusCode(): int;
 
-    public function __construct(string $message = null, ...$args)
+    public function __construct(string $message = null, int $code = 0, ?Throwable $previous = null)
     {
-        parent::__construct($message ?? self::DEFAULT_MESSAGE ?? '', ...$args);
+        parent::__construct($message ?? self::DEFAULT_MESSAGE ?? '', $code, $previous);
     }
 
     public function getId(): string
