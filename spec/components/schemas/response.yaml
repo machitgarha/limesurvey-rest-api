@@ -1,159 +1,177 @@
 response:
-  type: object
-  required:
-    - answers
-  submit_time:
-    allOf:
-      - $ref: "./types.yaml#/date_time"
-      - description: Submission time; defaults to current server time
-  start_time:
-    allOf:
-      - $ref: "./types.yaml#/date_time"
-      - description: The time responding has been started; defaults to current server time
-  end_time:
-    allOf:
-      - $ref: "./types.yaml#/date_time"
-      - description: The time responder did the last action; defaults to current server time
+  allOf:
+    - oneOf:
+      - type: object
+        description: When the survey format is question-by-question
+        required: [question_id]
+        properties:
+          question_id:
+            $ref: "../../components/schemas/question.yaml#/question_id"
+      - type: object
+        description: When the survey format is group-by-group
+        required: [question_group_id]
+        properties:
+          question_group_id:
+            $ref: "../../components/schemas/question_group.yaml#/question_group_id"
+      - type: object
+        description: When the survey format is all-in-one
 
-  answers:
-    type: object
-    description: Mappings of question IDs to the answers
-    additionalProperties:
-      oneOf:
-        - $ref: "#/response_answer_unanswered"
+    - type: object
+      required:
+        - answers
+      properties:
+        submit_time:
+          allOf:
+            - $ref: "./types.yaml#/date_time"
+            - description: Submission time; defaults to current server time
+        start_time:
+          allOf:
+            - $ref: "./types.yaml#/date_time"
+            - description: The time responding has been started; defaults to current server time
+        end_time:
+          allOf:
+            - $ref: "./types.yaml#/date_time"
+            - description: The time responder did the last action; defaults to current server time
 
-        - type: integer
-          description: Specific to '5 point choice' question type
-          minimum: 1
-          maximum: 5
-
-        - allOf:
-          - $ref: "./answer.yaml#/answer_code"
-          - description: |
-              The answer code. Specific to following question types:
-
-              - Bootstrap options (buttons)
-              - Bootstrap dropdown
-              - Image select list (radio)
-              - List (radio)
-              - List (dropdown)
-              - Language switch
-              - Yes/no
-              - Gender
-
-        - type: string
-          description: |
-            The answer text. Specific to following question types:
-
-            - Browser detection
-            - Short free text
-            - Long free text
-            - Huge free text
-          minLength: 1
-
-        - type: object
-          description: Specific to 'List with comment' question type
-          properties:
-            code:
-              $ref: "./answer.yaml#/answer_code"
-            comment:
-              type: string
-
-        - type: object
-          description: >
-            Mapping of each subquestion code to its answer. Specific question types having
-            subquestions (e.g. all Arrays', Multiple choices, Multiple free texts).
-
+        answers:
+          type: object
+          description: Mappings of question IDs to the answers
           additionalProperties:
             oneOf:
               - $ref: "#/response_answer_unanswered"
 
               - type: integer
-                description: Specific to 'Array, 5 point choice' question type
+                description: Specific to '5 point choice' question type
                 minimum: 1
                 maximum: 5
 
-              - type: integer
-                description: Specific to 'Array, 10 point choice' question type
-                minimum: 1
-                maximum: 10
-
-              - type: string
-                description: Specific to 'Array, Increase/Same/Decrease' question type
-                minLength: 1
-                maxLength: 1
-                enum:
-                  - I
-                  - S
-                  - D
-
-              - type: string
-                description: Specific to 'Array, Yes/No/Uncertain' question type
-                minLength: 1
-                maxLength: 1
-                enum:
-                  - Y
-                  - N
-                  - U
-
               - allOf:
-                  - $ref: "./answer.yaml#/answer_code"
-                  - description: >
-                      The answer code; specific to 'Array (using flexible labels)' and 'Array,
-                      column' question types
+                - $ref: "./answer.yaml#/answer_code"
+                - description: |
+                    The answer code. Specific to following question types:
 
-              - type: array
-                description: >
-                  A pair of answer codes; specific to 'Array, dual scale' question type. If the
-                  question is not mandatory, then passing the first or second element as null is
-                  possible.
-                minItems: 1
-                maxItems: 2
-                items:
-                  oneOf:
-                    - $ref: "#/response_answer_unanswered"
-                    - $ref: "./answer.yaml#/answer_code"
+                    - Bootstrap options (buttons)
+                    - Bootstrap dropdown
+                    - Image select list (radio)
+                    - List (radio)
+                    - List (dropdown)
+                    - Language switch
+                    - Yes/no
+                    - Gender
+
+              - type: string
+                description: |
+                  The answer text. Specific to following question types:
+
+                  - Browser detection
+                  - Short free text
+                  - Long free text
+                  - Huge free text
+                minLength: 1
+
+              - type: object
+                description: Specific to 'List with comment' question type
+                properties:
+                  code:
+                    $ref: "./answer.yaml#/answer_code"
+                  comment:
+                    type: string
 
               - type: object
                 description: >
-                  The key is the subquestion code with Y-scale. The value is a mapping of
-                  subquestion code with X-scale to their actual values (i.e. answers).
+                  Mapping of each subquestion code to its answer. Specific question types having
+                  subquestions (e.g. all Arrays', Multiple choices, Multiple free texts).
 
                 additionalProperties:
                   oneOf:
                     - $ref: "#/response_answer_unanswered"
 
                     - type: integer
-                      description: Specific to 'Array, numbers' question type
+                      description: Specific to 'Array, 5 point choice' question type
+                      minimum: 1
+                      maximum: 5
+
+                    - type: integer
+                      description: Specific to 'Array, 10 point choice' question type
                       minimum: 1
                       maximum: 10
 
                     - type: string
-                      description: The answer text; specific to 'Array, texts' question types
+                      description: Specific to 'Array, Increase/Same/Decrease' question type
                       minLength: 1
+                      maxLength: 1
+                      enum:
+                        - I
+                        - S
+                        - D
 
-              - type: boolean
-                description: >
-                  Whether the subquestion is selected or not. Specific to all 'Mutliple choice'
-                  question types except the 'Multiple choice with comments'.
+                    - type: string
+                      description: Specific to 'Array, Yes/No/Uncertain' question type
+                      minLength: 1
+                      maxLength: 1
+                      enum:
+                        - Y
+                        - N
+                        - U
 
-              - type: object
-                description: Specific to 'Multiple choice with comments' question type
-                required: [is_selected]
-                properties:
-                  is_selected:
-                    type: boolean
-                    description: Whether the subquestion is selected or not
-                  comment:
-                    oneOf:
-                      - type: 'null'
-                        description: When is_selected is false
-                      - type: string
-                        description: When is_selected is true
+                    - allOf:
+                        - $ref: "./answer.yaml#/answer_code"
+                        - description: >
+                            The answer code; specific to 'Array (using flexible labels)' and
+                            'Array, column' question types
 
-              - type: string
-                description: Specific to 'Multiple short free texts' question type
-                minLength: 1
+                    - type: array
+                      description: >
+                        A pair of answer codes; specific to 'Array, dual scale' question type. If the
+                        question is not mandatory, then passing the first or second element as null is
+                        possible.
+                      minItems: 1
+                      maxItems: 2
+                      items:
+                        oneOf:
+                          - $ref: "#/response_answer_unanswered"
+                          - $ref: "./answer.yaml#/answer_code"
+
+                    - type: object
+                      description: >
+                        The key is the subquestion code with Y-scale. The value is a mapping of
+                        subquestion code with X-scale to their actual values (i.e. answers).
+
+                      additionalProperties:
+                        oneOf:
+                          - $ref: "#/response_answer_unanswered"
+
+                          - type: integer
+                            description: Specific to 'Array, numbers' question type
+                            minimum: 1
+                            maximum: 10
+
+                          - type: string
+                            description: The answer text; specific to 'Array, texts' question types
+                            minLength: 1
+
+                    - type: boolean
+                      description: >
+                        Whether the subquestion is selected or not. Specific to all 'Mutliple
+                        choice' question types except the 'Multiple choice with comments'.
+
+                    - type: object
+                      description: Specific to 'Multiple choice with comments' question type
+                      required: [is_selected]
+                      properties:
+                        is_selected:
+                          type: boolean
+                          description: Whether the subquestion is selected or not
+                        comment:
+                          oneOf:
+                            - type: 'null'
+                              description: When is_selected is false
+                            - type: string
+                              description: When is_selected is true
+
+                    - type: string
+                      description: Specific to 'Multiple short free texts' question type
+                      minLength: 1
 
 response_answer_unanswered:
   type: 'null'
