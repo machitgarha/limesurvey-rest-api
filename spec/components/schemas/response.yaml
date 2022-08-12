@@ -1,4 +1,5 @@
 response:
+  type: object
   required:
     - answers
   submit_time:
