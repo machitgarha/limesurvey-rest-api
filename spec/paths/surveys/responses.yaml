@@ -34,7 +34,9 @@ post:
           required: [data]
           properties:
             data:
-              $ref: "../../components/schemas/response.yaml#/response"
+              type: object
+              properties:
+                $ref: "../../components/schemas/response.yaml#/response"
   responses:
     "201":
       description: Created
