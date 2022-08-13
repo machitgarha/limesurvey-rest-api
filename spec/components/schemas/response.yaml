@@ -210,3 +210,7 @@ response_answer_unanswered:
 response_id:
   type: integer
   description: Survey response ID
+
+file_contents:
+  type: string
+  description: Base64-encoded contents of the file

@@ -36,6 +36,8 @@ paths:
     $ref: "./paths/surveys/responses.yaml"
   /surveys/{survey_id}/responses/{response_id}:
     $ref: "./paths/surveys/responses_by_id.yaml"
+  /surveys/{survey_id}/responses/{response_id}/files/{file_id}:
+    $ref: "./paths/surveys/responses/files_by_id.yaml"
 
 components:
   securitySchemes:
