@@ -81,6 +81,11 @@ response:
                   - M
                   - F
 
+              - type: array
+                description: >
+                  The answers (i.e. choices) sorted by their rankings. Specific to Ranking question
+                  types. If a choice is not ranked, then it must be excluded. 
+
               - type: object
                 description: Specific to 'List with comment' question type
                 properties:
@@ -92,8 +97,8 @@ response:
               - type: object
                 description: >
                   Mapping of each subquestion code to its answer. Specific question types having
-                  subquestions; including all Arrays (e.g. 'Array, dual scale') and Multiple inputs
-                  (e.g. Mutiple choices).
+                  subquestions; including all Arrays (e.g. 'Array, dual scale'), Multiple inputs
+                  (e.g. Mutiple choices), and Rankings.
 
                 additionalProperties:
                   oneOf:

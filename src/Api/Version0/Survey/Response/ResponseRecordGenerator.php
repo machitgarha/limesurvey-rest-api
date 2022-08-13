@@ -64,6 +64,7 @@ class AnswerFieldGenerator
         Question::QT_O_LIST_WITH_COMMENT => 'generateListWithComment',
         Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS => 'generateMultipleChoiceWithComments',
         Question::QT_Q_MULTIPLE_SHORT_TEXT => 'generateSubQuestions',
+        Question::QT_R_RANKING => 'generateRanking',
         Question::QT_S_SHORT_FREE_TEXT => 'generate',
         Question::QT_T_LONG_FREE_TEXT => 'generate',
         Question::QT_U_HUGE_FREE_TEXT => 'generate',
@@ -166,6 +167,14 @@ class AnswerFieldGenerator
 
             yield $subQuestionFieldName => $answerValue['is_selected'] ? 'Y' : null;
             yield $subQuestionFieldName . 'comment' => $answerValue['comment'] ?? null;
+        }
+    }
+
+    private static function generateRanking(Question $question, ?array $answer): Generator
+    {
+        foreach ($answer as $ranking => $answerItem) {
+            $fieldName = self::makeQuestionFieldName($question) . $ranking;
+            yield $fieldName => $answerItem;
         }
     }
 }
