@@ -83,7 +83,7 @@ class ResponseController implements Controller
         $data = $this->decodeJsonRequestBodyInnerData();
         $this->validateResponseData($data, $survey);
 
-        $recordData = ResponseRecordGenerator::generate($data, $survey);
+        $recordData = RecordGenerator::generate($data, $survey);
 
         $this->validateResponseData($recordData, $survey);
 

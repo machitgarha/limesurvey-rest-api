@@ -7,11 +7,9 @@ use Survey;
 use Question;
 use Generator;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ResponseRecordGenerator\{
-    AnswerFieldGenerator
-};
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\RecordGenerator\AnswerGenerator;
 
-class ResponseRecordGenerator
+class RecordGenerator
 {
     public static function generate(array $responseData, Survey $survey)
     {
@@ -23,7 +21,7 @@ class ResponseRecordGenerator
             'startlanguage' => $survey->language,
 
         ] + \iterator_to_array(
-            AnswerFieldGenerator::generateAll($survey, $responseData)
+            AnswerGenerator::generateAll($survey, $responseData)
         );
 
         if ($survey->isDateStamp) {
@@ -37,14 +35,16 @@ class ResponseRecordGenerator
     }
 }
 
-namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ResponseRecordGenerator;
+namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\RecordGenerator;
 
 use Question;
+
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FieldNameGenerator;
 
 /**
  * @internal
  */
-class AnswerFieldGenerator
+class AnswerGenerator
 {
     private const GENERATOR_METHOD_MAP = [
         Question::QT_1_ARRAY_DUAL => 'generateArrayDual',
@@ -90,19 +90,6 @@ class AnswerFieldGenerator
         }
     }
 
-    private static function makeQuestionFieldName(Question $question): string
-    {
-        return "{$question->sid}X{$question->gid}X{$question->qid}";
-    }
-
-    private static function makeSubQuestionFieldName(
-        Question $question,
-        string ...$subQuestionCodes
-    ): string {
-        return self::makeQuestionFieldName($question) .
-            \implode('_', $subQuestionCodes);
-    }
-
     private static function generateDummy(Question $question): Generator
     {
         yield from [];
@@ -110,19 +97,21 @@ class AnswerFieldGenerator
 
     private static function generate(Question $question, $answer): Generator
     {
-        yield self::makeQuestionFieldName($question) => $answer;
+        yield FieldNameGenerator::generate($question) => $answer;
     }
 
     private static function generateListWithComment(Question $question, ?array $answer): Generator
     {
         yield from self::generate($question, $answer['code'] ?? null);
-        yield self::makeQuestionFieldName($question) . 'comment' => $answer['comment'] ?? null;
+        yield FieldNameGenerator::generate($question) . 'comment'
+            => $answer['comment'] ?? null;
     }
 
     private static function generateSubQuestions(Question $question, ?array $answer): Generator
     {
         foreach ($answer as $subQuestionCode => $subAnswer) {
-            yield self::makeSubQuestionFieldName($question, $subQuestionCode) => $subAnswer;
+            yield FieldNameGenerator::generateForSubQuestion($question, $subQuestionCode)
+                => $subAnswer;
         }
     }
 
@@ -130,7 +119,11 @@ class AnswerFieldGenerator
     {
         foreach ($answer as $subQuestionCode => $subAnswerPair) {
             foreach ($subAnswerPair as $key => $subAnswerPairItem) {
-                yield self::makeSubQuestionFieldName($question, $subQuestionCode) . "#$key"
+                yield
+                    FieldNameGenerator::generateForSubQuestion(
+                        $question,
+                        $subQuestionCode
+                    ) . "#$key"
                     => $subAnswerPairItem;
             }
         }
@@ -141,7 +134,7 @@ class AnswerFieldGenerator
         foreach ($answer as $yScaleSubQuestionCode => $yAnswer) {
             foreach ($yAnswer as $xScaleSubQuestionCode => $answerValue) {
                 yield
-                    self::makeSubQuestionFieldName(
+                    FieldNameGenerator::generateForSubQuestion(
                         $question,
                         $yScaleSubQuestionCode,
                         $xScaleSubQuestionCode
@@ -155,7 +148,7 @@ class AnswerFieldGenerator
     {
         foreach ($answer as $subQuestionCode => $answerValue) {
             yield
-                self::makeSubQuestionFieldName($question, $subQuestionCode)
+                FieldNameGenerator::generateForSubQuestion($question, $subQuestionCode)
                 => $answerValue ? 'Y' : null;
         }
     }
@@ -165,7 +158,10 @@ class AnswerFieldGenerator
         ?array $answer
     ): Generator {
         foreach ($answer as $subQuestionCode => $answerValue) {
-            $subQuestionFieldName = self::makeSubQuestionFieldName($question, $subQuestionCode);
+            $subQuestionFieldName = FieldNameGenerator::generateForSubQuestion(
+                $question,
+                $subQuestionCode
+            );
 
             yield $subQuestionFieldName => $answerValue['is_selected'] ? 'Y' : null;
             yield $subQuestionFieldName . 'comment' => $answerValue['comment'] ?? null;
@@ -175,7 +171,7 @@ class AnswerFieldGenerator
     private static function generateRanking(Question $question, ?array $answer): Generator
     {
         foreach ($answer as $ranking => $answerItem) {
-            $fieldName = self::makeQuestionFieldName($question) . $ranking;
+            $fieldName = FieldNameGenerator::generate($question) . $ranking;
             yield $fieldName => $answerItem;
         }
     }
