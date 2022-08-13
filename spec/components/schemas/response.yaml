@@ -81,10 +81,17 @@ response:
                   - M
                   - F
 
+              - type: string
+                format: date-time
+                description: Specific to 'Date/time' question type
+
+              - type: string
+                description: The equation result. Specific to 'Equation' question type
+
               - type: array
                 description: >
                   The answers (i.e. choices) sorted by their rankings. Specific to Ranking question
-                  types. If a choice is not ranked, then it must be excluded. 
+                  types. If a choice is not ranked, then it must be excluded.
 
               - type: object
                 description: Specific to 'List with comment' question type
