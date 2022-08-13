@@ -1,6 +1,6 @@
 <?php
 
-namespace MAChitgarha\LimeSurveyRestApi\Helper\Response;
+namespace MAChitgarha\LimeSurveyRestApi\Utility\Response;
 
 use Symfony\Component\HttpFoundation\Response;
 

@@ -14,12 +14,12 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
 
 use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 
-use MAChitgarha\LimeSurveyRestApi\Helper\Response\JsonResponse;
-use MAChitgarha\LimeSurveyRestApi\Helper\Response\EmptyResponse;
+use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
+use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
-use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
+use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
 class QuestionController implements Controller
 {

@@ -23,7 +23,7 @@ use MAChitgarha\LimeSurveyRestApi\Error\MethodNotAllowedError;
 use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
 use MAChitgarha\LimeSurveyRestApi\Error\MalformedRequestBodyError;
 
-use MAChitgarha\LimeSurveyRestApi\Helper\Response\JsonResponse;
+use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
 use MAChitgarha\LimeSurveyRestApi\Routing\Router;
 
@@ -41,7 +41,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 use Symfony\Component\Serializer\Serializer;
 
-use function MAChitgarha\LimeSurveyRestApi\Helper\Response\error;
+use function MAChitgarha\LimeSurveyRestApi\Utility\Response\error;
 
 class Plugin extends PluginBase
 {

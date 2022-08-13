@@ -32,7 +32,7 @@ use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotActiveError;
 use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
 
-use MAChitgarha\LimeSurveyRestApi\Helper\Response\EmptyResponse;
+use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
@@ -44,7 +44,7 @@ use Respect\Validation\Validator as v;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
+use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
 class ResponseController implements Controller
 {

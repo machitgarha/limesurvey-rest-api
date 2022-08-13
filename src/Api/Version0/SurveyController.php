@@ -18,12 +18,12 @@ use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
 use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
 
-use MAChitgarha\LimeSurveyRestApi\Helper\Response\JsonResponse;
-use MAChitgarha\LimeSurveyRestApi\Helper\Response\EmptyResponse;
+use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
+use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
-use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
+use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
 class SurveyController implements Controller
 {
@@ -70,7 +70,7 @@ class SurveyController implements Controller
         throw new NotImplementedError();
     }
 
-    public static function getSurveyInfo(int $id): Survey
+    public static function getSurveyInfo(int $id): array
     {
         App()->loadHelper('common');
         $surveyInfo = \getSurveyInfo($id);

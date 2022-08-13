@@ -15,7 +15,7 @@ use MAChitgarha\LimeSurveyRestApi\Error\AccessTokenExpiredError;
 use MAChitgarha\LimeSurveyRestApi\Error\InvalidCredentialsError;
 use MAChitgarha\LimeSurveyRestApi\Error\TooManyAuthenticationFailuresError;
 
-use MAChitgarha\LimeSurveyRestApi\Helper\Response\EmptyResponse;
+use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
@@ -24,7 +24,7 @@ use Respect\Validation\Validator as v;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use function MAChitgarha\LimeSurveyRestApi\Helper\Response\data;
+use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
 class BearerTokenController implements Controller
 {
