@@ -40,6 +40,9 @@ response:
             oneOf:
               - $ref: "#/response_answer_unanswered"
 
+              - type: boolean
+                description: Specific to 'Yes/no' question type
+
               - type: integer
                 description: Specific to '5 point choice' question type
                 minimum: 1
@@ -55,9 +58,6 @@ response:
                     - Image select list (radio)
                     - List (radio)
                     - List (dropdown)
-                    - Language switch
-                    - Yes/no
-                    - Gender
 
               - type: string
                 description: |
@@ -68,6 +68,15 @@ response:
                   - Long free text
                   - Huge free text
                 minLength: 1
+
+              - type: string
+                description: Specific to 'Language switch' question type
+
+              - type: string
+                description: Specific to 'Gender' question type
+                enum:
+                  - M
+                  - F
 
               - type: object
                 description: Specific to 'List with comment' question type
