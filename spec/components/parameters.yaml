@@ -24,7 +24,7 @@ response_id:
   in: path
   required: true
   schema:
-    $ref: "./schemas/response.yaml#/response_id"
+    $ref: "./schemas/response.yaml#/id"
 
 survey_id:
   name: survey_id

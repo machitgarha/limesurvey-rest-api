@@ -11,9 +11,8 @@ get:
             type: object
             required: [data]
             properties:
-              type: array
-              items:
-                $ref: "../../components/schemas/response.yaml#/response"
+              data:
+                $ref: "../../components/schemas/response.yaml#/response_list"
     "401":
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":

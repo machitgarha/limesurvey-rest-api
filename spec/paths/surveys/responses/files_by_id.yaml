@@ -1,8 +1,8 @@
 get:
   summary: Retrieve contents of a file uploaded as a response answer
   parameters:
-    - $ref: "../../components/parameters.yaml#/survey_id"
-    - $ref: "../../components/parameters.yaml#/response_id"
+    - $ref: "../../../components/parameters.yaml#/survey_id"
+    - $ref: "../../../components/parameters.yaml#/response_id"
   responses:
     "200":
       description: OK
@@ -13,10 +13,10 @@ get:
             required: [data]
             properties:
               contents:
-                $ref: "../../components/schemas/response.yaml#/file_contents"
+                $ref: "../../../components/schemas/response.yaml#/file_contents"
     "401":
-      $ref: "../../components/responses.yaml#/unauthorized"
+      $ref: "../../../components/responses.yaml#/unauthorized"
     "403":
-      $ref: "../../components/responses.yaml#/permission_denied"
+      $ref: "../../../components/responses.yaml#/permission_denied"
     "409":
-      $ref: "../../components/responses.yaml#/survey_not_active"
+      $ref: "../../../components/responses.yaml#/survey_not_active"
