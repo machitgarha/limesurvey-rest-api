@@ -86,7 +86,6 @@ class Plugin extends PluginBase
             [[$controllerClass, $method], $params] =
                 (new Router($this->request))->route();
 
-            /** @var JsonResponse $response */
             $response = $this
                 ->makeController($controllerClass, $params)
                 ->$method();
@@ -126,6 +125,7 @@ class Plugin extends PluginBase
             $response = $this->makeJsonErrorResponse(new InternalServerError());
         }
 
+        /** @var JsonResponse $response */
         $response->send();
     }
 
