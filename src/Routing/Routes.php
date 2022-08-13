@@ -5,6 +5,8 @@ namespace MAChitgarha\LimeSurveyRestApi\Routing;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Login\BearerTokenController;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\QuestionController;
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FileController;
+
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
@@ -80,6 +82,12 @@ class Routes
             'path' => ResponseController::PATH,
             'http_method' => HttpMethod::POST,
             'name' => ResponseController::class . '.new',
+        ],
+
+        [
+            'path' => FileController::PATH_BY_ID,
+            'http_method' => HttpMethod::GET,
+            'name' => FileController::class . '.get',
         ],
     ];
 

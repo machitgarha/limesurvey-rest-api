@@ -82,6 +82,11 @@ class SurveyController implements Controller
         return $surveyInfo;
     }
 
+    public static function getSurvey(int $id): Survey
+    {
+        return self::getSurveyInfo($id)['oSurvey'];
+    }
+
     public function get(): JsonResponse
     {
         throw new NotImplementedError();

@@ -6,6 +6,7 @@ use Yii;
 use Index;
 use Survey;
 use Question;
+use Response as SurveyResponse;
 use CController;
 use SurveyDynamic;
 use CHttpException;
@@ -56,6 +57,16 @@ class ResponseController implements Controller
     use Traits\RequestBodyDecoder;
 
     public const PATH = '/surveys/{survey_id}/responses';
+
+    public static function getResponse(int $surveyId, int $responseId): SurveyResponse
+    {
+        $response = SurveyResponse::model($surveyId)->findByPk($responseId);
+
+        if ($response === null) {
+            throw new ResourceIdNotFoundError('survey', $id);
+        }
+        return $response;
+    }
 
     public function list(): JsonResponse
     {

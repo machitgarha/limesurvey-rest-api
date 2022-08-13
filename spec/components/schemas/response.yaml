@@ -131,6 +131,8 @@ common_properties:
             description: >
               The answers (i.e. choices) sorted by their rankings. Specific to Ranking question
               types. If a choice is not ranked, then it must be excluded.
+            items:
+              $ref: "./answer.yaml#/answer_code"
 
           - type: array
             description: Specific to 'File upload' question type
@@ -281,4 +283,5 @@ unanswered:
 
 file_contents:
   type: string
+  format: byte
   description: Base64-encoded contents of the file

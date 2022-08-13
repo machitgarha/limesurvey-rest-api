@@ -29,6 +29,7 @@ bad_request_error:
         - MalformedRequestBody
         - RequiredKeyMissing
         - InvalidKeyValue
+        - InvalidPathParameter
 
 internal_server_error:
   type: object
