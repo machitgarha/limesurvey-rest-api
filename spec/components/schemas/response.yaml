@@ -48,6 +48,9 @@ response:
                 minimum: 1
                 maximum: 5
 
+              - type: number
+                description: Specific to 'Numerical input' question type
+
               - allOf:
                 - $ref: "./answer.yaml#/answer_code"
                 - description: |
@@ -89,7 +92,8 @@ response:
               - type: object
                 description: >
                   Mapping of each subquestion code to its answer. Specific question types having
-                  subquestions (e.g. all Arrays', Multiple choices, Multiple free texts).
+                  subquestions; including all Arrays (e.g. 'Array, dual scale') and Multiple inputs
+                  (e.g. Mutiple choices).
 
                 additionalProperties:
                   oneOf:
@@ -181,6 +185,9 @@ response:
                     - type: string
                       description: Specific to 'Multiple short free texts' question type
                       minLength: 1
+
+                    - type: number
+                      description: Specific to 'Multiple numerical input' question type
 
 response_answer_unanswered:
   type: 'null'
