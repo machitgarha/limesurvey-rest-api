@@ -132,6 +132,39 @@ common_properties:
               The answers (i.e. choices) sorted by their rankings. Specific to Ranking question
               types. If a choice is not ranked, then it must be excluded.
 
+          - type: array
+            description: Specific to 'File upload' question type
+            minItems: 0
+            maxItems: 1
+            items:
+              type: object
+              required:
+                - title
+                - comment
+                - size
+                - name
+                - extension
+                - uri
+              properties:
+                title:
+                  type: string
+                  description: User-entered file title
+                comment:
+                  type: string
+                size:
+                  type: number
+                  format: double
+                name:
+                  type: string
+                  description: The name of the file just before upload
+                extension:
+                  type: string
+                  description: File extension (e.g. PNG)
+                uri:
+                  type: string
+                  description: >
+                    (GET-only) The relative URI to retrieve the file contents
+
           - type: object
             description: Specific to 'List with comment' question type
             properties:
