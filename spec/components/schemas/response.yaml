@@ -178,3 +178,7 @@ response_answer_unanswered:
   description: >
     If question (i.e. parent question of the current subquestion) is *not* mandatory, giving a
     null value means the question was leaved unanswered.
+
+response_id:
+  type: integer
+  description: Survey response ID

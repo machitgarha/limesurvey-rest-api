@@ -1,0 +1,26 @@
+patch:
+  summary: Updates the answers of a response
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+    - $ref: "../../components/parameters.yaml#/response_id"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [data]
+          properties:
+            data:
+              $ref: "../../components/schemas/response.yaml#/response"
+  responses:
+    "204":
+      $ref: "../../components/responses.yaml#/empty_ok"
+    "400":
+      $ref: "../../components/responses.yaml#/bad_request"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"
+    "409":
+      $ref: "../../components/responses.yaml#/survey_not_active"

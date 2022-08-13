@@ -19,6 +19,13 @@ question_group_id:
   schema:
     $ref: "./schemas/question_group.yaml#/question_group_id"
 
+response_id:
+  name: response_id
+  in: path
+  required: true
+  schema:
+    $ref: "./schemas/response.yaml#/response_id"
+
 survey_id:
   name: survey_id
   in: path
