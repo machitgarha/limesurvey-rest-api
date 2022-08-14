@@ -6,7 +6,6 @@ use Yii;
 use Index;
 use Survey;
 use Question;
-use Response as SurveyResponse;
 use CController;
 use SurveyDynamic;
 use CHttpException;
@@ -17,8 +16,8 @@ use LimeExpressionManager;
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
-use MAChitgarha\LimeSurveyRestApi\Api\Permission;
-use MAChitgarha\LimeSurveyRestApi\Api\PermissionChecker;
+use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
+use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataGenerator;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ResponseRecordGenerator;
@@ -33,6 +32,8 @@ use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotActiveError;
 use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
+
+use MAChitgarha\LimeSurveyRestApi\Helper\SurveyHelper;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
 
@@ -59,24 +60,13 @@ class ResponseController implements Controller
 
     public const PATH = '/surveys/{survey_id}/responses';
 
-    // TODO: Make function in order like this: broader visibility first, statics first
-    public static function getResponse(int $surveyId, int $responseId): SurveyResponse
-    {
-        $response = SurveyResponse::model($surveyId)->findByPk($responseId);
-
-        if ($response === null) {
-            throw new ResourceIdNotFoundError('survey', $id);
-        }
-        return $response;
-    }
-
     public function list(): JsonResponse
     {
         ContentTypeValidator::validateIsJson($this->getRequest());
 
         $userId = $this->authorize()->getId();
 
-        $survey = SurveyController::getSurvey(
+        $survey = SurveyHelper::get(
             $surveyId = $this->getPathParameterAsInt('survey_id')
         );
 
@@ -108,8 +98,8 @@ class ResponseController implements Controller
 
         $userId = $this->authorize()->getId();
 
-        $surveyInfo = SurveyController::getSurveyInfo(
-            (int) $this->getPathParameter('survey_id')
+        $surveyInfo = SurveyHelper::getInfo(
+            $this->getPathParameterAsInt('survey_id')
         );
         $survey = $surveyInfo['oSurvey'];
 
@@ -121,11 +111,9 @@ class ResponseController implements Controller
         );
 
         $data = $this->decodeJsonRequestBodyInnerData();
-        $this->validateResponseData($data, $survey);
 
         $recordData = RecordGenerator::generate($data, $survey);
-
-        $this->validateResponseData($recordData, $survey);
+        $this->validateResponseData($recordData, $surveyInfo);
 
         $response = $this->makeResponse($recordData, $survey);
         $response->encryptSave();
@@ -142,9 +130,10 @@ class ResponseController implements Controller
         Yii::import('application.controllers.survey.index', true);
         $indexPage = new Index($this, 1);
 
+        $survey = $surveyInfo['oSurvey'];
+
         try {
             $thissurvey = $surveyInfo;
-            $survey = $surveyInfo['oSurvey'];
             $_POST += [
                 'sid' => $survey->sid,
             ];
@@ -165,13 +154,7 @@ class ResponseController implements Controller
             }
         }
 
-        if (!App()->db->schema->getTable($survey->responsesTableName)) {
-            if ($survey->active !== 'N') {
-                throw new LogicException('Survey responses table name is not created');
-            } else {
-                throw new SurveyNotActiveError();
-            }
-        }
+        SurveyHelper::assertIsActive($survey);
     }
 
     private static function makeResponse(array $recordData, Survey $survey): SurveyDynamic

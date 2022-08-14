@@ -17,8 +17,8 @@ use LimeExpressionManager;
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
-use MAChitgarha\LimeSurveyRestApi\Api\Permission;
-use MAChitgarha\LimeSurveyRestApi\Api\PermissionChecker;
+use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
+use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ResponseRecordGenerator;
 
@@ -35,6 +35,8 @@ use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotActiveError;
 use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
 use MAChitgarha\LimeSurveyRestApi\Error\InvalidPathParameterError;
+
+use MAChitgarha\LimeSurveyRestApi\Helper\SurveyHelper;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
@@ -84,7 +86,7 @@ class FileController implements Controller
 
         $filename = $this->getFileIdPathParameter();
 
-        $survey = SurveyController::getSurvey($surveyId);
+        $survey = SurveyController::get($surveyId);
 
         PermissionChecker::assertHasSurveyPermission(
             $survey,
@@ -92,7 +94,7 @@ class FileController implements Controller
             $userId,
             'responses'
         );
-        $this->assertSurveyIsActive($survey);
+        SurveyHelper::assertIsActive($survey);
 
         $response = ResponseController::getResponse($surveyId, $responseId);
 
@@ -119,13 +121,6 @@ class FileController implements Controller
         }
 
         return $param;
-    }
-
-    private function assertSurveyIsActive(Survey $survey): void
-    {
-        if (!$survey->isActive) {
-            throw new SurveyNotActiveError();
-        }
     }
 
     private static function assertFileExistsInResponse(

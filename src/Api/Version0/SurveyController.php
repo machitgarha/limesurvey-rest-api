@@ -70,23 +70,6 @@ class SurveyController implements Controller
         throw new NotImplementedError();
     }
 
-    public static function getSurveyInfo(int $id): array
-    {
-        App()->loadHelper('common');
-        $surveyInfo = \getSurveyInfo($id);
-
-        if ($surveyInfo === false) {
-            throw new ResourceIdNotFoundError('survey', $id);
-        }
-
-        return $surveyInfo;
-    }
-
-    public static function getSurvey(int $id): Survey
-    {
-        return self::getSurveyInfo($id)['oSurvey'];
-    }
-
     public function get(): JsonResponse
     {
         throw new NotImplementedError();

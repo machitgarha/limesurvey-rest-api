@@ -1,6 +1,6 @@
 <?php
 
-namespace MAChitgarha\LimeSurveyRestApi\Api;
+namespace MAChitgarha\LimeSurveyRestApi\Helper;
 
 class Permission
 {

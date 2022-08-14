@@ -7,8 +7,8 @@ use Question;
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
-use MAChitgarha\LimeSurveyRestApi\Api\Permission;
-use MAChitgarha\LimeSurveyRestApi\Api\PermissionChecker;
+use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
+use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
 
@@ -37,7 +37,7 @@ class QuestionController implements Controller
 
         $userId = $this->getAuthorizer()->authorize()->getId();
 
-        $survey = SurveyController::getSurvey(
+        $survey = SurveyController::get(
             $surveyId = $this->getPathParameter('survey_id')
         );
 
