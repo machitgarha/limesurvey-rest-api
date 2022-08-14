@@ -20,6 +20,7 @@ use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 use MAChitgarha\LimeSurveyRestApi\Api\Permission;
 use MAChitgarha\LimeSurveyRestApi\Api\PermissionChecker;
 
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataGenerator;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ResponseRecordGenerator;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerFieldGenerator;
@@ -58,6 +59,7 @@ class ResponseController implements Controller
 
     public const PATH = '/surveys/{survey_id}/responses';
 
+    // TODO: Make function in order like this: broader visibility first, statics first
     public static function getResponse(int $surveyId, int $responseId): SurveyResponse
     {
         $response = SurveyResponse::model($surveyId)->findByPk($responseId);
@@ -70,7 +72,33 @@ class ResponseController implements Controller
 
     public function list(): JsonResponse
     {
-        throw new NotImplementedError();
+        ContentTypeValidator::validateIsJson($this->getRequest());
+
+        $userId = $this->authorize()->getId();
+
+        $survey = SurveyController::getSurvey(
+            $surveyId = $this->getPathParameterAsInt('survey_id')
+        );
+
+        PermissionChecker::assertHasSurveyPermission(
+            $survey,
+            Permission::READ,
+            $userId,
+            'responses'
+        );
+
+        $responseRecords = \array_map(
+            function (SurveyDynamic $item) {
+                return ApiDataGenerator::generate(
+                    $item->decrypt()->attributes
+                );
+            },
+            SurveyDynamic::model($surveyId)->findAll()
+        );
+
+        return new JsonResponse(
+            data($responseRecords)
+        );
     }
 
     public function new(): EmptyResponse

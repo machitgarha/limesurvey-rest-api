@@ -62,6 +62,15 @@ class FileController implements Controller
 
     public const PATH_BY_ID = '/surveys/{survey_id}/responses/{response_id}/files/{file_id}';
 
+    public static function makeRelativePath(int $surveyId, int $responseId, string $fileId): string
+    {
+        return \str_replace(
+            ['{survey_id}', '{response_id}', '{file_id}'],
+            [$surveyId, $responseId, $fileId],
+            self::PATH_BY_ID
+        );
+    }
+
     public function get()
     {
         ContentTypeValidator::validateIsJson($this->getRequest());

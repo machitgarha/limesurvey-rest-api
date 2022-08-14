@@ -39,7 +39,7 @@ class SurveyController implements Controller
     {
         ContentTypeValidator::validateIsJson($this->getRequest());
 
-        $userId = $this->getAuthorizer()->authorize()->getId();
+        $userId = $this->authorize()->getId();
 
         $survey = new Survey();
         $survey->permission($userId);
