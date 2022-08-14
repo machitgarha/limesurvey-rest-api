@@ -2,6 +2,8 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 
+use Question;
+
 class FieldNameGenerator
 {
     public static function generate(Question $question): string
@@ -13,6 +15,6 @@ class FieldNameGenerator
         Question $question,
         string ...$subQuestionCodes
     ): string {
-        return self::generateForQuestion($question) . \implode('_', $subQuestionCodes);
+        return self::generate($question) . \implode('_', $subQuestionCodes);
     }
 }

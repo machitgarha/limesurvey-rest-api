@@ -11,12 +11,11 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataGenerator\
 
 class ApiDataGenerator
 {
-
     public static function generate(array $recordData, Survey $survey): array
     {
         $result = [
             'id' => $recordData['id'],
-            'submit_date' => $recordData['submitdata'],
+            'submit_date' => $recordData['submitdate'],
             'answers' => \iterator_to_array(
                 (new AnswerGenerator($recordData))->generateAll($survey)
             ),
@@ -35,6 +34,7 @@ class ApiDataGenerator
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataGenerator;
 
+use Survey;
 use Question;
 use Generator;
 use LogicException;
@@ -116,7 +116,7 @@ class AnswerGenerator
         throw new \Exception();
     }
 
-    public function generateAll(Survey $survey, array $recordData): Generator
+    public function generateAll(Survey $survey): Generator
     {
         /** @var Question $question */
         foreach ($survey->allQuestions as $question) {
@@ -251,7 +251,7 @@ class AnswerGenerator
 
     private function generateArrayDual(Question $question): array
     {
-        return $this->generateCustomSubQuestions(function (string $fieldName): array {
+        return $this->generateCustomSubQuestions($question, function (string $fieldName): array {
             return \array_map(
                 function (int $key) use ($fieldName): string {
                     return $this->getRecordField("$fieldName#$key", 'string');
@@ -263,12 +263,14 @@ class AnswerGenerator
 
     private function generateMultipleChoiceWithComments(Question $question): array
     {
-        return $this->generateCustomSubQuestions(function (string $fieldName): array {
-            $isSelected = $this->getRecordField($fieldName, 'bool');
+        return $this->generateCustomSubQuestions($question, function (string $fieldName): array {
+            $isSelected = $this->getRecordField($fieldName, 'bool') === true;
 
             return [
-                'is_selected' => $isSelected === true,
-                'comment' => $this->getRecordField($fieldName . 'comment', 'string')
+                'is_selected' => $isSelected,
+                'comment' => $isSelected
+                    ? ($this->getRecordField($fieldName . 'comment', 'string') ?? '')
+                    : null,
             ];
         });
     }

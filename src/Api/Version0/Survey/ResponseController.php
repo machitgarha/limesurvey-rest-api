@@ -88,9 +88,10 @@ class ResponseController implements Controller
         );
 
         $responseRecords = \array_map(
-            function (SurveyDynamic $item) {
+            function (SurveyDynamic $item) use ($survey) {
                 return ApiDataGenerator::generate(
-                    $item->decrypt()->attributes
+                    $item->decrypt()->attributes,
+                    $survey
                 );
             },
             SurveyDynamic::model($surveyId)->findAll()
