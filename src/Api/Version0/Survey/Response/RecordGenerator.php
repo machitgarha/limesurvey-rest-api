@@ -11,7 +11,7 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\RecordGenerator\A
 
 class RecordGenerator
 {
-    public static function generate(array $responseData, Survey $survey)
+    public static function generate(array $responseData, Survey $survey): array
     {
         $currentTime = \date('Y-m-d H:i:s');
 
@@ -37,7 +37,9 @@ class RecordGenerator
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\RecordGenerator;
 
+use Survey;
 use Question;
+use Generator;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FieldNameGenerator;
 
@@ -79,7 +81,7 @@ class AnswerGenerator
     public static function generateAll(Survey $survey, array $answersData): Generator
     {
         foreach ($survey->allQuestions as $question) {
-            $method = self::GENERATOR_METHOD_MAP[$question->type] ?? 'generateDummy';
+            $method = self::GENERATOR_METHOD_MAP[$question->type];
 
             if ($question->parent_qid === 0) {
                 yield from self::{$method}(
@@ -88,11 +90,6 @@ class AnswerGenerator
                 );
             }
         }
-    }
-
-    private static function generateDummy(Question $question): Generator
-    {
-        yield from [];
     }
 
     private static function generate(Question $question, $answer): Generator

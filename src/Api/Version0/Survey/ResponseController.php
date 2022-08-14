@@ -16,11 +16,13 @@ use LimeExpressionManager;
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator;
+
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataGenerator;
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ResponseRecordGenerator;
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\RecordGenerator;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerFieldGenerator;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerValidatorBuilder;
@@ -113,6 +115,7 @@ class ResponseController implements Controller
         );
 
         $data = $this->decodeJsonRequestBodyInnerData();
+        ApiDataValidator::validate($data, $survey);
 
         $recordData = RecordGenerator::generate($data, $survey);
         $this->validateResponseData($recordData, $surveyInfo);

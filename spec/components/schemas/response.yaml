@@ -164,8 +164,11 @@ common_properties:
                   description: File extension (e.g. PNG)
                 uri:
                   type: string
-                  description: >
-                    (GET-only) The relative URI to retrieve the file contents
+                  description: (GET-only) The relative URI to retrieve the file contents
+                contents:
+                  allOf:
+                    - $ref: "#/file_contents"
+                    - description: (non-GET-only) The base64-encoded contents of the file.
 
           - type: object
             description: Specific to 'List with comment' question type
