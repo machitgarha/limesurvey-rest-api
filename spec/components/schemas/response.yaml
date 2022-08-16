@@ -90,17 +90,6 @@ common_properties:
           - type: number
             description: Specific to 'Numerical input' question type
 
-          - allOf:
-            - $ref: "./answer.yaml#/answer_code"
-            - description: |
-                The answer code. Specific to following question types:
-
-                - Bootstrap options (buttons)
-                - Bootstrap dropdown
-                - Image select list (radio)
-                - List (radio)
-                - List (dropdown)
-
           - type: string
             description: |
               The answer text. Specific to following question types:
@@ -147,6 +136,7 @@ common_properties:
                 - name
                 - extension
                 - uri
+                - contents
               properties:
                 title:
                   type: string
@@ -164,11 +154,34 @@ common_properties:
                   description: File extension (e.g. PNG)
                 uri:
                   type: string
-                  description: (GET-only) The relative URI to retrieve the file contents
+                  description: The relative URI to retrieve the file contents
+                  readOnly: true
                 contents:
                   allOf:
                     - $ref: "#/file_contents"
-                    - description: (non-GET-only) The base64-encoded contents of the file.
+                    - writeOnly: true
+
+          - type: object
+            description: |
+                The answer code. Specific to following question types:
+
+                - Bootstrap options (buttons)
+                - Bootstrap dropdown
+                - Image select list (radio)
+                - List (radio)
+                - List (dropdown)
+            required:
+              - other
+              - value
+            properties:
+              other:
+                type: boolean
+                description: Whether the other option is selected or not
+              value:
+                oneOf:
+                  - $ref: "./answer.yaml#/answer_code"
+                  - type: string
+                    description: The value of other option when selected
 
           - type: object
             description: Specific to 'List with comment' question type
@@ -179,11 +192,12 @@ common_properties:
                 type: string
 
           - type: object
-            description: >
-              Mapping of each subquestion code to its answer. Specific question types having
-              subquestions; including all Arrays (e.g. 'Array, dual scale'), Multiple inputs
-              (e.g. Mutiple choices), and Rankings.
+            description: |
+              Mapping of each subquestion code to its answer. Specific to following question types:
 
+              - All Arrays (e.g. 'Array, dual scale', 'Array, Yes/No/Uncertain')
+              - Multiple short free texts
+              - Multiple numerical input
             additionalProperties:
               oneOf:
                 - $ref: "#/unanswered"
@@ -197,6 +211,9 @@ common_properties:
                   description: Specific to 'Array, 10 point choice' question type
                   minimum: 1
                   maximum: 10
+
+                - type: number
+                  description: Specific to 'Multiple numerical input' question type
 
                 - type: string
                   description: Specific to 'Array, Increase/Same/Decrease' question type
@@ -216,11 +233,15 @@ common_properties:
                     - N
                     - U
 
+                - type: string
+                  description: Specific to 'Multiple short free texts' question type
+                  minLength: 1
+
                 - allOf:
-                    - $ref: "./answer.yaml#/answer_code"
-                    - description: >
-                        The answer code; specific to 'Array (using flexible labels)' and
-                        'Array, column' question types
+                  - $ref: "./answer.yaml#/answer_code"
+                  - description: >
+                      The answer code; specific to 'Array (using flexible labels)' and
+                      'Array, column' question types
 
                 - type: array
                   description: >
@@ -252,31 +273,33 @@ common_properties:
                         description: The answer text; specific to 'Array, texts' question types
                         minLength: 1
 
-                - type: boolean
+          - type: object
+            description: >
+              Mapping of each subquestion code to its answer. Specific to 'Multiple choice' and
+              'Mulitple choice with comments' question types.
+
+              An special key 'other' (case-sensitive) may be provided if the question's Other
+              option is enabled and selected by the user.
+            additionalProperties:
+              type: object
+              required: [is_selected]
+              properties:
+                selected:
+                  type: boolean
+                  description: Whether the subquestion is selected or not
+                value:
+                  type: string
+                  nullable: true
                   description: >
-                    Whether the subquestion is selected or not. Specific to all 'Mutliple
-                    choice' question types except the 'Multiple choice with comments'.
-
-                - type: object
-                  description: Specific to 'Multiple choice with comments' question type
-                  required: [is_selected]
-                  properties:
-                    is_selected:
-                      type: boolean
-                      description: Whether the subquestion is selected or not
-                    comment:
-                      oneOf:
-                        - type: 'null'
-                          description: When is_selected is false
-                        - type: string
-                          description: When is_selected is true
-
-                - type: string
-                  description: Specific to 'Multiple short free texts' question type
-                  minLength: 1
-
-                - type: number
-                  description: Specific to 'Multiple numerical input' question type
+                    The value of the other choice, if selected (i.e. must only be provided if the
+                    subquestion key equals to 'other')
+                comment:
+                  type: string
+                  nullable: true
+                  description: >
+                    The comment when the question type is 'Multiple choice with comments'. It
+                    *must* be null when either the question type is without comments or selected
+                    is false.
 
 unanswered:
   type: 'null'
