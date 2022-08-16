@@ -41,6 +41,8 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataVali
 use Survey;
 use Question;
 
+use MAChitgarha\LimeSurveyRestApi\Helper\ResponseGeneratorHelper;
+
 use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
 
@@ -50,42 +52,81 @@ use Respect\Validation\Validator as v;
  */
 class AnswerValidatorBuilder
 {
-    private const BUILDER_METHOD_MAP = [
-        Question::QT_1_ARRAY_DUAL => 'buildForArrayDual',
-        Question::QT_5_POINT_CHOICE => 'buildFor5PointChoice',
-        Question::QT_A_ARRAY_5_POINT => 'buildForArray5PointChoice',
-        Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'buildForArray10PointChoice',
-        Question::QT_C_ARRAY_YES_UNCERTAIN_NO => 'buildForArrayYesNoUncertain',
-        Question::QT_D_DATE => 'buildForText',
-        Question::QT_E_ARRAY_INC_SAME_DEC => 'buildForArrayIncreaseSameDecrease',
-        Question::QT_F_ARRAY => 'buildForArrayWithPredefinedChoices',
-        Question::QT_G_GENDER => 'buildForText',
-        Question::QT_H_ARRAY_COLUMN => 'buildForArrayWithPredefinedChoices',
-        Question::QT_I_LANGUAGE => 'buildForText',
-        Question::QT_K_MULTIPLE_NUMERICAL => 'buildForNumericalSubQuestions',
-        Question::QT_L_LIST => 'buildForList',
-        Question::QT_M_MULTIPLE_CHOICE => 'buildForMultipleChoice',
-        Question::QT_N_NUMERICAL => 'buildForNumber',
-        Question::QT_O_LIST_WITH_COMMENT => 'buildForListWithComment',
-        Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS => 'buildForMultipleChoiceWithComments',
-        Question::QT_Q_MULTIPLE_SHORT_TEXT => 'buildForMultipleTexts',
-        Question::QT_R_RANKING => 'buildForRanking',
-        Question::QT_S_SHORT_FREE_TEXT => 'buildForText',
-        Question::QT_T_LONG_FREE_TEXT => 'buildForText',
-        Question::QT_U_HUGE_FREE_TEXT => 'buildForText',
-        Question::QT_Y_YES_NO_RADIO => 'buildForYesNo',
-        Question::QT_ASTERISK_EQUATION => 'buildForText',
-        Question::QT_EXCLAMATION_LIST_DROPDOWN => 'buildForList',
-        Question::QT_COLON_ARRAY_NUMBERS => 'buildForArray2dNumbers',
-        Question::QT_SEMICOLON_ARRAY_TEXT => 'buildForArray2dTexts',
-        Question::QT_VERTICAL_FILE_UPLOAD => 'buildForFile',
+    private const METHOD_TO_QUESTION_TYPE_LIST_MAPPING = [
+        'buildForBool' => [
+            Question::QT_Y_YES_NO_RADIO,
+        ],
+        'buildForInt' => [
+            Question::QT_5_POINT_CHOICE,
+        ],
+        'buildForFloat' => [
+            Question::QT_N_NUMERICAL,
+        ],
+        'buildForString' => [
+            Question::QT_D_DATE,
+            Question::QT_G_GENDER,
+            Question::QT_I_LANGUAGE,
+            Question::QT_S_SHORT_FREE_TEXT,
+            Question::QT_T_LONG_FREE_TEXT,
+            Question::QT_U_HUGE_FREE_TEXT,
+            Question::QT_ASTERISK_EQUATION,
+            Question::QT_EXCLAMATION_LIST_DROPDOWN,
+        ],
+        'buildForRanking' => [
+            Question::QT_R_RANKING,
+        ],
+        'buildForFile' => [
+            Question::QT_VERTICAL_FILE_UPLOAD,
+        ],
+        'buildForList' => [
+            Question::QT_L_LIST,
+        ],
+        'buildForListWithComment' => [
+            Question::QT_O_LIST_WITH_COMMENT,
+        ],
+        'buildForIntSubQuestions' => [
+            Question::QT_A_ARRAY_5_POINT,
+            Question::QT_B_ARRAY_10_CHOICE_QUESTIONS,
+        ],
+        'buildForFloatSubQuestions' => [
+            Question::QT_K_MULTIPLE_NUMERICAL,
+        ],
+        'buildForStringSubQuestions' => [
+            Question::QT_C_ARRAY_YES_UNCERTAIN_NO,
+            Question::QT_E_ARRAY_INC_SAME_DEC,
+            Question::QT_F_ARRAY,
+            Question::QT_H_ARRAY_COLUMN,
+            Question::QT_Q_MULTIPLE_SHORT_TEXT,
+        ],
+        'buildForArrayDual' => [
+            Question::QT_1_ARRAY_DUAL,
+        ],
+        'buildForMultipleChoice' => [
+            Question::QT_M_MULTIPLE_CHOICE,
+        ],
+        'buildForMultipleChoiceWithComments' => [
+            Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS,
+        ],
+        'buildForFloatSubQuestions2d' => [
+            Question::QT_COLON_ARRAY_NUMBERS,
+        ],
+        'buildForStringSubQuestions2d' => [
+            Question::QT_SEMICOLON_ARRAY_TEXT,
+        ],
     ];
+
+    /** @var array[] */
+    private $questionTypeToMethodMapping;
 
     /** @var bool */
     private $skipSoftMandatoryQuestions = true;
 
     public function __construct(bool $skipSoftMandatoryQuestions = true)
     {
+        $this->questionTypeToMethodMapping = ResponseGeneratorHelper::makeQuestionTypeToMethodMap(
+            self::METHOD_TO_QUESTION_TYPE_LIST_MAPPING
+        );
+
         $this->skipSoftMandatoryQuestions = $skipSoftMandatoryQuestions;
     }
 
@@ -121,11 +162,11 @@ class AnswerValidatorBuilder
                 }
             )
         ));
-        }
+    }
 
     private function build(Question $question): Validator
     {
-        $method = self::BUILDER_METHOD_MAP[$question->type];
+        $method = $this->questionTypeToMethodMapping[$question->type];
         $keyName = "answers.$question->qid";
 
         /** @var Validator $validator */
@@ -137,38 +178,71 @@ class AnswerValidatorBuilder
             : v::nullable($validator)->setName($keyName);
     }
 
-    private function buildForNumber(): Validator
-    {
-        return v::create()
-            ->floatType();
-    }
-
-    private function buildFor5PointChoice(): Validator
-    {
-        return v::create()
-            ->intType()
-            ->between(1, 5);
-    }
-
-    private function buildForYesNo(): Validator
+    private function buildForBool(): Validator
     {
         return v::create()
             ->boolType();
     }
 
-    private function buildForList(Question $question): Validator
+    private function buildForInt(): Validator
+    {
+        return v::create()
+            ->intType();
+    }
+
+    private function buildForFloat(): Validator
+    {
+        return v::create()
+            ->floatType();
+    }
+
+    private function buildForString(Question $question): Validator
     {
         return v::create()
             ->stringType()
-            ->in(
-                \array_column($question->answers, 'code')
-            );
+            ->length(1, null, true);
+    }
+
+    private function buildForRanking(Question $question): Validator
+    {
+        return v::create()
+            ->arrayType()
+            ->each(v::stringType());
+    }
+
+    private function buildForFile(Question $question): Validator
+    {
+        return v::create()
+            ->key('title', v::stringType())
+            ->key('comment', v::stringType())
+            ->key('size', v::floatType()->positive())
+            ->key('name', v::stringType())
+            ->key('extension', v::stringType())
+            // TODO: Is this check time-consuming or has any value?
+            ->key('contents', v::base64());
+    }
+
+    private function buildForList(Question $question): Validator
+    {
+        $result = $nonOtherValidator = v::create()
+            ->key('value', v::stringType())
+            ->key('other', v::identical(false));
+
+        if ($question->other === 'Y') {
+            $otherValidator = v::create()
+                ->key('value', v::stringType(), false)
+                ->key('other', v::identical(true));
+
+            $result = v::oneOf($otherValidator, $nonOtherValidator);
+        }
+
+        return $result;
     }
 
     private function buildForListWithComment(Question $question): Validator
     {
         return v::create()
-            ->key('code', $this->buildForList($question))
+            ->key('code', v::stringType())
             ->key('comment', v::stringType(), false);
     }
 
@@ -192,78 +266,26 @@ class AnswerValidatorBuilder
         ));
     }
 
-    private function buildForArraySomePointChoice(Question $question, int $count): Validator
+    private function buildForIntSubQuestions(Question $question): Validator
     {
-        return $this->buildForSubQuestions($question, function () use ($count) {
-            return v::create()
-                ->intType()
-                ->between(1, $count);
-        });
+        return $this->buildForSubQuestions($question, [$this, 'buildForInt']);
     }
 
-    private function buildForArray5PointChoice(Question $question): Validator
+    private function buildForFloatSubQuestions(Question $question): Validator
     {
-        return $this->buildForArraySomePointChoice($question, 5);
+        return $this->buildForSubQuestions($question, [$this, 'buildForFloat']);
     }
 
-    private function buildForArray10PointChoice(Question $question): Validator
+    private function buildForStringSubQuestions(Question $question): Validator
     {
-        return $this->buildForArraySomePointChoice($question, 10);
-    }
-
-    /**
-     * @param string[] $allowedValues
-     * @return Validator
-     */
-    private function buildForArrayOfAllowedStrings(
-        Question $question,
-        array $allowedValues
-    ): Validator {
-        return $this->buildForSubQuestions($question, function () use ($allowedValues) {
-            return v::create()
-                ->stringType()
-                ->in($allowedValues);
-        });
-    }
-
-    private function buildForArrayIncreaseSameDecrease(Question $question): Validator
-    {
-        return $this->buildForArrayOfAllowedStrings($question, ['I', 'S', 'D']);
-    }
-
-    private function buildForArrayWithPredefinedChoices(Question $question): Validator
-    {
-        return $this->buildForArrayOfAllowedStrings(
-            $question,
-            \array_column($question->answers, 'code')
-        );
-    }
-
-    private function buildForArrayYesNoUncertain(Question $question): Validator
-    {
-        return $this->buildForArrayOfAllowedStrings($question, ['Y', 'N', 'U']);
+        return $this->buildForSubQuestions($question, [$this, 'buildForString']);
     }
 
     private function buildForArrayDual(Question $question): Validator
     {
-        $filterPossibleAnswers = function (int $scaleId) use ($question) {
-            $possibleAnswers = [];
-
-            foreach ($question->answers as $answer) {
-                if ($answer->scale_id === $scaleId) {
-                    $possibleAnswers[] = $answer->code;
-                }
-            }
-
-            return $possibleAnswers;
-        };
-
         $makeKey = function (int $keyName) use ($filterPossibleAnswers, $question) {
-            return v::key(
-                $keyName,
-                v::in($filterPossibleAnswers($keyName)),
-                $this->isMandatory($question)
-            );
+            return v::create()
+                ->key($keyName, v::stringType(), $this->isMandatory($question));
         };
 
         return $this->buildForSubQuestions($question, function () use ($makeKey) {
@@ -274,127 +296,54 @@ class AnswerValidatorBuilder
         });
     }
 
-    private function buildForArray2d(
-        Question $question,
-        callable $valueValidatorBuilder
-    ): Validator {
-        $filterSubQuestions = function (int $scaleId) use ($question) {
-            return \array_filter(
-                $question->subquestions,
-                function (Question $subQuestion) use ($scaleId) {
-                    return $subQuestion->scale_id === $scaleId;
-                }
-            );
-        };
-
-        return $this->buildForSubQuestions(
-            $question,
-            function () use ($question, $valueValidatorBuilder, $filterSubQuestions) {
-                return $this->buildForSubQuestions(
-                    $question,
-                    $valueValidatorBuilder,
-                    $filterSubQuestions(1)
-                );
-            },
-            $filterSubQuestions(0)
-        );
-    }
-
-    private function buildForArray2dNumbers(Question $question): Validator
+    private static function buildForMultipleChoiceInnerKeys(): array
     {
-        return $this->buildForArray2d($question, function () {
-            return v::create()
-                ->intType()
-                ->between(1, 10);
-        });
-    }
-
-    private function buildForArray2dTexts(Question $question): Validator
-    {
-        return $this->buildForArray2d($question, function () {
-            return v::create()
-                ->stringType()
-                ->length(1, null, true);
-        });
+        // TODO: Maybe improve this? Is improvement needed at all? (Also for the 'with comments' counterpart)
+        return [
+            v::key('selected', v::boolType()),
+            v::key('other_value', v::nullable(v::stringType()), false),
+        ];
     }
 
     private function buildForMultipleChoice(Question $question): Validator
     {
-        $validator = $this->buildForSubQuestions($question, function () {
-            return v::boolType();
+        // At least one choice must have been selected, but we just leave it to the internal LimeSurvey validator
+        return $this->buildForSubQuestions($question, function () {
+            return v::keySet(...self::buildForMultipleChoiceInnerKeys());
         });
-
-        if ($this->isMandatory($question)) {
-            // At least one choice must have been selected
-            $validator->contains(true);
-        }
-
-        return $validator;
     }
 
     private function buildForMultipleChoiceWithComments(Question $question): Validator
     {
-        $validator = $this->buildForSubQuestions($question, function () {
-            return v::oneOf(
-                v::create()
-                    ->key('is_selected', v::identical(true))
-                    ->key('comment', v::stringType()),
-                v::create()
-                    ->key('is_selected', v::identical(false))
-                    ->key('comment', v::nullType(), false)
-            );
-        });
-
-        if ($this->isMandatory($question)) {
-            // At least one choice must have been selected
-            $validator->callback(function (array $items) {
-                foreach ($items as $item) {
-                    if ($item['is_selected'] ?? null === true) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-        }
-
-        return $validator;
-    }
-
-    private function buildForText(Question $question): Validator
-    {
-        return v::create()
-            ->stringType()
-            ->length(1, null, true);
-    }
-
-    private function buildForMultipleTexts(Question $question): Validator
-    {
-        return $this->buildForSubQuestions($question, function () use ($question) {
-            return $this->buildForText($question);
+        return $this->buildForSubQuestions($question, function () {
+            return v::keySet(...\array_merge(
+                self::buildForMultipleChoiceInnerKeys(),
+                [v::key('comment', v::nullable(v::stringType()), false)]
+            ));
         });
     }
 
-    private function buildForNumericalSubQuestions(Question $question): Validator
+    private function buildForSubQuestions2d(Question $question, callable $valueValidatorBuilder): Validator
     {
-        return $this->buildForSubQuestions($question, function () use ($question) {
-            return $this->buildForNumber();
-        });
+        [$yScaleSubQuestionList, $xScaleSubQuestionList] =
+            ResponseGeneratorHelper::splitSubQuestionsBasedOnScale2d($question);
+
+        return $this->buildForSubQuestions(
+            $question,
+            function () use ($question, $valueValidatorBuilder, $xScaleSubQuestionList) {
+                return $this->buildForSubQuestions($question, $valueValidatorBuilder, $xScaleSubQuestionList);
+            },
+            $yScaleSubQuestionList
+        );
     }
 
-    private function buildForRanking(Question $question): Validator
+    private function buildForFloatSubQuestions2d(Question $question): Validator
     {
-        return v::create()
-            ->each(v::stringType());
+        return $this->buildForSubQuestions2d($question, [$this, 'buildForFloat']);
     }
 
-    private function buildForFile(Question $question): Validator
+    private function buildForStringSubQuestions2d(Question $question): Validator
     {
-        return v::create()
-            ->key('title', v::stringType())
-            ->key('comment', v::stringType())
-            ->key('size', v::floatType()->positive())
-            ->key('name', v::stringType())
-            ->key('extension', v::stringType())
-            ->key('contents', v::base64());
+        return $this->buildForSubQuestions2d($question, [$this, 'buildForString']);
     }
 }

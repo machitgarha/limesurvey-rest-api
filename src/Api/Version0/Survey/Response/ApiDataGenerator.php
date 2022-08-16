@@ -106,7 +106,7 @@ class AnswerGenerator
         'generateMultipleChoiceWithComments' => [
             Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS,
         ],
-        'generateIntSubQuestions2d' => [
+        'generateFloatSubQuestions2d' => [
             Question::QT_COLON_ARRAY_NUMBERS,
         ],
         'generateStringSubQuestions2d' => [
@@ -363,9 +363,9 @@ class AnswerGenerator
         return $result;
     }
 
-    private function generateIntSubQuestions2d(Question $question, string $fieldNameBase): array
+    private function generateFloatSubQuestions2d(Question $question, string $fieldNameBase): array
     {
-        return $this->generateSubQuestions2d($question, $fieldNameBase, 'int');
+        return $this->generateSubQuestions2d($question, $fieldNameBase, 'float');
     }
 
     private function generateStringSubQuestions2d(Question $question, string $fieldNameBase): array
