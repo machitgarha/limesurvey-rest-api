@@ -42,6 +42,8 @@ use LogicException;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FileController;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FieldNameGenerator;
 
+use MAChitgarha\LimeSurveyRestApi\Helper\ResponseGeneratorHelper;
+
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 /**
@@ -49,43 +51,97 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
  */
 class AnswerGenerator
 {
-    private const GENERATOR_METHOD_MAP = [
-        Question::QT_1_ARRAY_DUAL => 'generateArrayDual',
-        Question::QT_5_POINT_CHOICE => 'generateInteger',
-        Question::QT_A_ARRAY_5_POINT => 'generateIntegerSubQuestions',
-        Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'generateIntegerSubQuestions',
-        Question::QT_C_ARRAY_YES_UNCERTAIN_NO => 'generateStringSubQuestions',
-        Question::QT_D_DATE => 'generateString',
-        Question::QT_E_ARRAY_INC_SAME_DEC => 'generateStringSubQuestions',
-        Question::QT_F_ARRAY => 'generateStringSubQuestions',
-        Question::QT_G_GENDER => 'generateString',
-        Question::QT_H_ARRAY_COLUMN => 'generateStringSubQuestions',
-        Question::QT_I_LANGUAGE => 'generateString',
-        Question::QT_K_MULTIPLE_NUMERICAL => 'generateNumericalSubQuestions',
-        Question::QT_L_LIST => 'generateString',
-        Question::QT_M_MULTIPLE_CHOICE => 'generateBooleanSubQuestions',
-        Question::QT_N_NUMERICAL => 'generateNumerical',
-        Question::QT_O_LIST_WITH_COMMENT => 'generateListWithComment',
-        Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS => 'generateMultipleChoiceWithComments',
-        Question::QT_Q_MULTIPLE_SHORT_TEXT => 'generateSubQuestions',
-        Question::QT_R_RANKING => 'generateRanking',
-        Question::QT_S_SHORT_FREE_TEXT => 'generateString',
-        Question::QT_T_LONG_FREE_TEXT => 'generateString',
-        Question::QT_U_HUGE_FREE_TEXT => 'generateString',
-        Question::QT_Y_YES_NO_RADIO => 'generateBoolean',
-        Question::QT_ASTERISK_EQUATION => 'generateString',
-        Question::QT_EXCLAMATION_LIST_DROPDOWN => 'generateString',
-        Question::QT_COLON_ARRAY_NUMBERS => 'generateIntegerSubQuestions2d',
-        Question::QT_SEMICOLON_ARRAY_TEXT => 'generateStringSubQuestions2d',
-        Question::QT_VERTICAL_FILE_UPLOAD => 'generateFile',
+    private const METHOD_TO_QUESTION_TYPE_LIST_MAPPING = [
+        'generateBool' => [
+            Question::QT_Y_YES_NO_RADIO,
+        ],
+        'generateInt' => [
+            Question::QT_5_POINT_CHOICE,
+        ],
+        'generateFloat' => [
+            Question::QT_N_NUMERICAL,
+        ],
+        'generateString' => [
+            Question::QT_D_DATE,
+            Question::QT_G_GENDER,
+            Question::QT_I_LANGUAGE,
+            Question::QT_S_SHORT_FREE_TEXT,
+            Question::QT_T_LONG_FREE_TEXT,
+            Question::QT_U_HUGE_FREE_TEXT,
+            Question::QT_ASTERISK_EQUATION,
+            Question::QT_EXCLAMATION_LIST_DROPDOWN,
+        ],
+        'generateRanking' => [
+            Question::QT_R_RANKING,
+        ],
+        'generateFile' => [
+            Question::QT_VERTICAL_FILE_UPLOAD,
+        ],
+        'generateList' => [
+            Question::QT_L_LIST,
+        ],
+        'generateListWithComment' => [
+            Question::QT_O_LIST_WITH_COMMENT,
+        ],
+        'generateIntSubQuestions' => [
+            Question::QT_A_ARRAY_5_POINT,
+            Question::QT_B_ARRAY_10_CHOICE_QUESTIONS,
+        ],
+        'generateFloatSubQuestions' => [
+            Question::QT_K_MULTIPLE_NUMERICAL,
+        ],
+        'generateStringSubQuestions' => [
+            Question::QT_C_ARRAY_YES_UNCERTAIN_NO,
+            Question::QT_E_ARRAY_INC_SAME_DEC,
+            Question::QT_F_ARRAY,
+            Question::QT_H_ARRAY_COLUMN,
+            Question::QT_Q_MULTIPLE_SHORT_TEXT,
+        ],
+        'generateArrayDual' => [
+            Question::QT_1_ARRAY_DUAL,
+        ],
+        'generateMultipleChoice' => [
+            Question::QT_M_MULTIPLE_CHOICE,
+        ],
+        'generateMultipleChoiceWithComments' => [
+            Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS,
+        ],
+        'generateIntSubQuestions2d' => [
+            Question::QT_COLON_ARRAY_NUMBERS,
+        ],
+        'generateStringSubQuestions2d' => [
+            Question::QT_SEMICOLON_ARRAY_TEXT,
+        ],
     ];
+
+    /** @var array[] */
+    private $questionTypeToMethodMapping;
+
     /** @var array[] */
     private $recordData;
 
     public function __construct(array $recordData)
     {
-        // TODO: Rename all these to attribute, to be consistent with the core
+        $this->questionTypeToMethodMapping = ResponseGeneratorHelper::makeQuestionTypeToMethodMap(
+            self::METHOD_TO_QUESTION_TYPE_LIST_MAPPING
+        );
+
         $this->recordData = $recordData;
+    }
+
+    public function generateAll(Survey $survey): Generator
+    {
+        foreach ($survey->allQuestions as $question) {
+            $method = $this->questionTypeToMethodMapping[$question->type];
+
+            // If question has no parent question, i.e. is not a subquestion
+            if ($question->parent_qid === 0) {
+                yield $question->title => $this->$method(
+                    $question,
+                    FieldNameGenerator::generate($question)
+                );
+            }
+        }
     }
 
     private function getRecordField(string $fieldName, string $type = null)
@@ -102,72 +158,54 @@ class AnswerGenerator
     {
         if ($type === null) {
             return $value;
-        } elseif ($type === 'string') {
-            return (string) $value;
+        } elseif ($type === 'bool') {
+            return $value === 'Y';
         } elseif ($type === 'int') {
             return (int) $value;
         } elseif ($type === 'float') {
             return (float) $value;
-        } elseif ($type === 'bool') {
-            return $value === 'Y';
+        } elseif ($type === 'string') {
+            return (string) $value;
         }
 
         // TODO: Improve this
         throw new \Exception();
     }
 
-    public function generateAll(Survey $survey): Generator
+    private function generateBool(Question $question, string $fieldName): ?bool
     {
-        /** @var Question $question */
-        foreach ($survey->allQuestions as $question) {
-            $method = self::GENERATOR_METHOD_MAP[$question->type];
-
-            // If question has no parent question, i.e. is not a subquestion
-            if ($question->parent_qid === 0) {
-                yield $question->title => $this->$method($question, $recordData);
-            }
-        }
+        return $this->getRecordField($fieldName, 'bool');
     }
 
-    private function generateInteger(Question $question): ?int
+    private function generateInt(Question $question, string $fieldName): ?int
     {
-        return $this->getRecordField(FieldNameGenerator::generate($question), 'int');
+        return $this->getRecordField($fieldName, 'int');
     }
 
-    private function generateBoolean(Question $question): ?bool
+    private function generateFloat(Question $question, string $fieldName): ?float
     {
-        return $this->getRecordField(FieldNameGenerator::generate($question), 'bool');
+        return $this->getRecordField($fieldName, 'float');
     }
 
-    private function generateNumerical(Question $question): ?float
+    private function generateString(Question $question, string $fieldName): ?string
     {
-        return $this->getRecordField(FieldNameGenerator::generate($question), 'float');
+        return $this->getRecordField($fieldName, 'string');
     }
 
-    private function generateString(Question $question)
-    {
-        return $this->getRecordField(FieldNameGenerator::generate($question), 'string');
-    }
-
-    private function generateRanking(Question $question): array
+    private function generateRanking(Question $question, string $fieldName): array
     {
         $result = [];
 
         $answersCount = \count($question->answers);
         for ($ranking = 0; $ranking < $answersCount; $ranking++) {
-            $result[] = $this->getRecordField(
-                FieldNameGenerator::generate($question) . "$ranking",
-                'string'
-            );
+            $result[] = $this->getRecordField("{$fieldName}{$ranking}", 'string');
         }
 
         return $result;
     }
 
-    private function generateFile(Question $question): array
+    private function generateFile(Question $question, string $fieldName): array
     {
-        $fieldName = FieldNameGenerator::generate($question);
-
         $fileInfoEncoded = $this->getRecordField($fieldName);
         $fileCount = (int) $this->getRecordField($fieldName . '_filecount');
 
@@ -191,104 +229,131 @@ class AnswerGenerator
         ];
     }
 
-    private function generateListWithComment(Question $question)
+    private function generateList(Question $question, string $fieldName): array
     {
-        $fieldName = FieldNameGenerator::generate($question);
+        $value = $this->getRecordField($fieldName, 'string');
+
+        if ($value !== '-oth-') {
+            return [
+                'other' => false,
+                'value' => $value,
+            ];
+        } else {
+            return [
+                'other' => true,
+                'value' => $this->getRecordField($fieldName . 'other', 'string'),
+            ];
+        }
+    }
+
+    private function generateListWithComment(Question $question, string $fieldName)
+    {
         return [
             'code' => $this->getRecordField($fieldName, 'string'),
-            'comment' => $this->getRecordField($fieldName, 'string'),
+            'comment' => $this->getRecordField($fieldName . 'comment', 'string'),
         ];
     }
 
-    private function generateSubQuestions(Question $question, string $type = null): array
+    private function generateSubQuestions(Question $question, string $fieldNameBase, callable $fn): array
     {
         $result = [];
 
         foreach ($question->subquestions as $subQuestion) {
-            $result[$subQuestion->title] = $this->getRecordField(
-                FieldNameGenerator::generateForSubQuestion($question, $subQuestion->title),
-                $type
+            $result[$subQuestion->title] = $fn(
+                // fieldName:
+                $fieldNameBase . FieldNameGenerator::generateSubQuestionSuffix($subQuestion)
             );
         }
 
         return $result;
     }
 
-    private function generateIntegerSubQuestions(Question $question): array
+    private function generateTypedSubQuestions(Question $question, string $fieldNameBase, string $type = null): array
     {
-        return $this->generateSubQuestions($question, 'int');
-    }
-
-    private function generateStringSubQuestions(Question $question): array
-    {
-        return $this->generateSubQuestions($question, 'string');
-    }
-
-    private function generateNumericalSubQuestions(Question $question): array
-    {
-        return $this->generateSubQuestions($question, 'float');
-    }
-
-    private function generateBooleanSubQuestions(Question $question): array
-    {
-        return $this->generateSubQuestions($question, 'bool');
-    }
-
-    private function generateCustomSubQuestions(Question $question, callable $fn): array
-    {
-        $result = [];
-
-        foreach ($question->subquestions as $subQuestion) {
-            $fieldName = FieldNameGenerator::generateForSubQuestion(
-                $question,
-                $subQuestion->title
-            );
-            $result[$subQuestion->title] = $fn($fieldName);
-        }
-
-        return $result;
-    }
-
-    private function generateArrayDual(Question $question): array
-    {
-        return $this->generateCustomSubQuestions($question, function (string $fieldName): array {
-            return \array_map(
-                function (int $key) use ($fieldName): string {
-                    return $this->getRecordField("$fieldName#$key", 'string');
-                },
-                [0, 1]
-            );
+        return $this->generateSubQuestions($question, $fieldNameBase, function (string $fieldName) use ($type) {
+            return $this->getRecordField($fieldName, $type);
         });
     }
 
-    private function generateMultipleChoiceWithComments(Question $question): array
+    private function generateIntSubQuestions(Question $question, string $fieldNameBase): array
     {
-        return $this->generateCustomSubQuestions($question, function (string $fieldName): array {
-            $isSelected = $this->getRecordField($fieldName, 'bool') === true;
+        return $this->generateTypedSubQuestions($question, $fieldNameBase, 'int');
+    }
 
+    private function generateFloatSubQuestions(Question $question, string $fieldNameBase): array
+    {
+        return $this->generateTypedSubQuestions($question, $fieldNameBase, 'float');
+    }
+
+    private function generateStringSubQuestions(Question $question, string $fieldNameBase): array
+    {
+        return $this->generateTypedSubQuestions($question, $fieldNameBase, 'string');
+    }
+
+    private function generateArrayDual(Question $question, string $fieldNameBase): array
+    {
+        return $this->generateTypedSubQuestions($question, $fieldNameBase, function (string $fieldName): array {
             return [
-                'is_selected' => $isSelected,
-                'comment' => $isSelected
-                    ? ($this->getRecordField($fieldName . 'comment', 'string') ?? '')
-                    : null,
+                $this->getRecordField("$fieldName#0", 'string'),
+                $this->getRecordField("$fieldName#1", 'string'),
             ];
         });
     }
 
-    private function generateSubQuestions2d(Question $question, string $type = null): array
+    private function generateMultipleChoice(Question $question, string $fieldNameBase): array
     {
-        [$yScaleSubQuestions, $xScaleSubQuestions] =
-            self::splitSubQuestionsBasedOnScale2d($question);
+        $result = $this->generateSubQuestions($question, $fieldNameBase, function (string $fieldName): array {
+            return [
+                'selected' => $this->getRecordField($fieldName, 'bool'),
+            ];
+        });
+
+        if ($question->other === 'Y') {
+            $value = $this->getRecordField($fieldNameBase . 'other', 'string');
+            $result['other'] = [
+                'selected' => $value === null,
+                'other_value' => $value,
+            ];
+        }
+
+        return $result;
+    }
+
+    private function generateMultipleChoiceWithComments(Question $question, string $fieldNameBase): array
+    {
+        $result = $this->generateSubQuestions($question, $fieldNameBase, function (string $fieldName): array {
+            return [
+                'selected' => $this->getRecordField($fieldName, 'bool'),
+                'comment' => $this->getRecordField($fieldName . 'comment', 'string'),
+            ];
+        });
+
+        if ($question->other === 'Y') {
+            $value = $this->getRecordField($fieldNameBase . 'other', 'string');
+
+            $result['other'] = [
+                'selected' => $value === null,
+                'other_value' => $value,
+                'comment' => $this->getRecordField($fieldNameBase . 'othercomment', 'string'),
+            ];
+        }
+
+        return $result;
+    }
+
+    private function generateSubQuestions2d(Question $question, string $fieldNameBase, string $type = null): array
+    {
+        [$yScaleSubQuestionList, $xScaleSubQuestionList] =
+            ResponseGeneratorHelper::splitSubQuestionsBasedOnScale2d($question);
 
         $result = [];
-        foreach ($yScaleSubQuestions as $yScaleSubQuestion) {
-            foreach ($xScaleSubQuestions as $xScaleSubQuestion) {
+        foreach ($yScaleSubQuestionList as $yScaleSubQuestion) {
+            foreach ($xScaleSubQuestionList as $xScaleSubQuestion) {
                 $result[$yScaleSubQuestion->title][$xScaleSubQuestion->title] =
                     $this->getRecordField(
-                        FieldNameGenerator::generateForSubQuestion(
-                            $question,
-                            $yScaleSubQuestion->title,
-                            $xScaleSubQuestion->title
+                        $fieldNameBase . FieldNameGenerator::generateSubQuestionSuffix(
+                            $yScaleSubQuestion,
+                            $xScaleSubQuestion
                         ),
                         $type
                     );
@@ -298,36 +363,13 @@ class AnswerGenerator
         return $result;
     }
 
-    /**
-     * @return array{0:Question[],1:Question[]}
-     */
-    private static function splitSubQuestionsBasedOnScale2d(Question $question): array
+    private function generateIntSubQuestions2d(Question $question, string $fieldNameBase): array
     {
-        $yScaleSubQuestions = [];
-        $xScaleSubQuestions = [];
-
-        foreach ($question->subquestions as $subQuestion) {
-            if ((int) $subQuestion->scale_id === 0) {
-                $yScaleSubQuestions[] = $subQuestion;
-            } elseif ((int) $subQuestion->scale_id === 1) {
-                $xScaleSubQuestions[] = $subQuestion;
-            } else {
-                throw new LogicException(
-                    "Invalid scale_id for subquestion with ID $subQuestion->qid"
-                );
-            }
-        }
-
-        return [$yScaleSubQuestions, $xScaleSubQuestions];
+        return $this->generateSubQuestions2d($question, $fieldNameBase, 'int');
     }
 
-    private function generateIntegerSubQuestions2d(Question $question): array
+    private function generateStringSubQuestions2d(Question $question, string $fieldNameBase): array
     {
-        return $this->generateSubQuestions2d($question, 'int');
-    }
-
-    private function generateStringSubQuestions2d(Question $question): array
-    {
-        return $this->generateSubQuestions2d($question, 'string');
+        return $this->generateSubQuestions2d($question, $fieldNameBase, 'string');
     }
 }

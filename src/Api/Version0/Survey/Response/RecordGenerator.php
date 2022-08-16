@@ -2,10 +2,8 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 
-use Answer;
 use Survey;
 use Question;
-use Generator;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\RecordGenerator\AnswerGenerator;
 
@@ -21,7 +19,7 @@ class RecordGenerator
             'startlanguage' => $survey->language,
 
         ] + \iterator_to_array(
-            AnswerGenerator::generateAll($survey, $responseData)
+            (new AnswerGenerator($responseData['answers']))->generateAll($survey)
         );
 
         if ($survey->isDateStamp) {
@@ -43,133 +41,237 @@ use Generator;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FieldNameGenerator;
 
+use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
+
+use MAChitgarha\LimeSurveyRestApi\Helper\ResponseGeneratorHelper;
+
 /**
  * @internal
  */
 class AnswerGenerator
 {
-    private const GENERATOR_METHOD_MAP = [
-        Question::QT_1_ARRAY_DUAL => 'generateArrayDual',
-        Question::QT_5_POINT_CHOICE => 'generate',
-        Question::QT_A_ARRAY_5_POINT => 'generateSubQuestions',
-        Question::QT_B_ARRAY_10_CHOICE_QUESTIONS => 'generateSubQuestions',
-        Question::QT_C_ARRAY_YES_UNCERTAIN_NO => 'generateSubQuestions',
-        Question::QT_D_DATE => 'generate',
-        Question::QT_E_ARRAY_INC_SAME_DEC => 'generateSubQuestions',
-        Question::QT_F_ARRAY => 'generateSubQuestions',
-        Question::QT_G_GENDER => 'generate',
-        Question::QT_H_ARRAY_COLUMN => 'generateSubQuestions',
-        Question::QT_I_LANGUAGE => 'generate',
-        Question::QT_K_MULTIPLE_NUMERICAL => 'generateSubQuestions',
-        Question::QT_L_LIST => 'generate',
-        Question::QT_M_MULTIPLE_CHOICE => 'generateMultipleChoice',
-        Question::QT_N_NUMERICAL => 'generate',
-        Question::QT_O_LIST_WITH_COMMENT => 'generateListWithComment',
-        Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS => 'generateMultipleChoiceWithComments',
-        Question::QT_Q_MULTIPLE_SHORT_TEXT => 'generateSubQuestions',
-        Question::QT_R_RANKING => 'generateRanking',
-        Question::QT_S_SHORT_FREE_TEXT => 'generate',
-        Question::QT_T_LONG_FREE_TEXT => 'generate',
-        Question::QT_U_HUGE_FREE_TEXT => 'generate',
-        Question::QT_Y_YES_NO_RADIO => 'generate',
-        Question::QT_ASTERISK_EQUATION => 'generate',
-        Question::QT_EXCLAMATION_LIST_DROPDOWN => 'generate',
-        Question::QT_COLON_ARRAY_NUMBERS => 'generateArray2d',
-        Question::QT_SEMICOLON_ARRAY_TEXT => 'generateArray2d',
+    private const METHOD_TO_QUESTION_TYPE_LIST_MAPPING = [
+        'generateBool' => [
+            Question::QT_Y_YES_NO_RADIO,
+        ],
+        'generateString' => [
+            Question::QT_5_POINT_CHOICE,
+            Question::QT_D_DATE,
+            Question::QT_G_GENDER,
+            Question::QT_I_LANGUAGE,
+            Question::QT_N_NUMERICAL,
+            Question::QT_S_SHORT_FREE_TEXT,
+            Question::QT_T_LONG_FREE_TEXT,
+            Question::QT_U_HUGE_FREE_TEXT,
+            Question::QT_ASTERISK_EQUATION,
+            Question::QT_EXCLAMATION_LIST_DROPDOWN,
+        ],
+        'generateRanking' => [
+            Question::QT_R_RANKING,
+        ],
+        'generateFile' => [
+            Question::QT_VERTICAL_FILE_UPLOAD,
+        ],
+        'generateList' => [
+            Question::QT_L_LIST,
+        ],
+        'generateListWithComment' => [
+            Question::QT_O_LIST_WITH_COMMENT,
+        ],
+        'generateStringSubQuestions' => [
+            Question::QT_A_ARRAY_5_POINT,
+            Question::QT_B_ARRAY_10_CHOICE_QUESTIONS,
+            Question::QT_C_ARRAY_YES_UNCERTAIN_NO,
+            Question::QT_E_ARRAY_INC_SAME_DEC,
+            Question::QT_F_ARRAY,
+            Question::QT_H_ARRAY_COLUMN,
+            Question::QT_K_MULTIPLE_NUMERICAL,
+            Question::QT_Q_MULTIPLE_SHORT_TEXT,
+        ],
+        'generateArrayDual' => [
+            Question::QT_1_ARRAY_DUAL,
+        ],
+        'generateMultipleChoice' => [
+            Question::QT_M_MULTIPLE_CHOICE,
+        ],
+        'generateMultipleChoiceWithComments' => [
+            Question::QT_P_MULTIPLE_CHOICE_WITH_COMMENTS,
+        ],
+        'generateStringSubQuestions2d' => [
+            Question::QT_COLON_ARRAY_NUMBERS,
+            Question::QT_SEMICOLON_ARRAY_TEXT,
+        ],
     ];
 
-    public static function generateAll(Survey $survey, array $answersData): Generator
+    /** @var array[] */
+    private $questionTypeToMethodMapping;
+
+    /** @var array */
+    private $answersData;
+
+    public function __construct(array $answersData)
+    {
+        $this->questionTypeToMethodMapping = ResponseGeneratorHelper::makeQuestionTypeToMethodMap(
+            self::METHOD_TO_QUESTION_TYPE_LIST_MAPPING
+        );
+
+        $this->answersData = $answersData;
+    }
+
+    public function generateAll(Survey $survey): Generator
     {
         foreach ($survey->allQuestions as $question) {
-            $method = self::GENERATOR_METHOD_MAP[$question->type];
+            $method = $this->questionTypeToMethodMapping[$question->type];
 
             if ($question->parent_qid === 0) {
                 yield from self::{$method}(
-                    $question,
-                    $answersData['answers'][$question->qid]
+                    $this->answersData[$question->qid] ?? null,
+                    FieldNameGenerator::generate($question),
+                    $question
                 );
             }
         }
     }
 
-    private static function generate(Question $question, $answer): Generator
+    private function generateBool(?bool $answer, string $fieldName): Generator
     {
-        yield FieldNameGenerator::generate($question) => $answer;
+        // NOTE: Don't remove the parantheses for PHP 8.x compatibility
+        yield $fieldName => $answer === null ? '' : ($answer ? 'Y' : 'N');
     }
 
-    private static function generateListWithComment(Question $question, ?array $answer): Generator
+    private function generateString(?string $answer, string $fieldName): Generator
     {
-        yield from self::generate($question, $answer['code'] ?? null);
-        yield FieldNameGenerator::generate($question) . 'comment'
-            => $answer['comment'] ?? null;
+        yield $fieldName => $answer ?? '';
     }
 
-    private static function generateSubQuestions(Question $question, ?array $answer): Generator
+    private function generateRanking(?array $answer, string $fieldName, Question $question): Generator
     {
-        foreach ($answer as $subQuestionCode => $subAnswer) {
-            yield FieldNameGenerator::generateForSubQuestion($question, $subQuestionCode)
-                => $subAnswer;
+        $answersCount = \count($question->answers);
+        for ($ranking = 0; $ranking < $answersCount; $ranking++) {
+            yield "{$fieldName}{$ranking}" => $answer[$ranking] ?? '';
         }
     }
 
-    private static function generateArrayDual(Question $question, ?array $answer): Generator
+    private function generateFile(?array $answer, string $fieldName, Question $question): Generator
     {
-        foreach ($answer as $subQuestionCode => $subAnswerPair) {
-            foreach ($subAnswerPair as $key => $subAnswerPairItem) {
-                yield
-                    FieldNameGenerator::generateForSubQuestion(
-                        $question,
-                        $subQuestionCode
-                    ) . "#$key"
-                    => $subAnswerPairItem;
-            }
+        if (empty($answer)) {
+            yield $fieldName => '';
+            yield "{$fieldName}_filecount" => 0;
+        } else {
+            // TODO
+            throw new NotImplementedError();
         }
     }
 
-    private static function generateArray2d(Question $question, ?array $answer): Generator
+    private function generateList(?array $answer, string $fieldName, Question $question): Generator
     {
-        foreach ($answer as $yScaleSubQuestionCode => $yAnswer) {
-            foreach ($yAnswer as $xScaleSubQuestionCode => $answerValue) {
-                yield
-                    FieldNameGenerator::generateForSubQuestion(
-                        $question,
-                        $yScaleSubQuestionCode,
-                        $xScaleSubQuestionCode
-                    )
-                    => $answerValue;
-            }
+        if ($answer['other'] ?? null) {
+            yield $fieldName => '-oth-';
+            yield "{$fieldName}other" => $answer['value'] ?? '';
+        } else {
+            yield $fieldName => $answer['value'];
         }
     }
 
-    private static function generateMultipleChoice(Question $question, ?array $answer): Generator
+    private function generateListWithComment(?array $answer, string $fieldName, Question $question): Generator
     {
-        foreach ($answer as $subQuestionCode => $answerValue) {
-            yield
-                FieldNameGenerator::generateForSubQuestion($question, $subQuestionCode)
-                => $answerValue ? 'Y' : null;
-        }
+        yield $fieldName => $answer['code'];
+        yield "{$fieldName}comment" => $answer['comment'];
     }
 
-    private static function generateMultipleChoiceWithComments(
+    private function generateSubQuestions(
+        ?array $answer,
+        string $fieldNameBase,
         Question $question,
-        ?array $answer
+        callable $fn
     ): Generator {
-        foreach ($answer as $subQuestionCode => $answerValue) {
-            $subQuestionFieldName = FieldNameGenerator::generateForSubQuestion(
-                $question,
-                $subQuestionCode
+        foreach ($question->subquestions as $subQuestion) {
+            yield from $fn(
+                $fieldNameBase . FieldNameGenerator::generateSubQuestionSuffix($subQuestion),
+                $answer[$subQuestion->title] ?? null
             );
-
-            yield $subQuestionFieldName => $answerValue['is_selected'] ? 'Y' : null;
-            yield $subQuestionFieldName . 'comment' => $answerValue['comment'] ?? null;
         }
     }
 
-    private static function generateRanking(Question $question, ?array $answer): Generator
+    private function generateStringSubQuestions(?array $answer, string $fieldNameBase, Question $question): Generator
     {
-        foreach ($answer as $ranking => $answerItem) {
-            $fieldName = FieldNameGenerator::generate($question) . $ranking;
-            yield $fieldName => $answerItem;
+        yield from $this->generateSubQuestions(
+            $answer,
+            $fieldNameBase,
+            $question,
+            /** @param int|float|string|null $subAnswer */
+            function (string $fieldName, $subAnswer): Generator {
+                yield $fieldName => $subAnswer ?? '';
+            }
+        );
+    }
+
+    private function generateArrayDual(?array $answer, string $fieldNameBase, Question $question): Generator
+    {
+        yield from $this->generateSubQuestions(
+            $answer,
+            $fieldNameBase,
+            $question,
+            function (string $fieldName, ?string $subAnswer): Generator {
+                yield "$subQuestionFieldName#0" => $subAnswer[0] ?? '';
+                yield "$subQuestionFieldName#1" => $subAnswer[1] ?? '';
+            }
+        );
+    }
+
+    private function generateMultipleChoice(?array $answer, string $fieldNameBase, Question $question): Generator
+    {
+        yield from $this->generateSubQuestions(
+            $answer,
+            $fieldNameBase,
+            $question,
+            function (string $fieldName, ?array $subAnswer): Generator {
+                // TODO: Return empty string when selected is false?
+                yield from $this->generateBool($subAnswer['selected'], $fieldName);
+            }
+        );
+
+        if ($question->other === 'Y') {
+            yield "{$fieldNameBase}other" => $answer['other']['other_value'] ?? '';
+        }
+    }
+
+    private function generateMultipleChoiceWithComments(
+        ?array $answer,
+        string $fieldNameBase,
+        Question $question
+    ): Generator {
+        yield from $this->generateSubQuestions(
+            $answer,
+            $fieldNameBase,
+            $question,
+            function (string $fieldName, ?array $subAnswer): Generator {
+                // TODO: Return empty string when selected is false?
+                yield from $this->generateBool($subAnswer['selected'], $fieldName);
+                yield "{$fieldName}comment" => $subAnswer['comment'] ?? '';
+            }
+        );
+
+        if ($question->other === 'Y') {
+            yield "{$fieldNameBase}other" => $answer['other']['other_value'] ?? '';
+            yield "{$fieldNameBase}othercomment" => $answer['other']['comment'] ?? '';
+        }
+    }
+
+    private function generateStringSubQuestions2d(?array $answer, string $fieldNameBase, Question $question): Generator
+    {
+        [$yScaleSubQuestionList, $xScaleSubQuestionList] =
+            ResponseGeneratorHelper::splitSubQuestionsBasedOnScale2d($question);
+
+        foreach ($yScaleSubQuestionList as $yScaleSubQuestion) {
+            foreach ($xScaleSubQuestionList as $xScaleSubQuestion) {
+                yield
+                    $fieldNameBase . FieldNameGenerator::generateSubQuestionSuffix(
+                        $yScaleSubQuestion,
+                        $xScaleSubQuestion
+                    )
+                    => $answer[$yScaleSubQuestion->title][$xScaleSubQuestion->title] ?? '';
+            }
         }
     }
 }

@@ -11,10 +11,13 @@ class FieldNameGenerator
         return "{$question->sid}X{$question->gid}X{$question->qid}";
     }
 
-    public static function generateForSubQuestion(
-        Question $question,
-        string ...$subQuestionCodes
-    ): string {
-        return self::generate($question) . \implode('_', $subQuestionCodes);
+    public static function generateSubQuestionSuffixByCode(string ...$subQuestionCodes): string
+    {
+        return \implode('_', $subQuestionCodes);
+    }
+
+    public static function generateSubQuestionSuffix(Question ...$subQuestions): string
+    {
+        return self::generateSubQuestionSuffixByCode(...\array_column($subQuestionCodes, 'title'));
     }
 }
