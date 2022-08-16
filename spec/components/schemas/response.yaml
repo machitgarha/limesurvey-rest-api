@@ -21,14 +21,14 @@ response:
     - $ref: "#/response_specific_question"
 
 response_all_in_one:
-  description: When survey format is all-in-one
   allOf:
+    - description: When survey format is all-in-one
     - $ref: "#/common_properties"
 
 response_specific_question_group:
-  description: When survey format is group-by-group
   allOf:
     - type: object
+      description: When survey format is group-by-group
       required: [question_group_id]
       properties:
         question_group_id:
@@ -36,9 +36,9 @@ response_specific_question_group:
     - $ref: "#/common_properties"
 
 response_specific_question:
-  description: When survey format is question-by-question
   allOf:
     - type: object
+      description: When survey format is question-by-question
       required: [question_id]
       properties:
         question_id:
@@ -56,21 +56,21 @@ common_properties:
   properties:
     submit_time:
       allOf:
-        - $ref: "./types.yaml#/date_time"
         - description: Submission time
           default: now
+        - $ref: "./types.yaml#/date_time"
 
     start_time:
       allOf:
-        - $ref: "./types.yaml#/date_time"
         - description: The time responding has been started
           default: now
+        - $ref: "./types.yaml#/date_time"
 
     end_time:
       allOf:
-        - $ref: "./types.yaml#/date_time"
         - description: The time responder did the last action
           default: now
+        - $ref: "./types.yaml#/date_time"
 
     answers:
       type: object
@@ -78,234 +78,281 @@ common_properties:
       additionalProperties:
         oneOf:
           - $ref: "#/unanswered"
+          - $ref: "#/answer_yes_no"
+          - $ref: "#/answer_5_point_choice"
+          - $ref: "#/answer_numerical_input"
+          - $ref: "#/answer_text"
+          - $ref: "#/answer_gender"
+          - $ref: "#/answer_date"
+          - $ref: "#/answer_equation"
+          - $ref: "#/answer_ranking"
+          - $ref: "#/answer_file"
+          - $ref: "#/answer_list"
+          - $ref: "#/answer_list_with_comment"
+          - $ref: "#/answer_multiple_choice_all"
+          - $ref: "#/answer_with_sub_questions"
 
-          - type: boolean
-            description: Specific to 'Yes/no' question type
+answer_yes_no:
+  type: boolean
+  description: Specific to 'Yes/no' question type
 
-          - type: integer
-            description: Specific to '5 point choice' question type
-            minimum: 1
-            maximum: 5
+answer_5_point_choice:
+  type: integer
+  description: Specific to '5 point choice' question type
+  minimum: 1
+  maximum: 5
 
-          - type: number
-            description: Specific to 'Numerical input' question type
+answer_numerical_input:
+  type: number
+  description: Specific to 'Numerical input' question type
 
-          - type: string
-            description: |
-              The answer text. Specific to following question types:
+answer_text:
+  type: string
+  description: |
+    The answer text. Specific to following question types:
 
-              - Browser detection
-              - Short free text
-              - Long free text
-              - Huge free text
-            minLength: 1
+    - Language switch
+    - Browser detection
+    - Short free text
+    - Long free text
+    - Huge free text
+  minLength: 1
 
-          - type: string
-            description: Specific to 'Language switch' question type
+answer_gender:
+  type: string
+  description: Specific to 'Gender' question type
+  enum:
+    - M
+    - F
 
-          - type: string
-            description: Specific to 'Gender' question type
-            enum:
-              - M
-              - F
+answer_date:
+  type: string
+  format: date-time
+  description: Specific to 'Date/time' question type
 
-          - type: string
-            format: date-time
-            description: Specific to 'Date/time' question type
+answer_equation:
+  type: string
+  description: The equation result. Specific to 'Equation' question type
 
-          - type: string
-            description: The equation result. Specific to 'Equation' question type
+answer_ranking:
+  type: array
+  description: >
+    The answers (i.e. choices) sorted by their rankings. Specific to Ranking question types. If a choice is not ranked, then it must be excluded.
+  items:
+    $ref: "./answer.yaml#/answer_code"
 
-          - type: array
-            description: >
-              The answers (i.e. choices) sorted by their rankings. Specific to Ranking question
-              types. If a choice is not ranked, then it must be excluded.
-            items:
-              $ref: "./answer.yaml#/answer_code"
+answer_file:
+  type: array
+  description: Specific to 'File upload' question type
+  minItems: 0
+  maxItems: 1
+  items:
+    type: object
+    required:
+      - title
+      - comment
+      - size
+      - name
+      - extension
+      - uri
+      - contents
+    properties:
+      title:
+        type: string
+        description: User-entered file title
+      comment:
+        type: string
+      size:
+        type: number
+        format: double
+      name:
+        type: string
+        description: The name of the file just before upload
+      extension:
+        type: string
+        description: File extension (e.g. PNG)
+      uri:
+        type: string
+        description: The relative URI to retrieve the file contents
+        readOnly: true
+      contents:
+        allOf:
+          - $ref: "#/file_contents"
+          - writeOnly: true
 
-          - type: array
-            description: Specific to 'File upload' question type
-            minItems: 0
-            maxItems: 1
-            items:
-              type: object
-              required:
-                - title
-                - comment
-                - size
-                - name
-                - extension
-                - uri
-                - contents
-              properties:
-                title:
-                  type: string
-                  description: User-entered file title
-                comment:
-                  type: string
-                size:
-                  type: number
-                  format: double
-                name:
-                  type: string
-                  description: The name of the file just before upload
-                extension:
-                  type: string
-                  description: File extension (e.g. PNG)
-                uri:
-                  type: string
-                  description: The relative URI to retrieve the file contents
-                  readOnly: true
-                contents:
-                  allOf:
-                    - $ref: "#/file_contents"
-                    - writeOnly: true
+answer_list:
+  type: object
+  description: |
+      The answer code. Specific to following question types:
 
-          - type: object
-            description: |
-                The answer code. Specific to following question types:
+      - Bootstrap options (buttons)
+      - Bootstrap dropdown
+      - Image select list (radio)
+      - List (radio)
+      - List (dropdown)
+  required:
+    - other
+    - value
+  properties:
+    other:
+      type: boolean
+      description: Whether the other option is selected or not
+    value:
+      oneOf:
+        - $ref: "./answer.yaml#/answer_code"
+        - type: string
+          description: The value of other option when selected
 
-                - Bootstrap options (buttons)
-                - Bootstrap dropdown
-                - Image select list (radio)
-                - List (radio)
-                - List (dropdown)
-            required:
-              - other
-              - value
-            properties:
-              other:
-                type: boolean
-                description: Whether the other option is selected or not
-              value:
-                oneOf:
-                  - $ref: "./answer.yaml#/answer_code"
-                  - type: string
-                    description: The value of other option when selected
+answer_list_with_comment:
+  type: object
+  description: Specific to 'List with comment' question type
+  required:
+    - code
+    - comment
+  properties:
+    code:
+      $ref: "./answer.yaml#/answer_code"
+    comment:
+      type: string
 
-          - type: object
-            description: Specific to 'List with comment' question type
-            properties:
-              code:
-                $ref: "./answer.yaml#/answer_code"
-              comment:
-                type: string
+answer_multiple_choice_all:
+  description: |
+    Mapping of each subquestion code to its answer. Specific to 'Multiple choice' and 'Mulitple choice with comments' question types.
 
-          - type: object
-            description: |
-              Mapping of each subquestion code to its answer. Specific to following question types:
+    An special key 'other' (case-sensitive) may be provided if the question's Other option is enabled and selected by the user.
+  additionalProperties:
+    oneOf:
+      - $ref: "#/answer_item_mutiple_choice"
+      - $ref: "#/answer_item_mutiple_choice_with_comments"
 
-              - All Arrays (e.g. 'Array, dual scale', 'Array, Yes/No/Uncertain')
-              - Multiple short free texts
-              - Multiple numerical input
-            additionalProperties:
-              oneOf:
-                - $ref: "#/unanswered"
+answer_item_mutiple_choice:
+  type: object
+  required: [is_selected]
+  properties:
+    selected:
+      type: boolean
+      description: Whether the subquestion is selected or not
+    value:
+      type: string
+      nullable: true
+      description: >
+        The value of the other choice, if selected (i.e. must only be provided if the
+        subquestion key equals to 'other')
 
-                - type: integer
-                  description: Specific to 'Array, 5 point choice' question type
-                  minimum: 1
-                  maximum: 5
+answer_item_mutiple_choice_with_comments:
+  allOf:
+    - $ref: "#/answer_item_mutiple_choice"
+    - type: object
+      properties:
+        comment:
+          type: string
+          nullable: true
+          description: >
+            The comment when the question type is 'Multiple choice with comments'. It *must* be null when selected is false.
 
-                - type: integer
-                  description: Specific to 'Array, 10 point choice' question type
-                  minimum: 1
-                  maximum: 10
+answer_with_sub_questions:
+  type: object
+  description: |
+    Mapping of each subquestion code to its answer. Specific to following question types:
 
-                - type: number
-                  description: Specific to 'Multiple numerical input' question type
+    - All Arrays (e.g. 'Array, dual scale', 'Array, Yes/No/Uncertain')
+    - Multiple short free texts
+    - Multiple numerical input
+  additionalProperties:
+    oneOf:
+      - $ref: "#/unanswered"
+      - $ref: "#/answer_item_array_5_point_choice"
+      - $ref: "#/answer_item_array_10_point_choice"
+      - $ref: "#/answer_item_multiple_numerical_input"
+      - $ref: "#/answer_item_array_increase_same_decrease"
+      - $ref: "#/answer_item_yes_no_uncertain"
+      - $ref: "#/answer_item_multiple_short_free_texts"
+      - $ref: "#/answer_item_array_answer_code"
+      - $ref: "#/answer_item_array_dual"
+      - $ref: "#/answer_item_array_2d"
 
-                - type: string
-                  description: Specific to 'Array, Increase/Same/Decrease' question type
-                  minLength: 1
-                  maxLength: 1
-                  enum:
-                    - I
-                    - S
-                    - D
+answer_item_array_5_point_choice:
+  allOf:
+    - description: Specific to 'Array, 5 point choice' question type
+    - $ref: "#/answer_5_point_choice"
 
-                - type: string
-                  description: Specific to 'Array, Yes/No/Uncertain' question type
-                  minLength: 1
-                  maxLength: 1
-                  enum:
-                    - Y
-                    - N
-                    - U
+answer_item_array_10_point_choice:
+  type: integer
+  description: Specific to 'Array, 10 point choice' question type
+  minimum: 1
+  maximum: 10
 
-                - type: string
-                  description: Specific to 'Multiple short free texts' question type
-                  minLength: 1
+answer_item_multiple_numerical_input:
+  allOf:
+    - description: Specific to 'Multiple numerical input' question type
+    - $ref: "#/answer_numerical_input"
 
-                - allOf:
-                  - $ref: "./answer.yaml#/answer_code"
-                  - description: >
-                      The answer code; specific to 'Array (using flexible labels)' and
-                      'Array, column' question types
+answer_item_array_increase_same_decrease:
+  type: string
+  description: Specific to 'Array, Increase/Same/Decrease' question type
+  minLength: 1
+  maxLength: 1
+  enum:
+    - I
+    - S
+    - D
 
-                - type: array
-                  description: >
-                    A pair of answer codes; specific to 'Array, dual scale' question type. If the
-                    question is not mandatory, then passing the first or second element as null is
-                    possible.
-                  minItems: 1
-                  maxItems: 2
-                  items:
-                    oneOf:
-                      - $ref: "#/unanswered"
-                      - $ref: "./answer.yaml#/answer_code"
+answer_item_yes_no_uncertain:
+  type: string
+  description: Specific to 'Array, Yes/No/Uncertain' question type
+  minLength: 1
+  maxLength: 1
+  enum:
+    - Y
+    - N
+    - U
 
-                - type: object
-                  description: >
-                    The key is the subquestion code with Y-scale. The value is a mapping of
-                    subquestion code with X-scale to their actual values (i.e. answers).
+answer_item_multiple_short_free_texts:
+  type: string
+  description: Specific to 'Multiple short free texts' question type
+  minLength: 1
 
-                  additionalProperties:
-                    oneOf:
-                      - $ref: "#/unanswered"
+answer_item_array_answer_code:
+  allOf:
+    - description: The answer code; specific to 'Array (using flexible labels)' and 'Array, column' question types
+    - $ref: "./answer.yaml#/answer_code"
 
-                      - type: integer
-                        description: Specific to 'Array, numbers' question type
-                        minimum: 1
-                        maximum: 10
+answer_item_array_dual:
+  type: array
+  description: >
+    A pair of answer codes; specific to 'Array, dual scale' question type.
+  minItems: 1
+  maxItems: 2
+  items:
+    oneOf:
+      - $ref: "#/unanswered"
+      - $ref: "./answer.yaml#/answer_code"
 
-                      - type: string
-                        description: The answer text; specific to 'Array, texts' question types
-                        minLength: 1
+answer_item_array_2d:
+  type: object
+  description: >
+    The key is the subquestion code with Y-scale. The value is a mapping of subquestion code with X-scale to their actual values (i.e. answers).
+  additionalProperties:
+    oneOf:
+      - $ref: "#/unanswered"
+      - $ref: "#/answer_subitem_array_2d_numbers"
+      - $ref: "#/answer_subitem_array_2d_texts"
 
-          - type: object
-            description: >
-              Mapping of each subquestion code to its answer. Specific to 'Multiple choice' and
-              'Mulitple choice with comments' question types.
+answer_subitem_array_2d_numbers:
+  type: integer
+  description: Specific to 'Array, numbers' question type
+  minimum: 1
+  maximum: 10
 
-              An special key 'other' (case-sensitive) may be provided if the question's Other
-              option is enabled and selected by the user.
-            additionalProperties:
-              type: object
-              required: [is_selected]
-              properties:
-                selected:
-                  type: boolean
-                  description: Whether the subquestion is selected or not
-                value:
-                  type: string
-                  nullable: true
-                  description: >
-                    The value of the other choice, if selected (i.e. must only be provided if the
-                    subquestion key equals to 'other')
-                comment:
-                  type: string
-                  nullable: true
-                  description: >
-                    The comment when the question type is 'Multiple choice with comments'. It
-                    *must* be null when either the question type is without comments or selected
-                    is false.
+answer_subitem_array_2d_texts:
+  type: string
+  description: The answer text; specific to 'Array, texts' question types
+  minLength: 1
 
 unanswered:
   type: 'null'
   description: >
-    If question (i.e. parent question of the current subquestion) is *not* mandatory, giving a
-    null value means the question was leaved unanswered.
+    If question (i.e. parent question of the current subquestion) is *not* mandatory, giving a null value means the question was leaved unanswered.
 
 file_contents:
   type: string
