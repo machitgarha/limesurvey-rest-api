@@ -70,22 +70,7 @@ class QuestionController implements Controller
         );
     }
 
-    public function new(): EmptyResponse
-    {
-        throw new NotImplementedError();
-    }
-
     public function get(): JsonResponse
-    {
-        throw new NotImplementedError();
-    }
-
-    public function update(): EmptyResponse
-    {
-        throw new NotImplementedError();
-    }
-
-    public function delete(): EmptyResponse
     {
         throw new NotImplementedError();
     }

@@ -75,6 +75,7 @@ class Plugin extends PluginBase
         $this->event->set('run', false);
 
         $this->log("New request caught: {$this->request->getMethod()} $path", Logger::LEVEL_INFO);
+        // TODO: Support sending 503 when maintenance mode is on
         $this->handleRequest();
 
         App()->end();

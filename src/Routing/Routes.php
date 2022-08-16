@@ -2,14 +2,7 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Routing;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Login\BearerTokenController;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\QuestionController;
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FileController;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
+use MAChitgarha\LimeSurveyRestApi\Api\Version0 as V0;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\HttpMethod;
 
@@ -21,73 +14,49 @@ class Routes
      */
     public const VERSION_0 = [
         [
-            'path' => BearerTokenController::PATH,
+            'name' => V0\Login\BearerTokenController::class . '.new',
+            'path' => V0\Login\BearerTokenController::PATH,
             'http_method' => HttpMethod::POST,
-            'name' => BearerTokenController::class . '.new',
         ], [
-            'path' => BearerTokenController::PATH,
+            'name' => V0\Login\BearerTokenController::class . '.delete',
+            'path' => V0\Login\BearerTokenController::PATH,
             'http_method' => HttpMethod::DELETE,
-            'name' => BearerTokenController::class . '.delete',
         ],
 
         [
-            'path' => SurveyController::PATH,
+            'name' => V0\SurveyController::class . '.list',
+            'path' => V0\SurveyController::PATH,
             'http_method' => HttpMethod::GET,
-            'name' => SurveyController::class . '.list',
         ], [
-            'path' => SurveyController::PATH,
+            'name' => V0\SurveyController::class . '.get',
+            'path' => V0\SurveyController::PATH_BY_ID,
+            'http_method' => HttpMethod::GET,
+        ],
+
+        [
+            'name' => V0\Survey\QuestionController::class . '.list',
+            'path' => V0\Survey\QuestionController::PATH,
+            'http_method' => HttpMethod::GET,
+        ], [
+            'name' => V0\Survey\QuestionController::class . '.get',
+            'path' => V0\Survey\QuestionController::PATH_BY_ID,
+            'http_method' => HttpMethod::GET,
+        ],
+
+        [
+            'name' => V0\Survey\ResponseController::class . '.list',
+            'path' => V0\Survey\ResponseController::PATH,
+            'http_method' => HttpMethod::GET,
+        ], [
+            'name' => V0\Survey\ResponseController::class . '.new',
+            'path' => V0\Survey\ResponseController::PATH,
             'http_method' => HttpMethod::POST,
-            'name' => SurveyController::class . '.new',
-        ], [
-            'path' => SurveyController::PATH_BY_ID,
-            'http_method' => HttpMethod::GET,
-            'name' => SurveyController::class . '.get',
-        ], [
-            'path' => SurveyController::PATH_BY_ID,
-            'http_method' => HttpMethod::PUT,
-            'name' => SurveyController::class . '.update',
-        ], [
-            'path' => SurveyController::PATH_BY_ID,
-            'http_method' => HttpMethod::DELETE,
-            'name' => SurveyController::class . '.delete',
         ],
 
         [
-            'path' => QuestionController::PATH,
+            'name' => V0\Survey\Response\FileController::class . '.get',
+            'path' => V0\Survey\Response\FileController::PATH_BY_ID,
             'http_method' => HttpMethod::GET,
-            'name' => QuestionController::class . '.list',
-        ], [
-            'path' => QuestionController::PATH,
-            'http_method' => HttpMethod::POST,
-            'name' => QuestionController::class . '.new',
-        ], [
-            'path' => QuestionController::PATH_BY_ID,
-            'http_method' => HttpMethod::GET,
-            'name' => QuestionController::class . '.get',
-        ], [
-            'path' => QuestionController::PATH_BY_ID,
-            'http_method' => HttpMethod::PUT,
-            'name' => QuestionController::class . '.update',
-        ], [
-            'path' => QuestionController::PATH_BY_ID,
-            'http_method' => HttpMethod::DELETE,
-            'name' => QuestionController::class . '.delete',
-        ],
-
-        [
-            'path' => ResponseController::PATH,
-            'http_method' => HttpMethod::GET,
-            'name' => ResponseController::class . '.list',
-        ], [
-            'path' => ResponseController::PATH,
-            'http_method' => HttpMethod::POST,
-            'name' => ResponseController::class . '.new',
-        ],
-
-        [
-            'path' => FileController::PATH_BY_ID,
-            'http_method' => HttpMethod::GET,
-            'name' => FileController::class . '.get',
         ],
     ];
 

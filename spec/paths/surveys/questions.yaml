@@ -20,32 +20,3 @@ get:
       $ref: "../../components/responses.yaml#/permission_denied"
     "404":
       $ref: "../../components/responses.yaml#/resouce_not_found"
-
-post:
-  summary: Create a new question in the survey
-  parameters:
-    - $ref: "../../components/parameters.yaml#/survey_id"
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          type: object
-          properties:
-            group_id:
-              $ref: "../../components/schemas/question_group.yaml#/question_group_id"
-            title:
-              type: string
-  responses:
-    "201":
-      description: Created
-      headers:
-        Location:
-          description: URL of the new question
-          required: true
-          schema:
-            type: string
-    "401":
-      $ref: "../../components/responses.yaml#/unauthorized"
-    "403":
-      $ref: "../../components/responses.yaml#/permission_denied"

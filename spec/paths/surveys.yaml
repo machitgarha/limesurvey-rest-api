@@ -16,19 +16,3 @@ get:
       $ref: "../components/responses.yaml#/unauthorized"
     "403":
       $ref: "../components/responses.yaml#/permission_denied"
-
-post:
-  summary: Create a new survey
-  responses:
-    "201":
-      description: Created
-      headers:
-        Location:
-          description: URL of the new survey
-          required: true
-          schema:
-            type: string
-    "401":
-      $ref: "../components/responses.yaml#/unauthorized"
-    "403":
-      $ref: "../components/responses.yaml#/permission_denied"
