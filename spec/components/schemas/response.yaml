@@ -89,7 +89,6 @@ common_properties:
           - $ref: "#/answer_file"
           - $ref: "#/answer_list"
           - $ref: "#/answer_list_with_comment"
-          - $ref: "#/answer_multiple_choice_all"
           - $ref: "#/answer_with_sub_questions"
 
 answer_yes_no:
@@ -136,8 +135,7 @@ answer_equation:
 
 answer_ranking:
   type: array
-  description: >
-    The answers (i.e. choices) sorted by their rankings. Specific to Ranking question types. If a choice is not ranked, then it must be excluded.
+  description: The answers (i.e. choices) sorted by their rankings. Specific to Ranking question types. If a choice is not ranked, then it must be excluded
   items:
     $ref: "./answer.yaml#/answer_code"
 
@@ -194,71 +192,36 @@ answer_list:
     - other
     - value
   properties:
-    other:
-      type: boolean
-      description: Whether the other option is selected or not
     value:
       oneOf:
         - $ref: "./answer.yaml#/answer_code"
         - type: string
-          description: The value of other option when selected
+          nullable: true
+          description: The text value of the other option. It must *not* be null if question's Other option is mandatory
+    other:
+      type: boolean
+      nullable: true
+      description: Whether the other option is selected or not. A null value is equivalent to false
 
 answer_list_with_comment:
   type: object
   description: Specific to 'List with comment' question type
   required:
     - code
-    - comment
   properties:
     code:
       $ref: "./answer.yaml#/answer_code"
     comment:
       type: string
-
-answer_multiple_choice_all:
-  description: |
-    Mapping of each subquestion code to its answer. Specific to 'Multiple choice' and 'Mulitple choice with comments' question types.
-
-    An special key 'other' (case-sensitive) may be provided if the question's Other option is enabled and selected by the user.
-  additionalProperties:
-    oneOf:
-      - $ref: "#/answer_item_mutiple_choice"
-      - $ref: "#/answer_item_mutiple_choice_with_comments"
-
-answer_item_mutiple_choice:
-  type: object
-  required: [is_selected]
-  properties:
-    selected:
-      type: boolean
-      description: Whether the subquestion is selected or not
-    value:
-      type: string
       nullable: true
-      description: >
-        The value of the other choice, if selected (i.e. must only be provided if the
-        subquestion key equals to 'other')
-
-answer_item_mutiple_choice_with_comments:
-  allOf:
-    - $ref: "#/answer_item_mutiple_choice"
-    - type: object
-      properties:
-        comment:
-          type: string
-          nullable: true
-          description: >
-            The comment when the question type is 'Multiple choice with comments'. It *must* be null when selected is false.
 
 answer_with_sub_questions:
   type: object
-  description: |
-    Mapping of each subquestion code to its answer. Specific to following question types:
-
-    - All Arrays (e.g. 'Array, dual scale', 'Array, Yes/No/Uncertain')
-    - Multiple short free texts
-    - Multiple numerical input
   additionalProperties:
+    description: |
+      Mapping of each subquestion code to its answer. Specific to all question types having subquestions, including Arrays (e.g. 'Array, dual scale', 'Array, Yes/No/Uncertain') and Multiple inputs (e.g. 'Multipleshort free texts', 'Multiple choice with comments').
+
+      **Note**: If the question is of type 'Multiple choice' or 'Multiple choice with comments', the keys may include the special value 'other' (case-sensitive) if the question's Other option is enabled (and must be available if it is user-selected).
     oneOf:
       - $ref: "#/unanswered"
       - $ref: "#/answer_item_array_5_point_choice"
@@ -269,6 +232,8 @@ answer_with_sub_questions:
       - $ref: "#/answer_item_multiple_short_free_texts"
       - $ref: "#/answer_item_array_answer_code"
       - $ref: "#/answer_item_array_dual"
+      - $ref: "#/answer_item_multiple_choice"
+      - $ref: "#/answer_item_multiple_choice_with_comments"
       - $ref: "#/answer_item_array_2d"
 
 answer_item_array_5_point_choice:
@@ -319,8 +284,7 @@ answer_item_array_answer_code:
 
 answer_item_array_dual:
   type: array
-  description: >
-    A pair of answer codes; specific to 'Array, dual scale' question type.
+  description: A pair of answer codes; specific to 'Array, dual scale' question type
   minItems: 1
   maxItems: 2
   items:
@@ -328,10 +292,32 @@ answer_item_array_dual:
       - $ref: "#/unanswered"
       - $ref: "./answer.yaml#/answer_code"
 
+answer_item_multiple_choice:
+  type: object
+  required: [selected]
+  properties:
+    selected:
+      type: boolean
+      description: Whether the subquestion is selected or not
+    other_value:
+      type: string
+      nullable: true
+      description: |
+        The value of the other option; present if the subquestion code is 'other' and the 'selected' field is true
+
+answer_item_multiple_choice_with_comments:
+  allOf:
+    - $ref: "#/answer_item_multiple_choice"
+    - type: object
+      properties:
+        comment:
+          type: string
+          nullable: true
+          description: The comment. *Must* be null when the selected field is false. *Must not* be null if the subquestion code is 'other' and the comment field is mandatory
+
 answer_item_array_2d:
   type: object
-  description: >
-    The key is the subquestion code with Y-scale. The value is a mapping of subquestion code with X-scale to their actual values (i.e. answers).
+  description: The key is the subquestion code with Y-scale. The value is a mapping of subquestion code with X-scale to their actual values (i.e. answers)
   additionalProperties:
     oneOf:
       - $ref: "#/unanswered"
@@ -351,8 +337,7 @@ answer_subitem_array_2d_texts:
 
 unanswered:
   type: 'null'
-  description: >
-    If question (i.e. parent question of the current subquestion) is *not* mandatory, giving a null value means the question was leaved unanswered.
+  description: If question (i.e. parent question of the current subquestion) is *not* mandatory, giving a null value means the question was leaved unanswered
 
 file_contents:
   type: string
