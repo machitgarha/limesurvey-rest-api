@@ -21,7 +21,9 @@ patch:
     "401":
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":
-      $ref: "../../components/responses.yaml#/permission_denied"
+      allOf:
+        - $ref: "../../components/responses.yaml#/permission_denied"
+        - $ref: "../../components/responses.yaml#/survey_out_of_time_range"
     "409":
       $ref: "../../components/responses.yaml#/survey_not_active"
     "503":

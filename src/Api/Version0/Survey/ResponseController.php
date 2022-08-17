@@ -176,7 +176,9 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 use LSETwigViewRenderer;
 use InvalidArgumentException;
 
+use MAChitgarha\LimeSurveyRestApi\Error\SurveyExpiredError;
 use MAChitgarha\LimeSurveyRestApi\Error\MaintenanceModeError;
+use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotStartedError;
 
 class CustomTwigRenderer extends LSETwigViewRenderer
 {
@@ -191,19 +193,36 @@ class CustomTwigRenderer extends LSETwigViewRenderer
         switch ($layout) {
             case 'layout_maintenance':
                 throw new MaintenanceModeError();
-                break;
+                // No break
 
             default:
                 throw new InvalidArgumentException("Unhandled Twig layout '$layout'");
-                break;
+                // No break
         }
     }
 }
 
 class IndexOutputController
 {
-    public function renderExitMessage(int $surveyId, string $type, array $messages = [], string $url = null, array $errors = null)
-    {
+    public function renderExitMessage(
+        int $surveyId,
+        string $type,
+        array $messages = [],
+        string $url = null,
+        array $errors = null
+    ): void {
+        switch ($type) {
+            case 'survey-expiry':
+                throw new SurveyExpiredError();
+                // No break
+
+            case 'survey-notstart':
+                throw new SurveyNotStartedError();
+                // No break
+
+            default:
+                throw new InvalidArgumentException("Unhandled exit type '$type'");
+        }
     }
 
     public function createUrl(string $route, $params = [], string $ampersand = '&')

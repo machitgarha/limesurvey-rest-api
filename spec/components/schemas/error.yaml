@@ -105,6 +105,15 @@ survey_not_active_error:
           enum:
             - SurveyNotActive
 
+survey_out_of_time_range:
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - SurveyNotStarted
+            - SurveyExpired
+
 too_many_authentication_failures_error:
   allOf:
     - $ref: "#/base_error"
