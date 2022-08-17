@@ -177,6 +177,7 @@ use LSETwigViewRenderer;
 use InvalidArgumentException;
 
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyExpiredError;
+use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 use MAChitgarha\LimeSurveyRestApi\Error\MaintenanceModeError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotStartedError;
 
@@ -225,7 +226,15 @@ class IndexOutputController
         }
     }
 
-    public function createUrl(string $route, $params = [], string $ampersand = '&')
+    public function createUrl(string $route, $params = [], string $ampersand = '&'): string
     {
+        return '';
+    }
+
+    public function createAction(string $action)
+    {
+        if ($action === 'captcha') {
+            throw new NotImplementedError('Captcha is not implemented yet');
+        }
     }
 }
