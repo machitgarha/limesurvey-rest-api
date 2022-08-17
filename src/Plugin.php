@@ -8,7 +8,8 @@ use PluginBase;
 
 use LimeSurvey\PluginManager\PluginManager;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Config;
+use MAChitgarha\LimeSurveyRestApi\Config;
+
 use MAChitgarha\LimeSurveyRestApi\Api\ControllerDependencyContainer;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
@@ -22,6 +23,8 @@ use MAChitgarha\LimeSurveyRestApi\Error\InvalidKeyValueError;
 use MAChitgarha\LimeSurveyRestApi\Error\MethodNotAllowedError;
 use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
 use MAChitgarha\LimeSurveyRestApi\Error\MalformedRequestBodyError;
+
+use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
@@ -74,11 +77,29 @@ class Plugin extends PluginBase
         // Disable default request handling
         $this->event->set('run', false);
 
+        $this->setDebugging();
+
         $this->log("New request caught: {$this->request->getMethod()} $path", Logger::LEVEL_INFO);
-        // TODO: Support sending 503 when maintenance mode is on
         $this->handleRequest();
 
         App()->end();
+    }
+
+    private function setDebugging(): void
+    {
+        if (Config::DEBUG_MODE === DebugMode::FULL) {
+            $handler = function (int $code, string $message, string $file, int $line) {
+                $this->log(
+                    "$message (at $file:$line, code: $code)",
+                    Logger::LEVEL_ERROR
+                );
+            };
+            \set_error_handler($handler, \E_ALL);
+
+            // Logging is not possible for some odd reason
+            \error_reporting(\E_ALL);
+            \ini_set('display_errors', 1);
+        }
     }
 
     private function handleRequest(): void
@@ -118,16 +139,23 @@ class Plugin extends PluginBase
             );
 
         } catch (Throwable $error) {
-            $this->log(
-                $error->__toString(),
-                Logger::LEVEL_ERROR
+            $this->logThrowable($error);
+            $response = $this->makeJsonErrorResponse(
+                new InternalServerError()
             );
-
-            $response = $this->makeJsonErrorResponse(new InternalServerError());
         }
 
         /** @var JsonResponse $response */
         $response->send();
+    }
+
+    private function logThrowable(Throwable $error): void
+    {
+        $message = Config::DEBUG_MODE === DebugMode::FULL
+            ? $error->__toString()
+            : $error->getMessage();
+
+        $this->log($message, Logger::LEVEL_ERROR);
     }
 
     private function makeController(string $controllerClass, array $params): Controller
