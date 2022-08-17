@@ -2,7 +2,7 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Routing;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Config;
+use MAChitgarha\LimeSurveyRestApi\Config;
 
 use MAChitgarha\LimeSurveyRestApi\Error\ApiVersionMissingError;
 use MAChitgarha\LimeSurveyRestApi\Error\ApiVersionNotFoundError;
