@@ -11,12 +11,16 @@ use SurveyDynamic;
 use CHttpException;
 use LogicException;
 use RuntimeException;
+use LSYii_Application;
 use LimeExpressionManager;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator;
+
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\CustomTwigRenderer;
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\IndexOutputController;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
@@ -118,28 +122,25 @@ class ResponseController implements Controller
         ApiDataValidator::validate($data, $survey);
 
         $recordData = RecordGenerator::generate($data, $survey);
-        $this->validateResponseData($recordData, $surveyInfo);
-
-        $response = $this->makeResponse($recordData, $survey);
-        $response->encryptSave();
-
-        if (!$response->id) {
-            throw new RuntimeException('Cannot create response');
-        }
+        $this->submitResponse($recordData, $surveyInfo);
 
         return new EmptyResponse(Response::HTTP_CREATED);
     }
 
-    private function validateResponseData(array $responseData, array $surveyInfo): void
+    private function submitResponse(array $recordData, array $surveyInfo): void
     {
-        Yii::import('application.controllers.survey.index', true);
-        $indexPage = new Index($this, 1);
+        $indexPage = self::prepareCoreSurveyIndexClass();
 
+        /** @var Survey $survey */
         $survey = $surveyInfo['oSurvey'];
 
         try {
+            $surveyid = $survey->sid;
             $thissurvey = $surveyInfo;
-            $_POST += [
+            $_SESSION['survey_' . $surveyid]['step'] = 1;
+            $clienttoken = '';
+
+            $_POST = $recordData + [
                 'sid' => $survey->sid,
             ];
 
@@ -162,26 +163,38 @@ class ResponseController implements Controller
         SurveyHelper::assertIsActive($survey);
     }
 
-    private static function makeResponse(array $recordData, Survey $survey): SurveyDynamic
+    private static function prepareCoreSurveyIndexClass(): Index
     {
-        SurveyDynamic::sid($survey->sid);
+        \App()->setComponent('twigRenderer', new CustomTwigRenderer(), false);
 
-        $response = new SurveyDynamic();
+        Yii::import('application.controllers.survey.index', true);
 
-        /*
-         * Make sure the data doesn't have extra attributes (i.e. fields). Having less attributes
-         * than expected should not be a problem, as it finally will be caught by the active
-         * record itself if answer for a mandatory question isn't provided.
-         */
-        \assert(
-            [] === \array_diff(
-                \array_keys($recordData),
-                $response->tableSchema->columnNames
-            )
-        );
+        return new Index(new IndexOutputController(), 1);
+    }
+}
 
-        $response->setAttributes($recordData, false);
+namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 
-        return $response;
+use LSETwigViewRenderer;
+
+class CustomTwigRenderer extends LSETwigViewRenderer
+{
+    public function init()
+    {
+    }
+
+    public function renderTemplateFromFile($layout, $data, $return)
+    {
+    }
+}
+
+class IndexOutputController
+{
+    public function renderExitMessage(int $surveyId, string $type, array $messages = [], string $url = null, array $errors = null)
+    {
+    }
+
+    public function createUrl(string $route, $params = [], string $ampersand = '&')
+    {
     }
 }
