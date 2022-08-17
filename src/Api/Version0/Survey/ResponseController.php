@@ -159,8 +159,6 @@ class ResponseController implements Controller
                 );
             }
         }
-
-        SurveyHelper::assertIsActive($survey);
     }
 
     private static function prepareCoreSurveyIndexClass(): Index
@@ -169,13 +167,16 @@ class ResponseController implements Controller
 
         Yii::import('application.controllers.survey.index', true);
 
-        return new Index(new IndexOutputController(), 1);
+        return new Index(new IndexOutputController(), 'index');
     }
 }
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 
 use LSETwigViewRenderer;
+use InvalidArgumentException;
+
+use MAChitgarha\LimeSurveyRestApi\Error\MaintenanceModeError;
 
 class CustomTwigRenderer extends LSETwigViewRenderer
 {
@@ -185,6 +186,17 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
     public function renderTemplateFromFile($layout, $data, $return)
     {
+        $layout = \str_replace('.twig', '', $layout);
+
+        switch ($layout) {
+            case 'layout_maintenance':
+                throw new MaintenanceModeError();
+                break;
+
+            default:
+                throw new InvalidArgumentException("Unhandled Twig layout '$layout'");
+                break;
+        }
     }
 }
 
