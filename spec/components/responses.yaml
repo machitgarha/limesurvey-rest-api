@@ -60,6 +60,21 @@ invalid_credentials:
             items:
               $ref: "./schemas/error.yaml#/invalid_credentials_error"
 
+maintenance_mode:
+  description: The site is under maintenance mode (either soft or hard)
+  content:
+    application/json:
+      schema:
+        type: object
+        required: [errors]
+        properties:
+          errors:
+            type: array
+            minItems: 1
+            maxItems: 1
+            items:
+              $ref: "./schemas/error.yaml#/maintenance_mode_error"
+
 method_not_allowed:
   description: Method not allowed
   content:
@@ -154,6 +169,7 @@ too_many_authentication_failures:
               $ref: "./schemas/error.yaml#/too_many_authentication_failures_error"
 
 unauthorized:
+  description: Unauthorized request
   content:
     application/json:
       schema:
@@ -167,7 +183,6 @@ unauthorized:
             # maxItems: 1
             items:
               $ref: "./schemas/error.yaml#/unauthorized_error"
-  description: Unauthorized request
 
 unsupported_media_type:
   description: Unsupported media type given

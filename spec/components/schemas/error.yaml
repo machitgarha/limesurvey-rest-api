@@ -1,145 +1,133 @@
-api_version_missing_error:
+base_error:
   type: object
   required:
     - id
   properties:
     id:
       type: string
-      enum:
-        - ApiVersionMissing
+
+api_version_missing_error:
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - ApiVersionMissing
 
 api_version_not_found_error:
-    type: object
-    required:
-      - id
-    properties:
-      id:
-        type: string
-        enum:
-          - ApiVersionNotFound
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - ApiVersionNotFound
 
 bad_request_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - MalformedRequestBody
-        - RequiredKeyMissing
-        - InvalidKeyValue
-        - InvalidPathParameter
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - MalformedRequestBody
+            - RequiredKeyMissing
+            - InvalidKeyValue
+            - InvalidPathParameter
 
 internal_server_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - InternalServerError
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - InternalServerError
 
 invalid_credentials_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - InvalidCredentials
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - InvalidCredentials
+
+maintenance_mode_error:
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - MaintenanceMode
 
 method_not_allowed_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - MethodNotAllowed
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - MethodNotAllowed
 
 not_implemented_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - NotImplemented
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - NotImplemented
 
 path_not_found_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - PathNotFound
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - PathNotFound
 
 permission_denied_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - PermissionDenied
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - PermissionDenied
 
 resource_not_found_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - ResourceIdNotFound
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - ResourceIdNotFound
 
 survey_not_active_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - SurveyNotActive
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - SurveyNotActive
 
 too_many_authentication_failures_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - TooManyAuthenticationFailures
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - TooManyAuthenticationFailures
 
 unauthorized_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - AccessTokenExpired
-        - AccessTokenInvalid
-        - AuthorizationHeaderMissing
-        - AuthorizationHeaderUnsupported
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - AccessTokenExpired
+            - AccessTokenInvalid
+            - AuthorizationHeaderMissing
+            - AuthorizationHeaderUnsupported
 
 unsupported_media_type_error:
-  type: object
-  required:
-    - id
-  properties:
-    id:
-      type: string
-      enum:
-        - UnsupportedMediaType
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - UnsupportedMediaType
