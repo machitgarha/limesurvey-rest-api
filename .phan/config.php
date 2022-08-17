@@ -276,7 +276,10 @@ return [
     //
     // This is useful for excluding hopelessly unanalyzable
     // files that can't be removed for whatever reason.
-    'exclude_file_list' => [],
+    'exclude_file_list' => [
+        // TODO: Remove this!
+        'vendor/limesurvey/framework/yiilite.php',
+    ],
 
     // A directory list that defines files that will be excluded
     // from static analysis, but whose class and method
@@ -339,14 +342,8 @@ return [
     // Thus, both first-party and third-party code being used by
     // your application should be included in this list.
     'directory_list' => [
-        'src',
-        'vendor/cebe/php-openapi/src',
-        'vendor/phan/phan/src/Phan',
-        'vendor/respect/validation/library',
-        'vendor/symfony/http-foundation',
-        'vendor/symfony/polyfill-php80',
-        'vendor/symfony/routing',
-        'vendor/symfony/serializer',
+        'src/',
+        'vendor/',
     ],
 
     // A list of individual files to include in analysis
