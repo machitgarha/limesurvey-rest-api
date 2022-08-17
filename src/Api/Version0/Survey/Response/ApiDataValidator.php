@@ -226,7 +226,7 @@ class AnswerValidatorBuilder
     {
         $result = $nonOtherValidator = v::create()
             ->key('value', v::stringType())
-            ->key('other', v::identical(false));
+            ->key('other', v::identical(false), false);
 
         if ($question->other === 'Y') {
             $otherValidator = v::create()

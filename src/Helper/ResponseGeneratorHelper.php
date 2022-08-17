@@ -9,7 +9,7 @@ class ResponseGeneratorHelper
     ): array {
         $result = [];
 
-        foreach (self::METHOD_TO_QUESTION_TYPE_LIST_MAPPING as $methodName => $questionTypeList) {
+        foreach ($methodToQuestionTypeListMapping as $methodName => $questionTypeList) {
             foreach ($questionTypeList as $questionType) {
                 $result[$questionType] = $methodName;
             }
