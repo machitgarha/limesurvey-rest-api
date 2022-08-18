@@ -195,6 +195,28 @@ unauthorized_list:
                   - AuthorizationHeaderMissing
                   - AuthorizationHeaderUnsupported
 
+unprocessable_response:
+  allOf:
+    - required: [question_id]
+      properties:
+        question_id:
+          type: integer
+    - oneOf:
+      - title: mandatory_question_missing
+        properties:
+          id:
+            enum:
+              - MandatoryQuestionMissing
+      - title: invalid_answer
+        required: [message]
+        properties:
+          id:
+            enum:
+              - InvalidAnswer
+          message:
+            type: string
+            description: Localized message of the error
+
 unprocessable_response_list:
   allOf:
     - $ref: "#/error_list_base_with_one_item"
@@ -202,25 +224,7 @@ unprocessable_response_list:
       properties:
         errors:
           items:
-            allOf:
-              - $ref: "#/error_optional_message"
-              - properties:
-                  question_id:
-                    type: integer
-              - oneOf:
-                - title: mandatory_question_missing
-                  properties:
-                    id:
-                      enum:
-                        - MandatoryQuestionMissing
-                - title: invalid_answer
-                  required: [message]
-                  properties:
-                    id:
-                      enum:
-                        - InvalidAnswer
-                    message:
-                      description: Localized message of the error
+            $ref: "#/unprocessable_response"
 
 unsupported_media_type_list:
   allOf:

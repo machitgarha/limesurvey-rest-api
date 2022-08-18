@@ -6,7 +6,11 @@ use Throwable;
 
 abstract class Error extends \Exception
 {
+    /** @var null|string */
     protected const DEFAULT_MESSAGE = null;
+
+    /** @var mixed[] */
+    protected $extraParams = [];
 
     abstract public function getHttpStatusCode(): int;
 
@@ -19,5 +23,10 @@ abstract class Error extends \Exception
     {
         // @phan-suppress-next-line PhanParamSuspiciousOrder
         return \str_replace([__NAMESPACE__ . '\\', 'Error'], '', static::class);
+    }
+
+    public function getExtraParams(): array
+    {
+        return $this->extraParams;
     }
 }

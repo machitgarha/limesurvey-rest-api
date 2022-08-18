@@ -168,28 +168,43 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 use LSETwigViewRenderer;
 use InvalidArgumentException;
 
+use MAChitgarha\LimeSurveyRestApi\Error\ErrorBucket;
+use MAChitgarha\LimeSurveyRestApi\Error\InvalidAnswerError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyExpiredError;
 use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 use MAChitgarha\LimeSurveyRestApi\Error\MaintenanceModeError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotStartedError;
+use MAChitgarha\LimeSurveyRestApi\Error\MandatoryQuestionMissingError;
 
 class CustomTwigRenderer extends LSETwigViewRenderer
 {
+    /** @var ErrorBucket */
+    private $errorBucket;
+
+    public function __construct()
+    {
+        $this->errorBucket = new ErrorBucket();
+    }
+
     public function init()
     {
     }
 
     public function renderTemplateFromFile($layout, $data, $return): void
     {
-        $layout = \str_replace('.twig', '', $layout);
+        $layoutName = \str_replace('.twig', '', $layout);
 
-        switch ($layout) {
+        switch ($layoutName) {
             case 'layout_maintenance':
                 throw new MaintenanceModeError();
                 // No break
 
             case 'layout_global':
-                // Success, so do nothing!
+                if ($this->errorBucket->isEmpty()) {
+                    // TODO: What to do with a successful response?
+                } else {
+                    throw $this->errorBucket;
+                }
                 break;
 
             default:
@@ -200,9 +215,25 @@ class CustomTwigRenderer extends LSETwigViewRenderer
         }
     }
 
-    public function renderPartial($twigView, $data): string
+    public function renderPartial($twigPath, $data)
     {
-        return '';
+        $twigName = \str_replace(['/survey/questions/question_help/', '.twig'], '', $twigPath);
+
+        switch ($twigName) {
+            case 'mandatory_tip':
+                // TODO: Support for skipping soft mandatory questions
+                $this->errorBucket->addItem(new MandatoryQuestionMissingError(123));
+                break;
+
+            case 'em_tip':
+                $this->errorBucket->addItem(new InvalidAnswerError(123));
+                break;
+
+            default:
+                throw new InvalidArgumentException(
+                    "Unhandled Twig path '$twigPath'"
+                );
+        }
     }
 
     public function renderHtmlPage($html, $template): void

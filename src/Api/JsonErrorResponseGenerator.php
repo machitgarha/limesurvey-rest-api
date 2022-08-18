@@ -5,6 +5,7 @@ namespace MAChitgarha\LimeSurveyRestApi\Api;
 use Throwable;
 
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
+use MAChitgarha\LimeSurveyRestApi\Error\ErrorBucket;
 use MAChitgarha\LimeSurveyRestApi\Error\InvalidValueError;
 use MAChitgarha\LimeSurveyRestApi\Error\PathNotFoundError;
 use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
@@ -28,6 +29,9 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+
+use function MAChitgarha\LimeSurveyRestApi\Utility\Response\error;
+use function MAChitgarha\LimeSurveyRestApi\Utility\Response\errors;
 
 class JsonErrorResponseGenerator
 {
@@ -68,7 +72,10 @@ class JsonErrorResponseGenerator
             $this->logThrowable($error);
         }
 
-        $response = $this->generateForError($error);
+        $response = $error instanceof ErrorBucket
+            ? self::generateForErrorBucket($error)
+            : self::generateForError($error);
+
         foreach ($extraHeaders as $headerName => $headerValue) {
             $response->headers->set($headerName, $headerValue);
         }
@@ -95,7 +102,7 @@ class JsonErrorResponseGenerator
         return new InvalidValueError($exception->getMessage());
     }
 
-    private function generateForError(Error $error): JsonResponse
+    private static function generateDataForError(Error $error): array
     {
         $errorData = ['id' => $error->getId()];
 
@@ -103,9 +110,30 @@ class JsonErrorResponseGenerator
             $errorData['message'] = $error->getMessage();
         }
 
+        $errorData += $error->getExtraParams();
+
+        return $errorData;
+    }
+
+    private static function generateForError(Error $error): JsonResponse
+    {
         return new JsonResponse(
-            error($errorData),
+            error(self::generateDataForError($error)),
             $error->getHttpStatusCode()
+        );
+    }
+
+    private static function generateForErrorBucket(ErrorBucket $errorBucket): JsonResponse
+    {
+        $errorDataList = [];
+
+        foreach ($errorBucket->getItems() as $error) {
+            $errorDataList[] = self::generateDataForError($error);
+        }
+
+        return new JsonResponse(
+            errors($errorDataList),
+            $errorBucket->getHttpStatusCode()
         );
     }
 
