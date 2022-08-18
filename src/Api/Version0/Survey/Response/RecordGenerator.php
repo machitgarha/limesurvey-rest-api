@@ -169,14 +169,14 @@ class AnswerGenerator
             yield $fieldName => '-oth-';
             yield "{$fieldName}other" => $answer['value'] ?? '';
         } else {
-            yield $fieldName => $answer['value'];
+            yield $fieldName => $answer['value'] ?? '';
         }
     }
 
     private function generateListWithComment(?array $answer, string $fieldName, Question $question): Generator
     {
-        yield $fieldName => $answer['code'];
-        yield "{$fieldName}comment" => $answer['comment'];
+        yield $fieldName => $answer['code'] ?? '';
+        yield "{$fieldName}comment" => $answer['comment'] ?? '';
     }
 
     private function generateSubQuestions(
