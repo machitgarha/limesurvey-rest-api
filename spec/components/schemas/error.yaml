@@ -29,8 +29,6 @@ bad_request_error:
         id:
           enum:
             - MalformedRequestBody
-            - RequiredKeyMissing
-            - InvalidKeyValue
             - InvalidPathParameter
 
 internal_server_error:
@@ -132,6 +130,18 @@ unauthorized_error:
             - AccessTokenInvalid
             - AuthorizationHeaderMissing
             - AuthorizationHeaderUnsupported
+
+unprocessable_response:
+  allOf:
+    - $ref: "#/base_error"
+    - properties:
+        id:
+          enum:
+            - RequiredKeyMissing
+            - TypeMismatch
+            - InvalidValue
+            - MandatoryQuestionMissing
+            - InvalidAnswer
 
 unsupported_media_type_error:
   allOf:

@@ -16,29 +16,12 @@ use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Authorization\BearerTokenAuthorizer;
 
-use MAChitgarha\LimeSurveyRestApi\Error\Error;
-use MAChitgarha\LimeSurveyRestApi\Error\PathNotFoundError;
-use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
-use MAChitgarha\LimeSurveyRestApi\Error\InvalidKeyValueError;
-use MAChitgarha\LimeSurveyRestApi\Error\MethodNotAllowedError;
-use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
-use MAChitgarha\LimeSurveyRestApi\Error\MalformedRequestBodyError;
-
 use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
-
-use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
 use MAChitgarha\LimeSurveyRestApi\Routing\Router;
 
-use Respect\Validation\Exceptions\KeyException;
-use Respect\Validation\Exceptions\ValidationException;
-
 use Symfony\Component\HttpFoundation\Request;
-
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-
-use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
@@ -112,50 +95,12 @@ class Plugin extends PluginBase
                 ->makeController($controllerClass, $params)
                 ->$method();
 
-        } catch (Error $error) {
-            $response = $this->makeJsonErrorResponse($error);
-
-        } catch (ResourceNotFoundException $_) {
-            $response = $this->makeJsonErrorResponse(new PathNotFoundError());
-
-        } catch (MethodNotAllowedException $exception) {
-            $response = $this->makeJsonErrorResponse(new MethodNotAllowedError());
-            $response->headers->set(
-                'Allow',
-                \implode(', ', $exception->getAllowedMethods())
-            );
-
-        } catch (NotEncodableValueException $_) {
-            $response = $this->makeJsonErrorResponse(new MalformedRequestBodyError());
-
-        } catch (KeyException $exception) {
-            $response = $this->makeJsonErrorResponse(
-                new RequiredKeyMissingError($exception->getMessage())
-            );
-
-        } catch (ValidationException $exception) {
-            $response = $this->makeJsonErrorResponse(
-                new InvalidKeyValueError($exception->getMessage())
-            );
-
         } catch (Throwable $error) {
-            $this->logThrowable($error);
-            $response = $this->makeJsonErrorResponse(
-                new InternalServerError()
-            );
+            $response = (new JsonErrorResponseGenerator())->generate($error);
         }
 
-        /** @var JsonResponse $response */
+        /** @var Response $response */
         $response->send();
-    }
-
-    private function logThrowable(Throwable $error): void
-    {
-        $message = Config::DEBUG_MODE === DebugMode::FULL
-            ? $error->__toString()
-            : $error->getMessage();
-
-        $this->log($message, Logger::LEVEL_ERROR);
     }
 
     private function makeController(string $controllerClass, array $params): Controller
@@ -173,19 +118,5 @@ class Plugin extends PluginBase
 
         return $controller
             ->setContainer($container);
-    }
-
-    private function makeJsonErrorResponse(Error $error): JsonResponse
-    {
-        $errorData = ['id' => $error->getId()];
-
-        if (!empty($error->getMessage())) {
-            $errorData['message'] = $error->getMessage();
-        }
-
-        return new JsonResponse(
-            error($errorData),
-            $error->getHttpStatusCode()
-        );
     }
 }

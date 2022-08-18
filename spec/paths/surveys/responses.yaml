@@ -50,5 +50,7 @@ post:
         - $ref: "../../components/responses.yaml#/survey_out_of_time_range"
     "409":
       $ref: "../../components/responses.yaml#/survey_not_active"
+    "422":
+      $ref: "../../components/responses.yaml#/unprocessable_response"
     "503":
       $ref: "../../components/responses.yaml#/maintenance_mode"

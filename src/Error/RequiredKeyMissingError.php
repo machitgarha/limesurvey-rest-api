@@ -2,6 +2,6 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Error;
 
-class RequiredKeyMissingError extends BadRequestError
+class RequiredKeyMissingError extends UnprocessableEntityError
 {
 }
