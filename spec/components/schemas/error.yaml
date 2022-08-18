@@ -1,4 +1,4 @@
-base_error:
+error_base:
   type: object
   required:
     - id
@@ -6,147 +6,229 @@ base_error:
     id:
       type: string
 
-api_version_missing_error:
-  allOf:
-    - $ref: "#/base_error"
-    - properties:
-        id:
-          enum:
-            - ApiVersionMissing
+error_optional_message:
+  type: object
+  properties:
+    message:
+      type: string
 
-api_version_not_found_error:
-  allOf:
-    - $ref: "#/base_error"
-    - properties:
-        id:
-          enum:
-            - ApiVersionNotFound
+error_list_base:
+  type: object
+  required: [errors]
+  properties:
+    errors:
+      type: array
+      minItems: 1
 
-bad_request_error:
+error_list_base_with_one_item:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base"
     - properties:
-        id:
-          enum:
-            - MalformedRequestBody
-            - InvalidPathParameter
+        errors:
+          maxItems: 1
+          items:
+            $ref: "#/error_base"
 
-internal_server_error:
+api_version_missing_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - InternalServerError
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - ApiVersionMissing
 
-invalid_credentials_error:
+bad_request_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - InvalidCredentials
+        errors:
+          items:
+            allOf:
+              - $ref: "#/error_optional_message"
+              - properties:
+                  id:
+                    enum:
+                      - MalformedRequestBody
+                      - InvalidPathParameter
+                      - RequiredKeyMissing
+                      - TypeMismatch
+                      - InvalidValue
 
-maintenance_mode_error:
+internal_server_error_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - MaintenanceMode
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - InternalServerError
 
-method_not_allowed_error:
+invalid_credentials_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - MethodNotAllowed
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - InvalidCredentials
 
-not_implemented_error:
+maintenance_mode_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - NotImplemented
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - MaintenanceMode
 
-path_not_found_error:
+method_not_allowed_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - PathNotFound
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - MethodNotAllowed
 
-permission_denied_error:
+not_implemented_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - PermissionDenied
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - NotImplemented
 
-resource_not_found_error:
+path_not_found_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - ResourceIdNotFound
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - PathNotFound
+                  - ApiVersionNotFound
 
-survey_not_active_error:
+permission_denied_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - SurveyNotActive
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - PermissionDenied
 
-survey_out_of_time_range:
+resource_not_found_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
+    - $ref: "#/error_optional_message"
     - properties:
-        id:
-          enum:
-            - SurveyNotStarted
-            - SurveyExpired
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - ResourceIdNotFound
 
-too_many_authentication_failures_error:
+survey_not_active_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - TooManyAuthenticationFailures
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - SurveyNotActive
 
-unauthorized_error:
+survey_out_of_time_range_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - AccessTokenExpired
-            - AccessTokenInvalid
-            - AuthorizationHeaderMissing
-            - AuthorizationHeaderUnsupported
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - SurveyNotStarted
+                  - SurveyExpired
 
-unprocessable_response:
+too_many_authentication_failures_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - RequiredKeyMissing
-            - TypeMismatch
-            - InvalidValue
-            - MandatoryQuestionMissing
-            - InvalidAnswer
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - TooManyAuthenticationFailures
 
-unsupported_media_type_error:
+unauthorized_list:
   allOf:
-    - $ref: "#/base_error"
+    - $ref: "#/error_list_base_with_one_item"
     - properties:
-        id:
-          enum:
-            - UnsupportedMediaType
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - AccessTokenExpired
+                  - AccessTokenInvalid
+                  - AuthorizationHeaderMissing
+                  - AuthorizationHeaderUnsupported
+
+unprocessable_response_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - required: [question_id]
+      properties:
+        errors:
+          items:
+            allOf:
+              - $ref: "#/error_optional_message"
+              - properties:
+                  question_id:
+                    type: integer
+              - oneOf:
+                - title: mandatory_question_missing
+                  properties:
+                    id:
+                      enum:
+                        - MandatoryQuestionMissing
+                - title: invalid_answer
+                  required: [message]
+                  properties:
+                    id:
+                      enum:
+                        - InvalidAnswer
+                    message:
+                      description: Localized message of the error
+
+unsupported_media_type_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          items:
+            properties:
+              id:
+                enum:
+                  - UnsupportedMediaType

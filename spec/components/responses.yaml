@@ -3,228 +3,117 @@ api_version_missing:
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/api_version_missing_error"
+        $ref: "./schemas/error.yaml#/api_version_missing_list"
 
 bad_request:
   description: Bad request, mostly malformed or invalid request body
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/bad_request_error"
+        $ref: "./schemas/error.yaml#/bad_request_list"
 
 empty_ok:
-  description: OK
+  description: OK (no content)
 
 internal_server_error:
   description: Unknown internal server error
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/internal_server_error"
+        $ref: "./schemas/error.yaml#/internal_server_error_list"
 
 invalid_credentials:
   description: Invalid username or password
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/invalid_credentials_error"
+        $ref: "./schemas/error.yaml#/invalid_credentials_list"
 
 maintenance_mode:
   description: The site is under maintenance mode (either soft or hard)
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/maintenance_mode_error"
+        $ref: "./schemas/error.yaml#/maintenance_mode_list"
 
 method_not_allowed:
   description: Method not allowed
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/method_not_allowed_error"
+        $ref: "./schemas/error.yaml#/method_not_allowed_list"
+  header:
+    Allow:
+      description: List of allowed methods on the endpoint
+      required: true
+      example: GET, POST
 
 not_implemented:
   description: The interface is available, but not yet implemented
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/not_implemented_error"
+        $ref: "./schemas/error.yaml#/not_implemented_list"
 
-not_found:
-  description: Resource not found
+path_not_found:
+  description: Path not found
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/path_not_found_list"
 
 permission_denied:
   description: Permission denied
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/permission_denied_error"
+        $ref: "./schemas/error.yaml#/permission_denied_list"
 
-resouce_not_found:
+resource_not_found:
   description: Resource not found
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/resource_not_found_error"
+        $ref: "./schemas/error.yaml#/resource_not_found_list"
 
 survey_not_active:
   description: The request needs the survey to be active, but currently it is not
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/survey_not_active_error"
+        $ref: "./schemas/error.yaml#/survey_not_active_list"
 
 survey_out_of_time_range:
   description: Either the survey is not started yet or is expired
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/survey_out_of_time_range_error"
+        $ref: "./schemas/error.yaml#/survey_out_of_time_range_list"
 
 too_many_authentication_failures:
   description: Too many authentication failures
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/too_many_authentication_failures_error"
+        $ref: "./schemas/error.yaml#/too_many_authentication_failures_list"
 
 unauthorized:
   description: Unauthorized request
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            # TODO:
-            # maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/unauthorized_error"
+        $ref: "./schemas/error.yaml#/unauthorized_list"
 
 unprocessable_response:
-  description: Unsupported media type given
+  description: Cannot process response because of semantic errors, e.g. invalid or missing answers
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/unprocessable_response_error"
+        $ref: "./schemas/error.yaml#/unprocessable_response_list"
 
 unsupported_media_type:
   description: Unsupported media type given
   content:
     application/json:
       schema:
-        type: object
-        required: [errors]
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            maxItems: 1
-            items:
-              $ref: "./schemas/error.yaml#/unsupported_media_type_error"
+        $ref: "./schemas/error.yaml#/unsupported_media_type_list"

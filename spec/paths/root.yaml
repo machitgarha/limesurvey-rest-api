@@ -8,21 +8,7 @@ get:
     "400":
       $ref: "../components/responses.yaml#/api_version_missing"
     "404":
-      description: Requested path not found
-      content:
-        application/json:
-          schema:
-            type: object
-            required: [errors]
-            properties:
-              errors:
-                type: array
-                minItems: 1
-                maxItems: 1
-                items:
-                  oneOf:
-                    - $ref: "../components/schemas/error.yaml#/path_not_found_error"
-                    - $ref: "../components/schemas/error.yaml#/api_version_not_found_error"
+      $ref: "../components/responses.yaml#/path_not_found"
     "405":
       $ref: "../components/responses.yaml#/method_not_allowed"
     "415":
@@ -30,5 +16,5 @@ get:
     "500":
       $ref: "../components/responses.yaml#/internal_server_error"
     "501":
-      $ref: "../components/responses.yaml#/not_implemented_error"
+      $ref: "../components/responses.yaml#/not_implemented"
   security: []

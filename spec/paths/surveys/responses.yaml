@@ -17,7 +17,7 @@ get:
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":
       $ref: "../../components/responses.yaml#/permission_denied"
-    "409":
+    "422":
       $ref: "../../components/responses.yaml#/survey_not_active"
     "503":
       $ref: "../../components/responses.yaml#/maintenance_mode"
@@ -45,11 +45,11 @@ post:
     "401":
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":
-      allOf:
-        - $ref: "../../components/responses.yaml#/permission_denied"
-        - $ref: "../../components/responses.yaml#/survey_out_of_time_range"
+      $ref: "../../components/responses.yaml#/permission_denied"
     "409":
-      $ref: "../../components/responses.yaml#/survey_not_active"
+      description: SD
+      oneOf:
+        - $ref: "../../components/responses.yaml#/survey_not_active"
     "422":
       $ref: "../../components/responses.yaml#/unprocessable_response"
     "503":

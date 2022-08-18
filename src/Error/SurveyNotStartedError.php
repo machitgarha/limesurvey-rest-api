@@ -2,6 +2,6 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Error;
 
-class SurveyNotStartedError extends PermissionDeniedError
+class SurveyNotStartedError extends ConflictError
 {
 }

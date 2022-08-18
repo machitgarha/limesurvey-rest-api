@@ -2,6 +2,6 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Error;
 
-class SurveyExpiredError extends PermissionDeniedError
+class SurveyExpiredError extends ConflictError
 {
 }

@@ -14,4 +14,4 @@ get:
     "403":
       $ref: "../components/responses.yaml#/permission_denied"
     "404":
-      $ref: "../components/responses.yaml#/not_found"
+      $ref: "../components/responses.yaml#/resource_not_found"
