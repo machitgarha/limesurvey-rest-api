@@ -15,11 +15,8 @@ class ApiDataValidator
     /**
      * Validates the structure of the API data.
      */
-    public static function validate(
-        array $responseData,
-        Survey $survey,
-        bool $skipSoftMandatoryQuestions = true
-    ): void {
+    public static function validate(array $responseData, Survey $survey): void
+    {
         $dateTimeFormat = 'Y-m-d H:i:s';
 
         // TODO: Use a custom key rule to generate full indexes in exception messages
@@ -29,7 +26,7 @@ class ApiDataValidator
             ->key('end_time', v::dateTime($dateTimeFormat), false)
             ->key(
                 'answers',
-                (new AnswerValidatorBuilder($skipSoftMandatoryQuestions))
+                (new AnswerValidatorBuilder())
                     ->buildAll($survey)
             )
             ->check($responseData);
@@ -47,8 +44,12 @@ use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
 
 /**
+ * The methods try to build minimal validator, leaving the main validations to
+ * be done by the core. As a simple example, for 5 point choice questions, it
+ * only checks the value to be an integer and the required range (i.e. [1, 5])
+ * is ignored.
+ *
  * @internal
- * @todo Improve function names and make them consistent.
  */
 class AnswerValidatorBuilder
 {
@@ -118,29 +119,11 @@ class AnswerValidatorBuilder
     /** @var array[] */
     private $questionTypeToMethodMapping;
 
-    /** @var bool */
-    private $skipSoftMandatoryQuestions = true;
-
-    public function __construct(bool $skipSoftMandatoryQuestions = true)
+    public function __construct()
     {
         $this->questionTypeToMethodMapping = ResponseGeneratorHelper::makeQuestionTypeToMethodMap(
             self::METHOD_TO_QUESTION_TYPE_LIST_MAPPING
         );
-
-        $this->skipSoftMandatoryQuestions = $skipSoftMandatoryQuestions;
-    }
-
-    private function isMandatory(Question $question): bool
-    {
-        $mandatory = $question->mandatory;
-
-        if ($mandatory === 'Y') {
-            return true;
-        }
-        if ($mandatory === 'S') {
-            return !$this->skipSoftMandatoryQuestions;
-        }
-        return false;
     }
 
     public function buildAll(Survey $survey): Validator
@@ -173,9 +156,7 @@ class AnswerValidatorBuilder
         $validator = $this->$method($question);
         $validator->setName($keyName);
 
-        return $this->isMandatory($question)
-            ? $validator
-            : v::nullable($validator)->setName($keyName);
+        return $validator;
     }
 
     private function buildForBool(): Validator
@@ -196,47 +177,37 @@ class AnswerValidatorBuilder
             ->floatType();
     }
 
-    private function buildForString(Question $question): Validator
+    private function buildForString(): Validator
     {
         return v::create()
             ->stringType()
             ->length(1, null, true);
     }
 
-    private function buildForRanking(Question $question): Validator
+    private function buildForRanking(): Validator
     {
         return v::create()
             ->arrayType()
             ->each(v::stringType());
     }
 
-    private function buildForFile(Question $question): Validator
+    private function buildForFile(): Validator
     {
         return v::create()
             ->key('title', v::stringType())
             ->key('comment', v::stringType())
-            ->key('size', v::floatType()->positive())
+            ->key('size', v::floatType())
             ->key('name', v::stringType())
             ->key('extension', v::stringType())
-            // TODO: Is this check time-consuming or has any value?
+            // TODO: Performance?
             ->key('contents', v::base64());
     }
 
     private function buildForList(Question $question): Validator
     {
-        $result = $nonOtherValidator = v::create()
+        return $nonOtherValidator = v::create()
             ->key('value', v::stringType())
-            ->key('other', v::identical(false), false);
-
-        if ($question->other === 'Y') {
-            $otherValidator = v::create()
-                ->key('value', v::stringType(), false)
-                ->key('other', v::identical(true));
-
-            $result = v::oneOf($otherValidator, $nonOtherValidator);
-        }
-
-        return $result;
+            ->key('other', v::boolType(), false);
     }
 
     private function buildForListWithComment(Question $question): Validator
@@ -251,16 +222,9 @@ class AnswerValidatorBuilder
         callable $valueValidatorBuilder,
         array $subQuestions = null
     ): Validator {
-        $mandatory = $this->isMandatory($question);
-
         return v::keySet(...\array_map(
-            function (Question $subQuestion) use ($valueValidatorBuilder, $question, $mandatory) {
-                $validator = $valueValidatorBuilder();
-                return v::key(
-                    $subQuestion->title,
-                    $mandatory ? $validator : v::nullable($validator),
-                    $mandatory
-                );
+            function (Question $subQuestion) use ($valueValidatorBuilder, $question) {
+                return v::key($subQuestion->title, v::nullable($valueValidatorBuilder()), false);
             },
             $subQuestions ?? $question->subquestions
         ));
@@ -283,43 +247,34 @@ class AnswerValidatorBuilder
 
     private function buildForArrayDual(Question $question): Validator
     {
-        $makeKey = function (int $keyName) use ($filterPossibleAnswers, $question) {
-            return v::create()
-                ->key($keyName, v::stringType(), $this->isMandatory($question));
-        };
-
-        return $this->buildForSubQuestions($question, function () use ($makeKey) {
+        return $this->buildForSubQuestions($question, function () {
             return v::create()
                 ->arrayType()
                 ->length(1, 2, true)
-                ->keySet($makeKey(0), $makeKey(1));
+                ->key(0, v::stringType(), false)
+                ->key(1, v::stringType(), false);
         });
     }
 
     private static function buildForMultipleChoiceInnerKeys(): array
     {
-        // TODO: Maybe improve this? Is improvement needed at all? (Also for the 'with comments' counterpart)
-        return [
-            v::key('selected', v::boolType()),
-            v::key('other_value', v::nullable(v::stringType()), false),
-        ];
+        return v::create()
+            ->key('selected', v::boolType())
+            ->key('other_value', v::nullable(v::stringType()), false);
     }
 
     private function buildForMultipleChoice(Question $question): Validator
     {
-        // At least one choice must have been selected, but we just leave it to the internal LimeSurvey validator
         return $this->buildForSubQuestions($question, function () {
-            return v::keySet(...self::buildForMultipleChoiceInnerKeys());
+            return self::buildForMultipleChoiceInnerKeys();
         });
     }
 
     private function buildForMultipleChoiceWithComments(Question $question): Validator
     {
         return $this->buildForSubQuestions($question, function () {
-            return v::keySet(...\array_merge(
-                self::buildForMultipleChoiceInnerKeys(),
-                [v::key('comment', v::nullable(v::stringType()), false)]
-            ));
+            return self::buildForMultipleChoiceInnerKeys()
+                ->key('comment', v::nullable(v::stringType()), false);
         });
     }
 
@@ -330,8 +285,8 @@ class AnswerValidatorBuilder
 
         return $this->buildForSubQuestions(
             $question,
-            function () use ($question, $valueValidatorBuilder, $xScaleSubQuestionList) {
-                return $this->buildForSubQuestions($question, $valueValidatorBuilder, $xScaleSubQuestionList);
+            function () use ($question, $yScaleSubQuestionList, $xScaleSubQuestionList) {
+                return $this->buildForSubQuestions($question, $yScaleSubQuestionList, $xScaleSubQuestionList);
             },
             $yScaleSubQuestionList
         );
