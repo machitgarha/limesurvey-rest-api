@@ -148,8 +148,8 @@ class ResponseController implements Controller
 
         } catch (CHttpException $exception) {
             /**
-             * We know the survey exists, because no exceptions thrown before. So, in this case,
-             * it's an unexpected error instead.
+             * We know the survey exists, because no exceptions thrown before.
+             * So, in this case, it's an unexpected error instead.
              */
             if ($exception->statusCode === Response::HTTP_NOT_FOUND) {
                 throw new InternalServerError(
@@ -187,7 +187,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     {
     }
 
-    public function renderTemplateFromFile($layout, $data, $return)
+    public function renderTemplateFromFile($layout, $data, $return): void
     {
         $layout = \str_replace('.twig', '', $layout);
 
@@ -196,10 +196,25 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                 throw new MaintenanceModeError();
                 // No break
 
+            case 'layout_global':
+                // Success, so do nothing!
+                break;
+
             default:
-                throw new InvalidArgumentException("Unhandled Twig layout '$layout'");
+                throw new InvalidArgumentException(
+                    "Unhandled Twig layout '$layout'"
+                );
                 // No break
         }
+    }
+
+    public function renderPartial($twigView, $data): string
+    {
+        return '';
+    }
+
+    public function renderHtmlPage($html, $template): void
+    {
     }
 }
 
@@ -222,7 +237,9 @@ class IndexOutputController
                 // No break
 
             default:
-                throw new InvalidArgumentException("Unhandled exit type '$type'");
+                throw new InvalidArgumentException(
+                    "Unhandled exit type '$type'"
+                );
         }
     }
 
