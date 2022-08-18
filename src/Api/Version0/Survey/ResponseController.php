@@ -222,11 +222,15 @@ class CustomTwigRenderer extends LSETwigViewRenderer
         switch ($twigName) {
             case 'mandatory_tip':
                 // TODO: Support for skipping soft mandatory questions
-                $this->errorBucket->addItem(new MandatoryQuestionMissingError(123));
+                $this->errorBucket->addItem(
+                    new MandatoryQuestionMissingError($data['qid'])
+                );
                 break;
 
             case 'em_tip':
-                $this->errorBucket->addItem(new InvalidAnswerError(123));
+                $this->errorBucket->addItem(
+                    new InvalidAnswerError($data['qid'], $data['vtip'])
+                );
                 break;
 
             default:

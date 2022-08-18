@@ -3,6 +3,10 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api;
 
 use Throwable;
+use CLogger as Logger;
+
+use MAChitgarha\LimeSurveyRestApi\Config;
+use MAChitgarha\LimeSurveyRestApi\Plugin;
 
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
 use MAChitgarha\LimeSurveyRestApi\Error\ErrorBucket;
@@ -13,6 +17,8 @@ use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
 use MAChitgarha\LimeSurveyRestApi\Error\MethodNotAllowedError;
 use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
 use MAChitgarha\LimeSurveyRestApi\Error\MalformedRequestBodyError;
+
+use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
@@ -35,11 +41,15 @@ use function MAChitgarha\LimeSurveyRestApi\Utility\Response\errors;
 
 class JsonErrorResponseGenerator
 {
-    public function __construct()
+    /** @var Plugin */
+    private $plugin;
+
+    public function __construct(Plugin $plugin)
     {
+        $this->plugin = $plugin;
     }
 
-    public function generate(Throwable $throwable): Response
+    public function generate(Throwable $throwable): JsonResponse
     {
         $extraHeaders = [];
 
@@ -69,7 +79,7 @@ class JsonErrorResponseGenerator
         // For the sake of being similar to try/catch blocks
         elseif ($throwable instanceof Throwable) {
             $error = new InternalServerError();
-            $this->logThrowable($error);
+            $this->logThrowable($throwable);
         }
 
         $response = $error instanceof ErrorBucket
@@ -139,10 +149,10 @@ class JsonErrorResponseGenerator
 
     private function logThrowable(Throwable $error): void
     {
-        $message = Config::DEBUG_MODE === DebugMode::FULL
+        $message = (Config::DEBUG_MODE === DebugMode::FULL)
             ? $error->__toString()
             : $error->getMessage();
 
-        $this->log($message, Logger::LEVEL_ERROR);
+        $this->plugin->log(\get_class($error) . ": $message", Logger::LEVEL_ERROR);
     }
 }

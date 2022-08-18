@@ -2,11 +2,13 @@
 
 namespace MAChitgarha\LimeSurveyRestApi;
 
-use CLogger as Logger;
 use Throwable;
 use PluginBase;
+use CLogger as Logger;
 
 use LimeSurvey\PluginManager\PluginManager;
+
+use MAChitgarha\LimeSurveyRestApi\Api\JsonErrorResponseGenerator;
 
 use MAChitgarha\LimeSurveyRestApi\Config;
 
@@ -96,7 +98,7 @@ class Plugin extends PluginBase
                 ->$method();
 
         } catch (Throwable $error) {
-            $response = (new JsonErrorResponseGenerator())->generate($error);
+            $response = (new JsonErrorResponseGenerator($this))->generate($error);
         }
 
         /** @var Response $response */
