@@ -33,15 +33,10 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerV
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
 
-use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
-use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
-use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotActiveError;
-use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
-use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
-
 use MAChitgarha\LimeSurveyRestApi\Helper\SurveyHelper;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
+use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
@@ -51,7 +46,6 @@ use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
@@ -82,8 +76,6 @@ class ResponseController implements Controller
             $userId,
             'responses'
         );
-
-        SurveyHelper::assertIsActive($survey);
 
         $responseRecords = \array_map(
             function (SurveyDynamic $item) use ($survey) {

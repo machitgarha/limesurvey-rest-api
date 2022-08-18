@@ -94,7 +94,6 @@ class FileController implements Controller
             $userId,
             'responses'
         );
-        SurveyHelper::assertIsActive($survey);
 
         $response = ResponseController::getResponse($surveyId, $responseId);
 
