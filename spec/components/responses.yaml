@@ -42,8 +42,10 @@ method_not_allowed:
     application/json:
       schema:
         $ref: "./schemas/error.yaml#/method_not_allowed_list"
-  header:
+  headers:
     Allow:
+      schema:
+        type: string
       description: List of allowed methods on the endpoint
       required: true
       example: GET, POST
@@ -76,19 +78,12 @@ resource_not_found:
       schema:
         $ref: "./schemas/error.yaml#/resource_not_found_list"
 
-survey_not_active:
-  description: The request needs the survey to be active, but currently it is not
+survey_unaccessible:
+  description: Survey is not accessible (i.e. either inactive, not started or expired)
   content:
     application/json:
       schema:
-        $ref: "./schemas/error.yaml#/survey_not_active_list"
-
-survey_out_of_time_range:
-  description: Either the survey is not started yet or is expired
-  content:
-    application/json:
-      schema:
-        $ref: "./schemas/error.yaml#/survey_out_of_time_range_list"
+        $ref: "./schemas/error.yaml#/survey_unaccessible_list"
 
 too_many_authentication_failures:
   description: Too many authentication failures

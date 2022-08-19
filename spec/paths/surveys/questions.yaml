@@ -11,9 +11,10 @@ get:
             type: object
             required: [data]
             properties:
-              type: array
-              items:
-                $ref: "../../components/schemas/question.yaml#/question"
+              data:
+                type: array
+                items:
+                  $ref: "../../components/schemas/question.yaml#/question"
     "401":
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":

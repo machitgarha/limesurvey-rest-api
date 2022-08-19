@@ -147,7 +147,7 @@ resource_not_found_list:
                 enum:
                   - ResourceIdNotFound
 
-survey_not_active_list:
+survey_unaccessible_list:
   allOf:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
@@ -157,16 +157,6 @@ survey_not_active_list:
               id:
                 enum:
                   - SurveyNotActive
-
-survey_out_of_time_range_list:
-  allOf:
-    - $ref: "#/error_list_base_with_one_item"
-    - properties:
-        errors:
-          items:
-            properties:
-              id:
-                enum:
                   - SurveyNotStarted
                   - SurveyExpired
 

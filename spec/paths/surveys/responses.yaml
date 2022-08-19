@@ -45,9 +45,7 @@ post:
     "403":
       $ref: "../../components/responses.yaml#/permission_denied"
     "409":
-      description: SD
-      oneOf:
-        - $ref: "../../components/responses.yaml#/survey_not_active"
+      $ref: "../../components/responses.yaml#/survey_unaccessible"
     "422":
       $ref: "../../components/responses.yaml#/unprocessable_response"
     "503":
