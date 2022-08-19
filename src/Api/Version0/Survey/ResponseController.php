@@ -134,6 +134,7 @@ class ResponseController implements Controller
 
             $_POST = $recordData + [
                 'sid' => $survey->sid,
+                'thisstep' => 1,
             ];
 
             $indexPage->action();
@@ -238,6 +239,10 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                 break;
 
             case 'em_tip':
+                // TODO: What to do here?
+                break;
+
+            case 'error_tip':
                 $this->errorBucket->addItem(
                     new InvalidAnswerError($data['qid'], $data['vtip'])
                 );
@@ -280,7 +285,12 @@ class IndexOutputController
         }
     }
 
-    public function createUrl(string $route, $params = [], string $ampersand = '&'): string
+    public function createAbsoluteUrl(): string
+    {
+        return '';
+    }
+
+    public function createUrl(): string
     {
         return '';
     }
