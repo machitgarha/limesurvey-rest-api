@@ -20,9 +20,13 @@ class Router
     /** @var Request */
     private $request;
 
-    public function __construct(Request $request)
+    /** @var PathInfo */
+    private $pathInfo;
+
+    public function __construct(Request $request, PathInfo $pathInfo)
     {
         $this->request = $request;
+        $this->pathInfo = $pathInfo;
     }
 
     /**
@@ -36,13 +40,7 @@ class Router
     public function route(): array
     {
         $routeCollection = new RouteCollection();
-
-        [$apiVersion, $path] = self::splitPathApiVersion($this->request->getPathInfo());
-
-        // Remove trailing slash
-        if (\str_ends_with($path, '/')) {
-            $path = \rtrim($path, '/');
-        }
+        $apiVersion = $this->pathInfo->getApiVersion();
 
         foreach ($this->getRoutesForApiVersion($apiVersion) as $route) {
             $routeCollection->add(
@@ -52,30 +50,9 @@ class Router
         }
 
         $matcher = new UrlMatcher($routeCollection, $this->getContext());
-        $params = $matcher->match($path);
+        $params = $matcher->match($this->pathInfo->getRoutingPath());
 
         return [self::getControllerMethodPair($params['_route']), $params];
-    }
-
-    /**
-     * Splits a path into its API version and the remaining part.
-     *
-     * @return array{0:string,1:string} A pair of API version (without replacing 'v' prefix, e.g.
-     * 'v0') and the rest of the path (i.e. the path relative to the version).
-     */
-    private static function splitPathApiVersion(string $path): array
-    {
-        $pattern = '/^\/(v\d+)(\/.*)?$/';
-        $path = \str_replace('/' . Config::PATH_PREFIX, '', $path);
-
-        if (!\preg_match($pattern, $path, $matches)) {
-            throw new ApiVersionMissingError();
-        }
-
-        return [
-            $matches[1],
-            $matches[2] ?? '/',
-        ];
     }
 
     private static function getRoutesForApiVersion(string $version): array
