@@ -336,7 +336,10 @@ answer_subitem_array_2d_texts:
   minLength: 1
 
 unanswered:
-  type: 'null'
+  type: string
+  nullable: true
+  minLength: 0
+  maxLength: 0
   description: If question (i.e. parent question of the current subquestion) is *not* mandatory, giving a null value means the question was leaved unanswered
 
 file_contents:
