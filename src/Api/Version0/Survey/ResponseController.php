@@ -159,12 +159,16 @@ class ResponseController implements Controller
 
         Yii::import('application.controllers.survey.index', true);
 
-        return new Index(new IndexOutputController(), 'index');
+        $controller = new IndexOutputController();
+        \App()->setController($controller);
+
+        return new Index($controller, 'index');
     }
 }
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 
+use CComponent;
 use LSETwigViewRenderer;
 use InvalidArgumentException;
 
@@ -280,5 +284,9 @@ class IndexOutputController
         if ($action === 'captcha') {
             throw new NotImplementedError('Captcha is not implemented yet');
         }
+    }
+
+    public function recordCachingAction()
+    {
     }
 }
