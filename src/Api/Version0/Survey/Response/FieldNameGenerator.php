@@ -18,6 +18,6 @@ class FieldNameGenerator
 
     public static function generateSubQuestionSuffix(Question ...$subQuestions): string
     {
-        return self::generateSubQuestionSuffixByCode(...\array_column($subQuestionCodes, 'title'));
+        return self::generateSubQuestionSuffixByCode(...\array_column($subQuestions, 'title'));
     }
 }

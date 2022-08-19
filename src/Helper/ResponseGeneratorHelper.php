@@ -2,6 +2,8 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Helper;
 
+use Question;
+
 class ResponseGeneratorHelper
 {
     public static function makeQuestionTypeToMethodMap(

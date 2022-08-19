@@ -285,8 +285,8 @@ class AnswerValidatorBuilder
 
         return $this->buildForSubQuestions(
             $question,
-            function () use ($question, $yScaleSubQuestionList, $xScaleSubQuestionList) {
-                return $this->buildForSubQuestions($question, $yScaleSubQuestionList, $xScaleSubQuestionList);
+            function () use ($question, $valueValidatorBuilder, $xScaleSubQuestionList) {
+                return $this->buildForSubQuestions($question, $valueValidatorBuilder, $xScaleSubQuestionList);
             },
             $yScaleSubQuestionList
         );
