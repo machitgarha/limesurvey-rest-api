@@ -150,6 +150,12 @@ class ResponseController implements Controller
                     $exception
                 );
             }
+
+            if ($exception->statusCode === Response::HTTP_UNAUTHORIZED) {
+                SurveyHelper::assertIsActive($survey);
+            }
+
+            throw $exception;
         }
     }
 
