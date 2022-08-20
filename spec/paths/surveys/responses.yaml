@@ -33,7 +33,7 @@ post:
           required: [data]
           properties:
             data:
-              $ref: "../../components/schemas/response.yaml#/response"
+              $ref: "../../components/schemas/response.yaml#/response_new"
   responses:
     "201":
       description: Created

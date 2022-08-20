@@ -19,6 +19,8 @@ error_list_base:
     errors:
       type: array
       minItems: 1
+      items:
+        $ref: "#/error_base"
 
 error_list_base_with_one_item:
   allOf:
@@ -26,8 +28,6 @@ error_list_base_with_one_item:
     - properties:
         errors:
           maxItems: 1
-          items:
-            $ref: "#/error_base"
 
 api_version_missing_list:
   allOf:
@@ -194,6 +194,7 @@ unauthorized_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:

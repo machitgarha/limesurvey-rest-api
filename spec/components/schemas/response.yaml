@@ -6,15 +6,8 @@ response_list:
 response_list_item:
   allOf:
     - $ref: "#/common_properties"
-    - type: object
-      required:
-        - id
-        - answers
-      properties:
-        id:
-          $ref: "#/id"
 
-response:
+response_new:
   allOf:
     - $ref: "#/common_properties"
     - oneOf:
@@ -23,11 +16,10 @@ response:
       - $ref: "#/response_specific_question"
 
 response_all_in_one:
-  description: When survey format is all-in-one
+  type: object
 
 response_specific_question_group:
   type: object
-  description: When survey format is group-by-group
   required: [question_group_id]
   properties:
     question_group_id:
@@ -35,7 +27,6 @@ response_specific_question_group:
 
 response_specific_question:
   type: object
-  description: When survey format is question-by-question
   required: [question_id]
   properties:
     question_id:
@@ -48,13 +39,21 @@ id:
 common_properties:
   type: object
   required:
+    - id
+    - submit_time
     - answers
   properties:
+    id:
+      allOf:
+        - $ref: "#/id"
+        - readOnly: true
+
     submit_time:
       allOf:
-        - description: Submission time
-          default: now
         - $ref: "./types.yaml#/date_time"
+        - description: Submission time, a value of null means an incomplete response
+          nullable: true
+          readOnly: true
 
     start_time:
       allOf:
