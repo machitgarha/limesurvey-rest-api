@@ -39,7 +39,7 @@ post:
       description: Created
       # TODO: Return the URL of the new response in a Location header
     "400":
-      $ref: "../../components/responses.yaml#/bad_request"
+      $ref: "../../components/responses.yaml#/bad_request_for_response"
     "401":
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":

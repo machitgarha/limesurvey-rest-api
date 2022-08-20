@@ -6,6 +6,9 @@ use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
 
 class Config
 {
-    public const PATH_PREFIX = 'restApi';
+    /** @var string */
     public const DEBUG_MODE = DebugMode::OFF;
+
+    /** @var bool Whether to rebuild the cache or not (e.g. for validation). Useful for development. */
+    public const CACHE_REBUILD = false;
 }

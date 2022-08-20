@@ -5,30 +5,39 @@ namespace MAChitgarha\LimeSurveyRestApi\Api;
 use Throwable;
 use CLogger as Logger;
 
+use League\OpenAPIValidation\PSR7\Exception\NoContentType;
+
+use League\OpenAPIValidation\PSR7\Exception\Validation\InvalidBody;
+use League\OpenAPIValidation\PSR7\Exception\Validation\InvalidPath;
+use League\OpenAPIValidation\PSR7\Exception\Validation\InvalidHeaders;
+use League\OpenAPIValidation\PSR7\Exception\Validation\InvalidSecurity;
+use League\OpenAPIValidation\PSR7\Exception\Validation\InvalidParameter;
+
+use League\OpenAPIValidation\Schema\Exception\TypeMismatch;
+use League\OpenAPIValidation\Schema\Exception\KeywordMismatch;
+use League\OpenAPIValidation\Schema\Exception\TooManyValidSchemas;
+use League\OpenAPIValidation\Schema\Exception\NotEnoughValidSchemas;
+
 use MAChitgarha\LimeSurveyRestApi\Config;
 use MAChitgarha\LimeSurveyRestApi\Plugin;
 
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
 use MAChitgarha\LimeSurveyRestApi\Error\ErrorBucket;
-use MAChitgarha\LimeSurveyRestApi\Error\InvalidValueError;
-use MAChitgarha\LimeSurveyRestApi\Error\PathNotFoundError;
-use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
 use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
-use MAChitgarha\LimeSurveyRestApi\Error\MethodNotAllowedError;
-use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
+use MAChitgarha\LimeSurveyRestApi\Error\InvalidPathParameterError;
+use MAChitgarha\LimeSurveyRestApi\Error\InvalidSecurityError;
+use MAChitgarha\LimeSurveyRestApi\Error\KeywordMismatchError;
 use MAChitgarha\LimeSurveyRestApi\Error\MalformedRequestBodyError;
+use MAChitgarha\LimeSurveyRestApi\Error\MethodNotAllowedError;
+use MAChitgarha\LimeSurveyRestApi\Error\PathNotFoundError;
+use MAChitgarha\LimeSurveyRestApi\Error\QuestionTypeMismatchError;
+use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
+use MAChitgarha\LimeSurveyRestApi\Error\UnsupportedMediaTypeError;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
-use Respect\Validation\Exceptions\KeyException;
-use Respect\Validation\Exceptions\IntTypeException;
-use Respect\Validation\Exceptions\BoolTypeException;
-use Respect\Validation\Exceptions\NullTypeException;
-use Respect\Validation\Exceptions\ArrayTypeException;
-use Respect\Validation\Exceptions\FloatTypeException;
-use Respect\Validation\Exceptions\StringTypeException;
 use Respect\Validation\Exceptions\ValidationException;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
@@ -36,8 +45,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
-use function MAChitgarha\LimeSurveyRestApi\Utility\Response\error;
-use function MAChitgarha\LimeSurveyRestApi\Utility\Response\errors;
+use function MAChitgarha\LimeSurveyRestApi\Utility\Response\{error, errors};
 
 class JsonErrorResponseGenerator
 {
@@ -70,16 +78,27 @@ class JsonErrorResponseGenerator
         elseif ($throwable instanceof NotEncodableValueException) {
             $error = new MalformedRequestBodyError();
         }
-        elseif ($throwable instanceof KeyException) {
-            $error = new RequiredKeyMissingError($throwable->getMessage());
+        elseif ($throwable instanceof InvalidBody) {
+            $error = self::convertInvalidBodyToError($throwable);
+        }
+        elseif ($throwable instanceof InvalidHeaders) {
+            $error = self::convertInvalidHeadersToError($throwable);
+        }
+        elseif ($throwable instanceof InvalidPath) {
+            $error = self::convertInvalidPathToError($throwable);
+        }
+        elseif ($throwable instanceof InvalidSecurity) {
+            $error = new InvalidSecurityError();
+        }
+        elseif ($throwable instanceof NoContentType) {
+            $error = new UnsupportedMediaTypeError();
         }
         elseif ($throwable instanceof ValidationException) {
             $error = self::convertValidationExceptionToError($throwable);
         }
         // For the sake of being similar to try/catch blocks
         elseif ($throwable instanceof Throwable) {
-            $error = new InternalServerError();
-            $this->logThrowable($throwable);
+            $error = $this->makeInternalServerError($throwable);
         }
 
         $response = $error instanceof ErrorBucket
@@ -93,23 +112,78 @@ class JsonErrorResponseGenerator
         return $response;
     }
 
-    private static function convertValidationExceptionToError(ValidationException $exception): Error
+    private function convertInvalidBodyToError(InvalidBody $exception): Error
     {
-        if (\in_array(
-            \get_class($exception),
-            [
-                ArrayTypeException::class,
-                BoolTypeException::class,
-                FloatTypeException::class,
-                IntTypeException::class,
-                NullTypeException::class,
-                StringTypeException::class,
-            ]
-        )) {
-            return new TypeMismatchError($exception->getMessage());
+        $message = $exception->getMessage();
+        $previous = $exception->getPrevious();
+
+        if (\str_contains($message, 'Syntax error')) {
+            return new MalformedRequestBodyError();
         }
 
-        return new InvalidValueError($exception->getMessage());
+        if ($previous instanceof TypeMismatch) {
+            return new TypeMismatchError(
+                $previous->getMessage()
+            );
+        }
+
+        if ($previous instanceof KeywordMismatch) {
+            // Remove the 'Keyword validation failed: ' section
+            $previousMessage = $previous->getMessage();
+            if (\str_contains($previousMessage, ': ')) {
+                return new KeywordMismatchError(
+                    \explode(': ', $previousMessage, 2)[1]
+                );
+            }
+        }
+
+        return $this->makeInternalServerError($exception);
+    }
+
+    private function convertInvalidHeadersToError(InvalidHeaders $exception): Error
+    {
+        if (\str_contains($exception->getMessage(), 'Content-Type')) {
+            return new UnsupportedMediaTypeError();
+        }
+
+        return $this->makeInternalServerError($exception);
+    }
+
+    private function convertInvalidPathToError(InvalidPath $exception): Error
+    {
+        $previous = $exception->getPrevious();
+        $previous2nd = $previous ? $previous->getPrevious() : null;
+
+        if (
+            $previous instanceof InvalidParameter &&
+            $previous2nd instanceof TypeMismatch
+        ) {
+            return new InvalidPathParameterError(
+                "{$previous->getMessage()}. {$previous2nd->getMessage()}"
+            );
+        }
+
+        return $this->makeInternalServerError($exception);
+    }
+
+    private static function convertValidationExceptionToError(ValidationException $exception): Error
+    {
+        return new QuestionTypeMismatchError($exception->getMessage());
+    }
+
+    private function makeInternalServerError(Throwable $throwable): InternalServerError
+    {
+        $this->logThrowable($throwable);
+        return new InternalServerError();
+    }
+
+    private function logThrowable(Throwable $error): void
+    {
+        $message = (Config::DEBUG_MODE === DebugMode::FULL)
+            ? $error->__toString()
+            : $error->getMessage();
+
+        $this->plugin->log(\get_class($error) . ": $message", Logger::LEVEL_ERROR);
     }
 
     private static function generateDataForError(Error $error): array
@@ -145,14 +219,5 @@ class JsonErrorResponseGenerator
             errors($errorDataList),
             $errorBucket->getHttpStatusCode()
         );
-    }
-
-    private function logThrowable(Throwable $error): void
-    {
-        $message = (Config::DEBUG_MODE === DebugMode::FULL)
-            ? $error->__toString()
-            : $error->getMessage();
-
-        $this->plugin->log(\get_class($error) . ": $message", Logger::LEVEL_ERROR);
     }
 }

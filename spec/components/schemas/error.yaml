@@ -40,22 +40,40 @@ api_version_missing_list:
                 enum:
                   - ApiVersionMissing
 
+bad_request:
+  allOf:
+    - $ref: "#/error_optional_message"
+    - properties:
+        id:
+          enum:
+            - MalformedRequestBody
+            - InvalidPathParameter
+            - KeywordMismatch
+            - TypeMismatch
+
 bad_request_list:
   allOf:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
           items:
-            allOf:
-              - $ref: "#/error_optional_message"
-              - properties:
-                  id:
-                    enum:
-                      - MalformedRequestBody
-                      - InvalidPathParameter
-                      - RequiredKeyMissing
-                      - TypeMismatch
-                      - InvalidValue
+            $ref: "#/bad_request"
+
+bad_request_for_response_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          items:
+            oneOf:
+              - $ref: "#/bad_request"
+              - title: question_type_mismatch
+                allOf:
+                  - $ref: "#/error_optional_message"
+                  - properties:
+                      id:
+                        enum:
+                          - QuestionTypeMismatch
 
 internal_server_error_list:
   allOf:
@@ -182,8 +200,7 @@ unauthorized_list:
                 enum:
                   - AccessTokenExpired
                   - AccessTokenInvalid
-                  - AuthorizationHeaderMissing
-                  - AuthorizationHeaderUnsupported
+                  - InvalidSecurity
 
 unprocessable_response:
   allOf:

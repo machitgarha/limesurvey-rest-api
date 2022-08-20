@@ -24,6 +24,10 @@ use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
 
 use MAChitgarha\LimeSurveyRestApi\Routing\Router;
 
+use MAChitgarha\LimeSurveyRestApi\Validation\RequestValidator;
+
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -45,25 +49,24 @@ class Plugin extends PluginBase
 
     public function beforeControllerAction(): void
     {
-        $pathInfo = new PathInfo($_SERVER['PATH_INFO'] ?? '');
+        $pathInfoValue = $_SERVER['PATH_INFO'] ?? '';
 
-        if (!$pathInfo->isBelongedToThisPlugin()) {
+        if (!Router::shouldWeHandle($pathInfoValue)) {
             return;
         }
+        // Else, disable default request handling
+        $this->event->set('run', false);
 
         $request = Request::createFromGlobals();
-
-        // Disable default request handling
-        $this->event->set('run', false);
 
         $this->setDebugging();
 
         $this->log(
-            "New request caught: {$request->getMethod()} {$pathInfo->get()}",
+            "New request caught: {$request->getMethod()} {$pathInfoValue}",
             Logger::LEVEL_INFO
         );
 
-        $this->handleRequest($request, $pathInfo);
+        $this->handleRequest($request, $pathInfoValue);
 
         App()->end();
     }
@@ -85,14 +88,17 @@ class Plugin extends PluginBase
         }
     }
 
-    private function handleRequest(Request $request, PathInfo $pathInfo): void
+    private function handleRequest(Request $request, string $pathInfoValue): void
     {
         try {
-            [[$controllerClass, $method], $params] =
-                (new Router($request, $pathInfo))->route();
+            $router = new Router(
+                $pathInfo = new PathInfo($pathInfoValue)
+            );
+
+            [[$controllerClass, $method], $params] = $router->route($request);
 
             $response = $this
-                ->makeController($controllerClass, $params, $request)
+                ->makeController($controllerClass, $params, $request, $router)
                 ->$method();
 
         } catch (Throwable $error) {
@@ -103,17 +109,25 @@ class Plugin extends PluginBase
         $response->send();
     }
 
-    private function makeController(string $controllerClass, array $params, Request $request): Controller
-    {
+    private function makeController(
+        string $controllerClass,
+        array $params,
+        Request $request,
+        Router $router
+    ): Controller {
         /** @var Controller $controller */
         $controller = new $controllerClass();
 
         $request->attributes->replace($params);
 
+        $pathInfo = $router->getPathInfo();
+
         $container = new ControllerDependencyContainer(
             $request,
+            $pathInfo,
             new Serializer([], [new JsonEncoder()]),
-            new BearerTokenAuthorizer($request)
+            new BearerTokenAuthorizer($request),
+            new RequestValidator($request, $pathInfo, new FilesystemAdapter())
         );
 
         return $controller

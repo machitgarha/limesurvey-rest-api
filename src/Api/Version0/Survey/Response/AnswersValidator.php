@@ -4,36 +4,26 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 
 use Survey;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator\{
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\AnswersValidator\{
     AnswerValidatorBuilder
 };
 
 use Respect\Validation\Validator as v;
 
-class ApiDataValidator
+/**
+ * Validates each answer againts its related question type.
+ */
+class AnswersValidator
 {
-    /**
-     * Validates the structure of the API data.
-     */
-    public static function validate(array $responseData, Survey $survey): void
+    public static function validate(array $answersData, Survey $survey): void
     {
-        $dateTimeFormat = 'Y-m-d H:i:s';
-
-        // TODO: Use a custom key rule to generate full indexes in exception messages
-        v::create()
-            ->key('submit_time', v::dateTime($dateTimeFormat), false)
-            ->key('start_time', v::dateTime($dateTimeFormat), false)
-            ->key('end_time', v::dateTime($dateTimeFormat), false)
-            ->key(
-                'answers',
-                (new AnswerValidatorBuilder())
-                    ->buildAll($survey)
-            )
-            ->check($responseData);
+        (new AnswerValidatorBuilder())
+            ->buildAll($survey)
+            ->check($answersData);
     }
 }
 
-namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator;
+namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\AnswersValidator;
 
 use Survey;
 use Question;
@@ -156,7 +146,7 @@ class AnswerValidatorBuilder
         $validator = $this->$method($question);
         $validator->setName($keyName);
 
-        return $validator;
+        return v::nullable($validator);
     }
 
     private function buildForBool(): Validator
@@ -180,8 +170,7 @@ class AnswerValidatorBuilder
     private function buildForString(): Validator
     {
         return v::create()
-            ->stringType()
-            ->length(1, null, true);
+            ->stringType();
     }
 
     private function buildForRanking(): Validator

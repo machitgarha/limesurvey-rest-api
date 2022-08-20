@@ -17,16 +17,22 @@ use Symfony\Component\Routing\RouteCollection;
 
 class Router
 {
-    /** @var Request */
-    private $request;
-
     /** @var PathInfo */
     private $pathInfo;
 
-    public function __construct(Request $request, PathInfo $pathInfo)
+    public static function shouldWeHandle(string $pathInfoValue): bool
     {
-        $this->request = $request;
+        return \str_starts_with($pathInfoValue, '/' . PathInfo::PREFIX);
+    }
+
+    public function __construct(PathInfo $pathInfo)
+    {
         $this->pathInfo = $pathInfo;
+    }
+
+    public function getPathInfo(): PathInfo
+    {
+        return $this->pathInfo;
     }
 
     /**
@@ -37,22 +43,29 @@ class Router
      * transforms to the key 'survey_id'). The first element of the pair is another pair of the
      * controller's fully-qualified name and its method name.
      */
-    public function route(): array
+    public function route(Request $request): array
     {
         $routeCollection = new RouteCollection();
-        $apiVersion = $this->pathInfo->getApiVersion();
 
-        foreach ($this->getRoutesForApiVersion($apiVersion) as $route) {
+        $apiVersion = $this->pathInfo->getApiVersion();
+        $routes = $this->getRoutesForApiVersion($apiVersion);
+
+        foreach ($routes as $key => $route) {
             $routeCollection->add(
-                $route['name'],
+                (string) $key,
                 self::makeRoute($route)
             );
         }
 
-        $matcher = new UrlMatcher($routeCollection, $this->getContext());
-        $params = $matcher->match($this->pathInfo->getRoutingPath());
+        $matcher = new UrlMatcher(
+            $routeCollection,
+            (new RequestContext())->fromRequest($request)
+        );
+        $params = $matcher->match($this->pathInfo->getRoutedPath());
 
-        return [self::getControllerMethodPair($params['_route']), $params];
+        $route = $routes[(int) $params['_route']];
+
+        return [self::getControllerMethodPair($route['name']), $params];
     }
 
     private static function getRoutesForApiVersion(string $version): array
@@ -71,21 +84,7 @@ class Router
      */
     private static function makeRoute(array $route): Route
     {
-        return new Route(
-            $route['path'],
-            [],
-            $route['requirements'] ?? [],
-            [],
-            null,
-            [],
-            $route['http_method']
-        );
-    }
-
-    private function getContext(): RequestContext
-    {
-        return (new RequestContext())
-            ->fromRequest($this->request);
+        return new Route($route['path'], [], [], [], null, [], $route['http_method']);
     }
 
     private static function getControllerMethodPair(string $routeName): array

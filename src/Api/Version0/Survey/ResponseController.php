@@ -14,13 +14,21 @@ use RuntimeException;
 use LSYii_Application;
 use LimeExpressionManager;
 
+use League\OpenAPIValidation\PSR7\Exception\Validation\InvalidBody;
+
+use League\OpenAPIValidation\Schema\Exception\TooManyValidSchemas;
+use League\OpenAPIValidation\Schema\Exception\NotEnoughValidSchemas;
+
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator;
+
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\AnswersValidator;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\CustomTwigRenderer;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\IndexOutputController;
+
+use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
@@ -57,13 +65,12 @@ class ResponseController implements Controller
     use Traits\RequestGetter;
     use Traits\SerializerGetter;
     use Traits\RequestBodyDecoder;
+    use Traits\RequestValidator;
 
     public const PATH = '/surveys/{survey_id}/responses';
 
     public function list(): JsonResponse
     {
-        ContentTypeValidator::validateIsJson($this->getRequest());
-
         $userId = $this->authorize()->getId();
 
         $survey = SurveyHelper::get(
@@ -94,7 +101,7 @@ class ResponseController implements Controller
 
     public function new(): EmptyResponse
     {
-        ContentTypeValidator::validateIsJson($this->getRequest());
+        $this->validateNewOrUpdate();
 
         $userId = $this->authorize()->getId();
 
@@ -111,12 +118,35 @@ class ResponseController implements Controller
         );
 
         $data = $this->decodeJsonRequestBodyInnerData();
-        ApiDataValidator::validate($data, $survey);
+        AnswersValidator::validate($data['answers'], $survey);
 
         $recordData = RecordGenerator::generate($data, $survey);
         $this->submitResponse($recordData, $surveyInfo);
 
         return new EmptyResponse(Response::HTTP_CREATED);
+    }
+
+    private function validateNewOrUpdate(): void
+    {
+        try {
+            $this->validateRequest();
+        } catch (InvalidBody $exception) {
+            $previous = $exception->getPrevious();
+
+            if ($previous instanceof NotEnoughValidSchemas) {
+                throw new TypeMismatchError(
+                    'Cannot indicate the type of one of the answers (i.e. is probably out of valid answer types)'
+                );
+            }
+
+            if ($previous instanceof TooManyValidSchemas) {
+                // Ignoring, as it is possible (e.g. 5 point choice and number input)
+                // TODO: Risk of not validating other answers?
+                return;
+            }
+
+            throw $exception;
+        }
     }
 
     private function submitResponse(array $recordData, array $surveyInfo): void

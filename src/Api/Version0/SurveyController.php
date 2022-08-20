@@ -31,13 +31,14 @@ class SurveyController implements Controller
     use Traits\AuthorizerGetter;
     use Traits\RequestGetter;
     use Traits\SerializerGetter;
+    use Traits\RequestValidator;
 
     public const PATH = '/surveys';
     public const PATH_BY_ID = '/surveys/{survey_id}';
 
     public function list(): JsonResponse
     {
-        ContentTypeValidator::validateIsJson($this->getRequest());
+        $this->validateRequest();
 
         $userId = $this->authorize()->getId();
 

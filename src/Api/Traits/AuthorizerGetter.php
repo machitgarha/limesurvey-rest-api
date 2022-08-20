@@ -6,6 +6,9 @@ use MAChitgarha\LimeSurveyRestApi\Api\ControllerDependencyContainer;
 
 use MAChitgarha\LimeSurveyRestApi\Authorization\Authorizer;
 
+/**
+ * @todo Rename to Authorizer
+ */
 trait AuthorizerGetter
 {
     abstract public function getContainer(): ControllerDependencyContainer;

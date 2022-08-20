@@ -2,13 +2,15 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Routing;
 
+use BadMethodCallException;
+
 use MAChitgarha\LimeSurveyRestApi\Config;
 
 use MAChitgarha\LimeSurveyRestApi\Error\ApiVersionMissingError;
 
 class PathInfo
 {
-    private const PREFIX = 'restApi';
+    public const PREFIX = 'restApi';
 
     /** @var string */
     private $pathInfo;
@@ -17,16 +19,13 @@ class PathInfo
     private $apiVersion = null;
 
     /** @var ?string */
-    private $routingPath = null;
+    private $routedPath = null;
 
     public function __construct(string $pathInfo)
     {
         $this->pathInfo = $pathInfo;
-    }
 
-    public function isBelongedToThisPlugin(): bool
-    {
-        return \str_starts_with($this->pathInfo, '/' . self::PREFIX);
+        [$this->apiVersion, $this->routedPath] = self::splitPathInfo($pathInfo);
     }
 
     public function get(): string
@@ -36,30 +35,26 @@ class PathInfo
 
     public function getApiVersion(): string
     {
-        $this->makeApiVersionAndRoutingPathIfNeeded();
         return $this->apiVersion;
     }
 
-    public function getRoutingPath(): string
+    public function getRoutedPath(): string
     {
-        $this->makeApiVersionAndRoutingPathIfNeeded();
-        return $this->routingPath;
+        return $this->routedPath;
     }
 
-    private function makeApiVersionAndRoutingPathIfNeeded(): void
+    private static function splitPathInfo(string $pathInfo): array
     {
-        if ($this->apiVersion !== null) {
-            return;
-        }
-
         $pattern = '/^\/(v\d+)(\/.*)?$/';
 
-        if (!\preg_match($pattern, self::normalizePathInfo($this->pathInfo), $matches)) {
+        if (!\preg_match($pattern, self::normalizePathInfo($pathInfo), $matches)) {
             throw new ApiVersionMissingError();
         }
 
-        $this->apiVersion = $matches[1];
-        $this->routingPath = $matches[2] ?? '/';
+        return [
+            $matches[1],
+            $matches[2] ?? '/',
+        ];
     }
 
     private static function normalizePathInfo(string $pathInfo): string

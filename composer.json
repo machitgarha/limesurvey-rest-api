@@ -15,7 +15,11 @@
         "symfony/routing": "^5.4|^6.0",
         "symfony/http-foundation": "^5.4|^6.0",
         "respect/validation": "^2.0.17",
-        "symfony/serializer": "^5.4|^6.0"
+        "symfony/serializer": "^5.4|^6.0",
+        "league/openapi-psr7-validator": "^0.18.0",
+        "symfony/psr-http-message-bridge": "^2.1",
+        "nyholm/psr7": "^1.5",
+        "symfony/cache": "^5.4"
     },
     "require-dev": {
         "cebe/php-openapi": "^1.0",

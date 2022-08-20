@@ -33,15 +33,15 @@ class BearerTokenController implements Controller
     use Traits\RequestGetter;
     use Traits\SerializerGetter;
     use Traits\RequestBodyDecoder;
+    use Traits\RequestValidator;
 
     public const PATH = '/login/bearer_token';
 
     public function new(): JsonResponse
     {
-        ContentTypeValidator::validateIsJson($this->getRequest());
+        $this->validateRequest();
 
         $data = $this->decodeJsonRequestBodyInnerData();
-        $this->validateDataForNew($data);
 
         $this->login(
             $data['username'],
@@ -61,13 +61,6 @@ class BearerTokenController implements Controller
             ]),
             JsonResponse::HTTP_CREATED
         );
-    }
-
-    private function validateDataForNew(array $bodyData): void
-    {
-        v   ::key('username', v::stringType())
-            ->key('password', v::stringType())
-            ->check($bodyData);
     }
 
     private function login(string $username, string $password): void
@@ -134,7 +127,7 @@ class BearerTokenController implements Controller
 
     public function delete(): EmptyResponse
     {
-        ContentTypeValidator::validateIsJson($this->getRequest());
+        $this->validateRequest();
 
         try {
             $accessToken = $this->getAuthorizer()->authorize(false)->getAccessToken();

@@ -188,7 +188,7 @@ class AnswerGenerator
         foreach ($question->subquestions as $subQuestion) {
             yield from $fn(
                 $fieldNameBase . FieldNameGenerator::generateSubQuestionSuffix($subQuestion),
-                $answer[$subQuestion->title] ?? null
+                $answer['answers'][$subQuestion->title] ?? null
             );
         }
     }
@@ -226,8 +226,8 @@ class AnswerGenerator
             $fieldNameBase,
             $question,
             function (string $fieldName, ?array $subAnswer): Generator {
-                // TODO: Return empty string when selected is false?
-                yield from $this->generateBool($subAnswer['selected'], $fieldName);
+                // TODO: Return empty string when selected is false? (Also for with comments)
+                yield from $this->generateBool($subAnswer['selected'] ?? null, $fieldName);
             }
         );
 
@@ -246,8 +246,7 @@ class AnswerGenerator
             $fieldNameBase,
             $question,
             function (string $fieldName, ?array $subAnswer): Generator {
-                // TODO: Return empty string when selected is false?
-                yield from $this->generateBool($subAnswer['selected'], $fieldName);
+                yield from $this->generateBool($subAnswer['selected'] ?? null, $fieldName);
                 yield "{$fieldName}comment" => $subAnswer['comment'] ?? '';
             }
         );
@@ -270,7 +269,7 @@ class AnswerGenerator
                         $yScaleSubQuestion,
                         $xScaleSubQuestion
                     )
-                    => $answer[$yScaleSubQuestion->title][$xScaleSubQuestion->title] ?? '';
+                    => $answer['answers'][$yScaleSubQuestion->title]['answers'][$xScaleSubQuestion->title] ?? '';
             }
         }
     }

@@ -12,6 +12,13 @@ bad_request:
       schema:
         $ref: "./schemas/error.yaml#/bad_request_list"
 
+bad_request_for_response:
+  description: Bad request, mostly malformed or invalid request body
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/bad_request_for_response_list"
+
 empty_ok:
   description: OK (no content)
 

@@ -6,8 +6,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\Serializer\Serializer;
 
-use Respect\Validation\Validator as v;
-
 trait RequestBodyDecoder
 {
     abstract public function getRequest(): Request;
@@ -28,12 +26,6 @@ trait RequestBodyDecoder
      */
     public function decodeJsonRequestBodyInnerData(): array
     {
-        $body = $this->decodeJsonRequestBody();
-
-        v::create()
-            ->key('data', v::arrayType())
-            ->check($body);
-
-        return $body['data'];
+        return $this->decodeJsonRequestBody()['data'];
     }
 }

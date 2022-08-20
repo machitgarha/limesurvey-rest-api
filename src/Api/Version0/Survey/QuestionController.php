@@ -27,13 +27,14 @@ class QuestionController implements Controller
     use Traits\AuthorizerGetter;
     use Traits\PathParameterGetter;
     use Traits\RequestGetter;
+    use Traits\RequestValidator;
 
     public const PATH = '/surveys/{survey_id}/questions';
     public const PATH_BY_ID = '/surveys/{survey_id}/questions/{question_id}';
 
     public function list(): JsonResponse
     {
-        ContentTypeValidator::validateIsJson($this->getRequest());
+        $this->validateRequest();
 
         $userId = $this->getAuthorizer()->authorize()->getId();
 

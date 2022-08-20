@@ -9,15 +9,14 @@ use RuntimeException;
 
 use MAChitgarha\LimeSurveyRestApi\Error\AccessTokenExpiredError;
 use MAChitgarha\LimeSurveyRestApi\Error\AccessTokenInvalidError;
-use MAChitgarha\LimeSurveyRestApi\Error\AuthorizationHeaderMissingError;
-use MAChitgarha\LimeSurveyRestApi\Error\AuthorizationHeaderUnsupportedError;
+use MAChitgarha\LimeSurveyRestApi\Error\InvalidSecurityError;
 
 use Symfony\Component\HttpFoundation\Request;
 
 class BearerTokenAuthorizer implements Authorizer
 {
     private const HEADER_AUTHORIZATION = 'Authorization';
-    private const REGEX_HEADER_AUTHORIZATION = '/(Bearer|bearer) ([\w~]+)/';
+    private const REGEX_HEADER_AUTHORIZATION = '/Bearer ([\w~]+)/';
 
     /** @var Request */
     private $request;
@@ -33,8 +32,9 @@ class BearerTokenAuthorizer implements Authorizer
     /** @inheritDoc */
     public function authorize(bool $errorOnExpiration = true): self
     {
+        // TODO: Remove this check as being redundant?
         if (!$this->request->headers->has(self::HEADER_AUTHORIZATION)) {
-            throw new AuthorizationHeaderMissingError();
+            throw new InvalidSecurityError();
         }
 
         $authorizationHeader = $this->request->headers->get(self::HEADER_AUTHORIZATION);
@@ -63,10 +63,10 @@ class BearerTokenAuthorizer implements Authorizer
     private static function extractAccessTokenIfValid(string $authorizationHeader): string
     {
         if (!\preg_match(self::REGEX_HEADER_AUTHORIZATION, $authorizationHeader, $matches)) {
-            throw new AuthorizationHeaderUnsupportedError();
+            throw new InvalidSecurityError();
         }
 
-        return $matches[2];
+        return $matches[1];
     }
 
     // TODO: Make all the below functions a trait

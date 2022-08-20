@@ -259,7 +259,7 @@ class AnswerGenerator
         $result = [];
 
         foreach ($question->subquestions as $subQuestion) {
-            $result[$subQuestion->title] = $fn(
+            $result['answers'][$subQuestion->title] = $fn(
                 // fieldName:
                 $fieldNameBase . FieldNameGenerator::generateSubQuestionSuffix($subQuestion)
             );
@@ -349,14 +349,15 @@ class AnswerGenerator
         $result = [];
         foreach ($yScaleSubQuestionList as $yScaleSubQuestion) {
             foreach ($xScaleSubQuestionList as $xScaleSubQuestion) {
-                $result[$yScaleSubQuestion->title][$xScaleSubQuestion->title] =
+                $result['answers'][$yScaleSubQuestion->title]['answers'][$xScaleSubQuestion->title] =
                     $this->getRecordField(
                         $fieldNameBase . FieldNameGenerator::generateSubQuestionSuffix(
                             $yScaleSubQuestion,
                             $xScaleSubQuestion
                         ),
                         $type
-                    );
+                    )
+                ;
             }
         }
 

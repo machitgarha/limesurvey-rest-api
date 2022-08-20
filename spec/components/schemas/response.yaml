@@ -15,35 +15,31 @@ response_list_item:
           $ref: "#/id"
 
 response:
-  oneOf:
-    - $ref: "#/response_all_in_one"
-    - $ref: "#/response_specific_question_group"
-    - $ref: "#/response_specific_question"
+  allOf:
+    - $ref: "#/common_properties"
+    - oneOf:
+      - $ref: "#/response_all_in_one"
+      - $ref: "#/response_specific_question_group"
+      - $ref: "#/response_specific_question"
 
 response_all_in_one:
-  allOf:
-    - description: When survey format is all-in-one
-    - $ref: "#/common_properties"
+  description: When survey format is all-in-one
 
 response_specific_question_group:
-  allOf:
-    - type: object
-      description: When survey format is group-by-group
-      required: [question_group_id]
-      properties:
-        question_group_id:
-          $ref: "../../components/schemas/question_group.yaml#/question_group_id"
-    - $ref: "#/common_properties"
+  type: object
+  description: When survey format is group-by-group
+  required: [question_group_id]
+  properties:
+    question_group_id:
+      $ref: "../../components/schemas/question_group.yaml#/question_group_id"
 
 response_specific_question:
-  allOf:
-    - type: object
-      description: When survey format is question-by-question
-      required: [question_id]
-      properties:
-        question_id:
-          $ref: "../../components/schemas/question.yaml#/question_id"
-    - $ref: "#/common_properties"
+  type: object
+  description: When survey format is question-by-question
+  required: [question_id]
+  properties:
+    question_id:
+        $ref: "../../components/schemas/question.yaml#/question_id"
 
 id:
   type: integer
@@ -217,24 +213,28 @@ answer_list_with_comment:
 
 answer_with_sub_questions:
   type: object
-  additionalProperties:
-    description: |
-      Mapping of each subquestion code to its answer. Specific to all question types having subquestions, including Arrays (e.g. 'Array, dual scale', 'Array, Yes/No/Uncertain') and Multiple inputs (e.g. 'Multipleshort free texts', 'Multiple choice with comments').
+  required: [answers]
+  properties:
+    answers:
+      type: object
+      description: |
+        Mapping of each subquestion code to its answer. Specific to all question types having subquestions, including Arrays (e.g. 'Array, dual scale', 'Array, Yes/No/Uncertain') and Multiple inputs (e.g. 'Multipleshort free texts', 'Multiple choice with comments').
 
-      **Note**: If the question is of type 'Multiple choice' or 'Multiple choice with comments', the keys may include the special value 'other' (case-sensitive) if the question's Other option is enabled (and must be available if it is user-selected).
-    oneOf:
-      - $ref: "#/unanswered"
-      - $ref: "#/answer_item_array_5_point_choice"
-      - $ref: "#/answer_item_array_10_point_choice"
-      - $ref: "#/answer_item_multiple_numerical_input"
-      - $ref: "#/answer_item_array_increase_same_decrease"
-      - $ref: "#/answer_item_yes_no_uncertain"
-      - $ref: "#/answer_item_multiple_short_free_texts"
-      - $ref: "#/answer_item_array_answer_code"
-      - $ref: "#/answer_item_array_dual"
-      - $ref: "#/answer_item_multiple_choice"
-      - $ref: "#/answer_item_multiple_choice_with_comments"
-      - $ref: "#/answer_item_array_2d"
+        **Note**: If the question is of type 'Multiple choice' or 'Multiple choice with comments', the keys may include the special value 'other' (case-sensitive) if the question's Other option is enabled (and must be available if it is user-selected).
+      additionalProperties:
+        oneOf:
+          - $ref: "#/unanswered"
+          - $ref: "#/answer_item_array_5_point_choice"
+          - $ref: "#/answer_item_array_10_point_choice"
+          - $ref: "#/answer_item_multiple_numerical_input"
+          - $ref: "#/answer_item_array_increase_same_decrease"
+          - $ref: "#/answer_item_yes_no_uncertain"
+          - $ref: "#/answer_item_multiple_short_free_texts"
+          - $ref: "#/answer_item_array_answer_code"
+          - $ref: "#/answer_item_array_dual"
+          - $ref: "#/answer_item_multiple_choice"
+          - $ref: "#/answer_item_multiple_choice_with_comments"
+          - $ref: "#/answer_item_array_2d"
 
 answer_item_array_5_point_choice:
   allOf:
@@ -317,12 +317,16 @@ answer_item_multiple_choice_with_comments:
 
 answer_item_array_2d:
   type: object
-  description: The key is the subquestion code with Y-scale. The value is a mapping of subquestion code with X-scale to their actual values (i.e. answers)
-  additionalProperties:
-    oneOf:
-      - $ref: "#/unanswered"
-      - $ref: "#/answer_subitem_array_2d_numbers"
-      - $ref: "#/answer_subitem_array_2d_texts"
+  required: [answers]
+  properties:
+    answers:
+      type: object
+      description: Mapping of subquestion code with X-scale to their actual values (i.e. answers). The parent key of 'answers' is the subquestion code with Y-scale
+      additionalProperties:
+        oneOf:
+          - $ref: "#/unanswered"
+          - $ref: "#/answer_subitem_array_2d_numbers"
+          - $ref: "#/answer_subitem_array_2d_texts"
 
 answer_subitem_array_2d_numbers:
   type: integer
