@@ -4,32 +4,75 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 
 use Survey;
 use Question;
+use RuntimeException;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\RecordGenerator\AnswerGenerator;
 
-class RecordGenerator
+class PostDataGenerator
 {
-    public static function generate(array $responseData, Survey $survey): array
+    /** @var array[] */
+    private $responseData;
+
+    /** @var Survey */
+    private $survey;
+
+    public function __construct(array $responseData, Survey $survey)
     {
-        $currentTime = \date('Y-m-d H:i:s');
+        $this->responseData = $responseData;
+        $this->survey = $survey;
+    }
 
+    public function generate(): array
+    {
         $result = [
-            'submitdate' => $responseData['submit_time'] ?? $currentTime,
-            // TODO: Add support for specifying it in the request
-            'startlanguage' => $survey->language,
+            'sid' => $this->survey->sid,
+            'thisstep' => self::generateStep(),
+            // TODO: Maybe other things as well?
+            'move' => 'movenext',
+        ];
 
-        ] + \iterator_to_array(
-            (new AnswerGenerator($responseData['answers']))->generateAll($survey)
+        $result += \iterator_to_array(
+            (new AnswerGenerator($this->responseData['answers']))
+                ->generateAll($this->survey)
         );
 
-        if ($survey->isDateStamp) {
-            $result += [
-                'startdate' => $responseData['start_time'] ?? $currentTime,
-                'datestamp' => $responseData['end_time'] ?? $currentTime,
+        $result += self::generateStartEndTimes();
+
+        return $result;
+    }
+
+    private function generateStep(): int
+    {
+        switch ($this->survey->format) {
+            case 'A':
+                return 1;
+                // No break
+            case 'G':
+                return $this->responseData['question_group_id'];
+                // No break
+            case 'Q':
+                return $this->responseData['question_id'];
+                // No break
+            default:
+                throw new RuntimeException(
+                    "Unknown survey format {$this->survey->format}"
+                );
+                // No break
+        }
+    }
+
+    private function generateStartEndTimes(): array
+    {
+        if ($this->survey->isDateStamp) {
+            $currentTime = \date('Y-m-d H:i:s');
+
+            return [
+                'startdate' => $this->responseData['start_time'] ?? $currentTime,
+                'datestamp' => $this->responseData['end_time'] ?? $currentTime,
             ];
         }
 
-        return $result;
+        return [];
     }
 }
 

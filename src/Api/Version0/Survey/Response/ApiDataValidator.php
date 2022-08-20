@@ -3,27 +3,78 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 
 use Survey;
+use RuntimeException;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\AnswersValidator\{
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator\{
     AnswerValidatorBuilder
 };
 
 use Respect\Validation\Validator as v;
+use Respect\Validation\Validator;
 
-/**
- * Validates each answer againts its related question type.
- */
-class AnswersValidator
+class ApiDataValidator
 {
-    public static function validate(array $answersData, Survey $survey): void
+    /** @var array[] */
+    private $responseData;
+
+    /** @var Survey */
+    private $survey;
+
+    public function __construct(array $responseData, Survey $survey)
     {
-        (new AnswerValidatorBuilder())
-            ->buildAll($survey)
-            ->check($answersData);
+        $this->responseData = $responseData;
+        $this->survey = $survey;
+    }
+
+    /**
+     * Validates the response data.
+     *
+     * This method validates:
+     *
+     * - each answer againts its related question type.
+     * - have one of question_group_id or question_id (or none) wrt survey format.
+     */
+    public function validate(): void
+    {
+        $validator = v::create();
+
+        $this
+            ->addAnswersValidator($validator)
+            ->addSurveyFormatValidator($validator);
+
+        $validator->check($answersData);
+    }
+
+    private function addAnswersValidator(Validator $validator): self
+    {
+        $validator->key(
+            'answers',
+            (new AnswerValidatorBuilder())->buildAll($this->survey)
+        );
+
+        return $this;
+    }
+
+    private function addSurveyFormatValidator(Validator $validator): self
+    {
+        switch ($this->survey->format) {
+            case 'A':
+                break;
+            case 'G':
+                $validator->key('question_group_id', v::intType());
+                break;
+            case 'Q':
+                $validator->key('question_id', v::intType());
+                break;
+            default:
+                throw new RuntimeException("Unknown survey format {$survey->format}");
+        }
+
+        return $this;
     }
 }
 
-namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\AnswersValidator;
+namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator;
 
 use Survey;
 use Question;

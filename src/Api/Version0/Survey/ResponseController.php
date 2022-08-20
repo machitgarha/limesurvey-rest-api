@@ -24,6 +24,8 @@ use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\AnswersValidator;
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator;
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\PostDataGenerator;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\CustomTwigRenderer;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\IndexOutputController;
@@ -118,10 +120,9 @@ class ResponseController implements Controller
         );
 
         $data = $this->decodeJsonRequestBodyInnerData();
-        AnswersValidator::validate($data['answers'], $survey);
+        (new ApiDataValidator($data, $survey))->validate();
 
-        $recordData = RecordGenerator::generate($data, $survey);
-        $this->submitResponse($recordData, $surveyInfo);
+        $this->submitResponse($data, $surveyInfo);
 
         return new EmptyResponse(Response::HTTP_CREATED);
     }
@@ -149,7 +150,7 @@ class ResponseController implements Controller
         }
     }
 
-    private function submitResponse(array $recordData, array $surveyInfo): void
+    private function submitResponse(array $apiResponseData, array $surveyInfo): void
     {
         $indexPage = self::prepareCoreSurveyIndexClass();
 
@@ -157,16 +158,13 @@ class ResponseController implements Controller
         $survey = $surveyInfo['oSurvey'];
 
         try {
+            $_POST = (new PostDataGenerator($apiResponseData, $survey))
+                ->generate();
+
             $surveyid = $survey->sid;
             $thissurvey = $surveyInfo;
-            $_SESSION['survey_' . $surveyid]['step'] = 1;
             $clienttoken = '';
-
-            $_POST = $recordData + [
-                'sid' => $survey->sid,
-                'thisstep' => 1,
-                'move' => 'movenext'
-            ];
+            $_SESSION['survey_' . $surveyid]['step'] = $_POST['thisstep'];
 
             $indexPage->action();
 
