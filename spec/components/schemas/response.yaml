@@ -5,15 +5,17 @@ response_list:
 
 response_list_item:
   allOf:
+    - $ref: "#/read_properties"
     - $ref: "#/common_properties"
 
 response_new:
   allOf:
-    - $ref: "#/common_properties"
     - oneOf:
       - $ref: "#/response_all_in_one"
       - $ref: "#/response_specific_question_group"
       - $ref: "#/response_specific_question"
+    - $ref: "#/common_properties"
+    - $ref: "#/write_properties"
 
 response_all_in_one:
   type: object
@@ -36,13 +38,11 @@ id:
   type: integer
   description: Survey response ID
 
-common_properties:
+read_properties:
   type: object
   required:
     - id
     - submit_time
-    - answers
-    - relevances
   properties:
     id:
       allOf:
@@ -56,6 +56,37 @@ common_properties:
           nullable: true
           readOnly: true
 
+write_properties:
+  type: object
+  required:
+    - relevances
+    properties:
+    relevances:
+      type: object
+      required:
+        - groups
+        - questions
+      writeOnly: true
+      description: Whether the questions and question groups are relevant or not. A value of null means *not* relevant
+      properties:
+        groups:
+          type: object
+          description: Mapping of *group order* (not group ID) to its relevance
+          additionalProperties:
+            type: boolean
+            nullable: true
+        questions:
+          type: object
+          description: Mapping of *question ID* to its relevance
+          additionalProperties:
+            type: boolean
+            nullable: true
+
+common_properties:
+  type: object
+  required:
+    - answers
+  properties:
     start_time:
       allOf:
         - description: The time responding has been started
@@ -86,24 +117,6 @@ common_properties:
           - $ref: "#/answer_list"
           - $ref: "#/answer_list_with_comment"
           - $ref: "#/answer_with_sub_questions"
-
-    relevances:
-      type: object
-      writeOnly: true
-      description: Whether the questions and question groups are relevant or not. A value of null means *not* relevant
-      properties:
-        groups:
-          type: object
-          description: Mapping of *group order* (not group ID) to its relevance
-          additionalProperties:
-            type: boolean
-            nullable: true
-        questions:
-          type: object
-          description: Mapping of *question ID* to its relevance
-          additionalProperties:
-            type: boolean
-            nullable: true
 
 answer_yes_no:
   type: boolean
