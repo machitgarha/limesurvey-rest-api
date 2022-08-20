@@ -2,6 +2,6 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Error;
 
-class KeywordMismatchError extends UnprocessableEntityError
+class KeywordMismatchError extends BadRequestError
 {
 }

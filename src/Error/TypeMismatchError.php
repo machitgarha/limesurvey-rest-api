@@ -2,6 +2,6 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Error;
 
-class TypeMismatchError extends UnprocessableEntityError
+class TypeMismatchError extends BadRequestError
 {
 }
