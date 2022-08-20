@@ -18,6 +18,8 @@ use League\OpenAPIValidation\Schema\Exception\KeywordMismatch;
 use League\OpenAPIValidation\Schema\Exception\TooManyValidSchemas;
 use League\OpenAPIValidation\Schema\Exception\NotEnoughValidSchemas;
 
+use League\OpenAPIValidation\Schema\Keywords\Required;
+
 use MAChitgarha\LimeSurveyRestApi\Config;
 use MAChitgarha\LimeSurveyRestApi\Plugin;
 
@@ -59,6 +61,8 @@ class JsonErrorResponseGenerator
 
     public function generate(Throwable $throwable): JsonResponse
     {
+        $this->plugin->logThrowable($throwable);
+
         $extraHeaders = [];
 
         // To make elseif blocks look aligned
@@ -173,7 +177,6 @@ class JsonErrorResponseGenerator
 
     private function makeInternalServerError(Throwable $throwable): InternalServerError
     {
-        $this->plugin->logThrowable($throwable);
         return new InternalServerError();
     }
 
