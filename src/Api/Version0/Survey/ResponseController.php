@@ -165,6 +165,7 @@ class ResponseController implements Controller
             $_POST = $recordData + [
                 'sid' => $survey->sid,
                 'thisstep' => 1,
+                'move' => 'movenext'
             ];
 
             $indexPage->action();

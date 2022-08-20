@@ -25,6 +25,8 @@ use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
 use MAChitgarha\LimeSurveyRestApi\Routing\Router;
 
 use MAChitgarha\LimeSurveyRestApi\Validation\RequestValidator;
+use MAChitgarha\LimeSurveyRestApi\Validation\ValidatorBuilder;
+use MAChitgarha\LimeSurveyRestApi\Validation\ResponseValidator;
 
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
@@ -90,6 +92,8 @@ class Plugin extends PluginBase
 
     private function handleRequest(Request $request, string $pathInfoValue): void
     {
+        $validatorBuilder = new ValidatorBuilder(new FilesystemAdapter());
+
         try {
             $router = new Router(
                 $pathInfo = new PathInfo($pathInfoValue)
@@ -98,12 +102,16 @@ class Plugin extends PluginBase
             [[$controllerClass, $method], $params] = $router->route($request);
 
             $response = $this
-                ->makeController($controllerClass, $params, $request, $router)
+                ->makeController($controllerClass, $params, $request, $router, $validatorBuilder)
                 ->$method();
 
         } catch (Throwable $error) {
             $response = (new JsonErrorResponseGenerator($this))->generate($error);
         }
+
+        assert($this->isResponseValid(
+            new ResponseValidator($response, new PathInfo($pathInfoValue), $validatorBuilder, $request->getMethod())
+        ));
 
         /** @var Response $response */
         $response->send();
@@ -113,7 +121,8 @@ class Plugin extends PluginBase
         string $controllerClass,
         array $params,
         Request $request,
-        Router $router
+        Router $router,
+        ValidatorBuilder $validatorBuilder
     ): Controller {
         /** @var Controller $controller */
         $controller = new $controllerClass();
@@ -124,13 +133,32 @@ class Plugin extends PluginBase
 
         $container = new ControllerDependencyContainer(
             $request,
-            $pathInfo,
             new Serializer([], [new JsonEncoder()]),
             new BearerTokenAuthorizer($request),
-            new RequestValidator($request, $pathInfo, new FilesystemAdapter())
+            new RequestValidator($request, $pathInfo, $validatorBuilder)
         );
 
         return $controller
             ->setContainer($container);
+    }
+
+    private function isResponseValid(ResponseValidator $responseValidator): bool
+    {
+        try {
+            $responseValidator->validate();
+        } catch (Throwable $throwable) {
+            $this->logThrowable($throwable);
+            return false;
+        }
+        return true;
+    }
+
+    public function logThrowable(Throwable $error): void
+    {
+        $message = (Config::DEBUG_MODE === DebugMode::FULL)
+            ? $error->__toString()
+            : $error->getMessage();
+
+        $this->log(\get_class($error) . ": $message", Logger::LEVEL_ERROR);
     }
 }

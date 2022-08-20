@@ -173,17 +173,8 @@ class JsonErrorResponseGenerator
 
     private function makeInternalServerError(Throwable $throwable): InternalServerError
     {
-        $this->logThrowable($throwable);
+        $this->plugin->logThrowable($throwable);
         return new InternalServerError();
-    }
-
-    private function logThrowable(Throwable $error): void
-    {
-        $message = (Config::DEBUG_MODE === DebugMode::FULL)
-            ? $error->__toString()
-            : $error->getMessage();
-
-        $this->plugin->log(\get_class($error) . ": $message", Logger::LEVEL_ERROR);
     }
 
     private static function generateDataForError(Error $error): array

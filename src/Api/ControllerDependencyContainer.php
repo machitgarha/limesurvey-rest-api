@@ -17,9 +17,6 @@ class ControllerDependencyContainer
     /** @var Request */
     private $request;
 
-    /** @var PathInfo */
-    private $pathInfo;
-
     /** @var Serializer */
     private $serializer;
 
@@ -31,13 +28,11 @@ class ControllerDependencyContainer
 
     public function __construct(
         Request $request,
-        PathInfo $pathInfo,
         Serializer $serializer,
         Authorizer $authorizer,
         RequestValidator $requestValidator
     ) {
         $this->request = $request;
-        $this->pathInfo = $pathInfo;
         $this->serializer = $serializer;
         $this->authorizer = $authorizer;
         $this->requestValidator = $requestValidator;
@@ -46,11 +41,6 @@ class ControllerDependencyContainer
     public function getRequest(): Request
     {
         return $this->request;
-    }
-
-    public function getPathInfo(): PathInfo
-    {
-        return $this->pathInfo;
     }
 
     public function getSerializer(): Serializer

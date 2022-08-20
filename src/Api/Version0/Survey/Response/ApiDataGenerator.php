@@ -15,7 +15,7 @@ class ApiDataGenerator
     {
         $result = [
             'id' => $recordData['id'],
-            'submit_date' => $recordData['submitdate'],
+            'submit_time' => $recordData['submitdate'],
             'answers' => \iterator_to_array(
                 (new AnswerGenerator($recordData))->generateAll($survey)
             ),
