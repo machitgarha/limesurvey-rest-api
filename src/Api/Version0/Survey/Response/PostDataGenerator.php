@@ -36,7 +36,9 @@ class PostDataGenerator
                 ->generateAll($this->survey)
         );
 
-        $result += self::generateStartEndTimes();
+        $result = $result
+            + self::generateStartEndTimes()
+            + self::generateRelevances();
 
         return $result;
     }
@@ -73,6 +75,23 @@ class PostDataGenerator
         }
 
         return [];
+    }
+
+    private function generateRelevances(): array
+    {
+        $result = [];
+        $relevances = $this->responseData['relevances'];
+
+        foreach ($relevances['groups'] as $groupOrder => $relevance) {
+            --$groupOrder;
+            $result["relevanceG{$groupOrder}"] = $relevance ? '1' : '0';
+        }
+
+        foreach ($relevances['questions'] as $questionId => $relevance) {
+            $result["relevance{$questionId}"] = $relevance ? '1' : '0';
+        }
+
+        return $result;
     }
 }
 

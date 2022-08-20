@@ -42,6 +42,7 @@ common_properties:
     - id
     - submit_time
     - answers
+    - relevances
   properties:
     id:
       allOf:
@@ -85,6 +86,24 @@ common_properties:
           - $ref: "#/answer_list"
           - $ref: "#/answer_list_with_comment"
           - $ref: "#/answer_with_sub_questions"
+
+    relevances:
+      type: object
+      writeOnly: true
+      description: Whether the questions and question groups are relevant or not. A value of null means *not* relevant
+      properties:
+        groups:
+          type: object
+          description: Mapping of *group order* (not group ID) to its relevance
+          additionalProperties:
+            type: boolean
+            nullable: true
+        questions:
+          type: object
+          description: Mapping of *question ID* to its relevance
+          additionalProperties:
+            type: boolean
+            nullable: true
 
 answer_yes_no:
   type: boolean
