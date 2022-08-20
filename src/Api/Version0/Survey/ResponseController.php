@@ -140,12 +140,6 @@ class ResponseController implements Controller
                 );
             }
 
-            if ($previous instanceof TooManyValidSchemas) {
-                // Ignoring, as it is possible (e.g. 5 point choice and number input)
-                // TODO: Risk of not validating other answers?
-                return;
-            }
-
             throw $exception;
         }
     }

@@ -60,7 +60,7 @@ write_properties:
   type: object
   required:
     - relevances
-    properties:
+  properties:
     relevances:
       type: object
       required:
@@ -103,7 +103,7 @@ common_properties:
       type: object
       description: Mappings of question IDs to the answers
       additionalProperties:
-        oneOf:
+        anyOf:
           - $ref: "#/unanswered"
           - $ref: "#/answer_yes_no"
           - $ref: "#/answer_5_point_choice"
@@ -220,7 +220,7 @@ answer_list:
     - value
   properties:
     value:
-      oneOf:
+      anyOf:
         - $ref: "./answer.yaml#/answer_code"
         - type: string
           nullable: true
@@ -253,7 +253,7 @@ answer_with_sub_questions:
 
         **Note**: If the question is of type 'Multiple choice' or 'Multiple choice with comments', the keys may include the special value 'other' (case-sensitive) if the question's Other option is enabled (and must be available if it is user-selected).
       additionalProperties:
-        oneOf:
+        anyOf:
           - $ref: "#/unanswered"
           - $ref: "#/answer_item_array_5_point_choice"
           - $ref: "#/answer_item_array_10_point_choice"
