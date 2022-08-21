@@ -161,4 +161,13 @@ class Plugin extends PluginBase
 
         $this->log(\get_class($error) . ": $message", Logger::LEVEL_ERROR);
     }
+
+    private static function removeUnnecessaryHeaders(): void
+    {
+        foreach ([
+            'Set-Cookie'
+        ] as $headerName) {
+            \header_remove($headerName);
+        }
+    }
 }
