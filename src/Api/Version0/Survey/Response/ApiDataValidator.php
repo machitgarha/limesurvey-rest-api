@@ -3,6 +3,7 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 
 use Survey;
+use SurveysGroups;
 use RuntimeException;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator\{
@@ -17,13 +18,17 @@ class ApiDataValidator
     /** @var array[] */
     private $responseData;
 
+    /** @var array */
+    private $surveyInfo;
+
     /** @var Survey */
     private $survey;
 
-    public function __construct(array $responseData, Survey $survey)
+    public function __construct(array $responseData, array $surveyInfo)
     {
         $this->responseData = $responseData;
-        $this->survey = $survey;
+        $this->surveyInfo = $surveyInfo;
+        $this->survey = $surveyInfo['oSurvey'];
     }
 
     /**
@@ -57,7 +62,8 @@ class ApiDataValidator
 
     private function addSurveyFormatValidator(Validator $validator): self
     {
-        switch ($this->survey->format) {
+        $format = $this->surveyInfo['format'];
+        switch ($format) {
             case 'A':
                 break;
             case 'G':
@@ -67,7 +73,9 @@ class ApiDataValidator
                 $validator->key('question_id', v::intType());
                 break;
             default:
-                throw new RuntimeException("Unknown survey format {$survey->format}");
+                throw new RuntimeException(
+                    "Unknown survey format '$format'"
+                );
         }
 
         return $this;

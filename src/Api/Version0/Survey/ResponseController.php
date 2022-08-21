@@ -120,7 +120,7 @@ class ResponseController implements Controller
         );
 
         $data = $this->decodeJsonRequestBodyInnerData();
-        (new ApiDataValidator($data, $survey))->validate();
+        (new ApiDataValidator($data, $surveyInfo))->validate();
 
         $this->submitResponse($data, $surveyInfo);
 
@@ -152,7 +152,7 @@ class ResponseController implements Controller
         $survey = $surveyInfo['oSurvey'];
 
         try {
-            $_POST = (new PostDataGenerator($apiResponseData, $survey))
+            $_POST = (new PostDataGenerator($apiResponseData, $surveyInfo))
                 ->generate();
 
             $surveyid = $survey->sid;

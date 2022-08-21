@@ -13,13 +13,17 @@ class PostDataGenerator
     /** @var array[] */
     private $responseData;
 
+    /** @var array */
+    private $surveyInfo;
+
     /** @var Survey */
     private $survey;
 
-    public function __construct(array $responseData, Survey $survey)
+    public function __construct(array $responseData, array $surveyInfo)
     {
         $this->responseData = $responseData;
-        $this->survey = $survey;
+        $this->surveyInfo = $surveyInfo;
+        $this->survey = $surveyInfo['oSurvey'];
     }
 
     public function generate(): array
@@ -45,7 +49,8 @@ class PostDataGenerator
 
     private function generateStep(): int
     {
-        switch ($this->survey->format) {
+        $format = $this->surveyInfo['format'];
+        switch ($format) {
             case 'A':
                 return 1;
                 // No break
@@ -57,7 +62,7 @@ class PostDataGenerator
                 // No break
             default:
                 throw new RuntimeException(
-                    "Unknown survey format {$this->survey->format}"
+                    "Unknown survey format '$format'"
                 );
                 // No break
         }
