@@ -57,7 +57,7 @@ class PostDataGenerator
             case 'G':
                 return $this->responseData['question_group_id'];
                 // No break
-            case 'Q':
+            case 'S':
                 return $this->responseData['question_id'];
                 // No break
             default:

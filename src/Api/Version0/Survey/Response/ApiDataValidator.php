@@ -69,7 +69,7 @@ class ApiDataValidator
             case 'G':
                 $validator->key('question_group_id', v::intType());
                 break;
-            case 'Q':
+            case 'S':
                 $validator->key('question_id', v::intType());
                 break;
             default:
