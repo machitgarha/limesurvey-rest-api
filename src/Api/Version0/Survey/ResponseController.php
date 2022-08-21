@@ -29,7 +29,9 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\PostDataGenerator
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\CustomTwigRenderer;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\IndexOutputController;
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\SurveyResponseIdHolder;
 
+use MAChitgarha\LimeSurveyRestApi\Error\Error;
 use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
@@ -70,6 +72,7 @@ class ResponseController implements Controller
     use Traits\RequestValidator;
 
     public const PATH = '/surveys/{survey_id}/responses';
+    public const PATH_BY_ID = '/surveys/{survey_id}/responses/{response_id}';
 
     public function list(): JsonResponse
     {
@@ -122,9 +125,12 @@ class ResponseController implements Controller
         $data = $this->decodeJsonRequestBodyInnerData();
         (new ApiDataValidator($data, $surveyInfo))->validate();
 
-        $this->submitResponse($data, $surveyInfo);
+        $responseUri = $this->submitResponse($data, $surveyInfo);
 
-        return new EmptyResponse(Response::HTTP_CREATED);
+        return new EmptyResponse(
+            Response::HTTP_CREATED,
+            ['Location' => $responseUri]
+        );
     }
 
     private function validateNewOrUpdate(): void
@@ -144,7 +150,7 @@ class ResponseController implements Controller
         }
     }
 
-    private function submitResponse(array $apiResponseData, array $surveyInfo): void
+    private function submitResponse(array $apiResponseData, array $surveyInfo): string
     {
         $indexPage = self::prepareCoreSurveyIndexClass();
 
@@ -158,10 +164,17 @@ class ResponseController implements Controller
             $surveyid = $survey->sid;
             $thissurvey = $surveyInfo;
             $clienttoken = '';
-            $_SESSION['survey_' . $surveyid]['step'] = $_POST['thisstep'];
+            $_SESSION["survey_$surveyid"]['step'] = $_POST['thisstep'];
 
-            $indexPage->action();
-
+            // See CustomTwigRenderer::renderTemplateFromFile() for more info
+            try {
+                $indexPage->action();
+            } catch (SurveyResponseIdHolder $holder) {
+                return self::makeNewResponseUri(
+                    $surveyid,
+                    $holder->getResponseId()
+                );
+            }
         } catch (CHttpException $exception) {
             /**
              * We know the survey exists, because no exceptions thrown before.
@@ -194,10 +207,20 @@ class ResponseController implements Controller
 
         return new Index($controller, 'index');
     }
+
+    private static function makeNewResponseUri(int $surveyId, int $responseId): string
+    {
+        return \str_replace(
+            ['{survey_id}', '{response_id}'],
+            [$surveyId, $responseId],
+            self::PATH_BY_ID
+        );
+    }
 }
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 
+use Exception;
 use CComponent;
 use LSETwigViewRenderer;
 use InvalidArgumentException;
@@ -235,7 +258,20 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
             case 'layout_global':
                 if ($this->errorBucket->isEmpty()) {
-                    // TODO: What to do with a successful response?
+                    $surveyId = $data['aSurveyInfo']['sid'];
+
+                    /*
+                     * As the parent implementation of current method ends the
+                     * app (using App()->end()), to prevent any problems and/or
+                     * inconsistencies, we should return here too. However,
+                     * returning a value is not possible, because the program
+                     * control returns to SurveyRuntimeHelper instead of our
+                     * dedicated controller. So we need to throw an special
+                     * (one-time) exception as a workaround.
+                     */
+                    throw new SurveyResponseIdHolder(
+                        $_SESSION["survey_$surveyId"]['srid']
+                    );
                 } else {
                     throw $this->errorBucket;
                 }
@@ -341,5 +377,23 @@ class IndexOutputController
 
     public function recordCachingAction()
     {
+    }
+}
+
+class SurveyResponseIdHolder extends Exception
+{
+    /** @var int */
+    private $responseId;
+
+    public function __construct(int $responseId)
+    {
+        parent::__construct();
+
+        $this->responseId = $responseId;
+    }
+
+    public function getResponseId(): int
+    {
+        return $this->responseId;
     }
 }

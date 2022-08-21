@@ -37,7 +37,14 @@ post:
   responses:
     "201":
       description: Created
-      # TODO: Return the URL of the new response in a Location header
+      headers:
+        Location:
+          description: The URI of the new survey response
+          required: true
+          schema:
+            type: string
+          example:
+            /surveys/313313/responses/1
     "400":
       $ref: "../../components/responses.yaml#/bad_request_for_response"
     "401":
