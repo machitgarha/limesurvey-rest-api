@@ -187,16 +187,14 @@ class AnswerGenerator
 
     public function generateAll(Survey $survey): Generator
     {
-        foreach ($survey->allQuestions as $question) {
+        foreach ($survey->baseQuestions as $question) {
             $method = $this->questionTypeToMethodMapping[$question->type];
 
-            if ($question->parent_qid === 0) {
-                yield from self::{$method}(
-                    $this->answersData[$question->qid] ?? null,
-                    FieldNameGenerator::generate($question),
-                    $question
-                );
-            }
+            yield from self::{$method}(
+                $this->answersData[$question->qid] ?? null,
+                FieldNameGenerator::generate($question),
+                $question
+            );
         }
     }
 

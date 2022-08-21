@@ -131,16 +131,13 @@ class AnswerGenerator
 
     public function generateAll(Survey $survey): Generator
     {
-        foreach ($survey->allQuestions as $question) {
+        foreach ($survey->baseQuestions as $question) {
             $method = $this->questionTypeToMethodMapping[$question->type];
 
-            // If question has no parent question, i.e. is not a subquestion
-            if ($question->parent_qid === 0) {
-                yield $question->title => $this->$method(
-                    $question,
-                    FieldNameGenerator::generate($question)
-                );
-            }
+            yield $question->title => $this->$method(
+                $question,
+                FieldNameGenerator::generate($question)
+            );
         }
     }
 

@@ -66,12 +66,27 @@ class ApiDataValidator
         switch ($format) {
             case 'A':
                 break;
+
             case 'G':
-                $validator->key('question_group_id', v::intType());
+                $validator->key(
+                    'question_group_id',
+                    v::intType()->in(
+                        \array_column($this->survey->groups, 'gid'),
+                        true
+                    )
+                );
                 break;
+
             case 'S':
-                $validator->key('question_id', v::intType());
+                $validator->key(
+                    'question_id',
+                    v::intType()->in(
+                        \array_column($this->survey->baseQuestions, 'qid'),
+                        true
+                    )
+                );
                 break;
+
             default:
                 throw new RuntimeException(
                     "Unknown survey format '$format'"
@@ -186,13 +201,7 @@ class AnswerValidatorBuilder
                     false
                 );
             },
-            // Strip out sub-questions, they will be handled by their parents
-            \array_filter(
-                $survey->allQuestions,
-                function (Question $question): bool {
-                    return $question->parent_qid === 0;
-                }
-            )
+            $survey->baseQuestions
         ));
     }
 
