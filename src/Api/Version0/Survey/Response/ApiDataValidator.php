@@ -62,37 +62,27 @@ class ApiDataValidator
 
     private function addSurveyFormatValidator(Validator $validator): self
     {
+        $valueValidatorList = [
+            'A' => v::identical(1),
+            'G' => v::intType()->in(
+                range(1, \count($this->survey->groups)),
+                true
+            ),
+            'S' => v::intType()->in(
+                range(1, \count($this->survey->baseQuestions)),
+                true
+            ),
+        ];
         $format = $this->surveyInfo['format'];
-        switch ($format) {
-            case 'A':
-                break;
+        $valueValidator = $valueValidatorList[$format] ?? null;
 
-            case 'G':
-                $validator->key(
-                    'question_group_id',
-                    v::intType()->in(
-                        \array_column($this->survey->groups, 'gid'),
-                        true
-                    )
-                );
-                break;
-
-            case 'S':
-                $validator->key(
-                    'question_id',
-                    v::intType()->in(
-                        \array_column($this->survey->baseQuestions, 'qid'),
-                        true
-                    )
-                );
-                break;
-
-            default:
-                throw new RuntimeException(
-                    "Unknown survey format '$format'"
-                );
+        if ($valueValidator === null) {
+            throw new RuntimeException(
+                "Unknown survey format '$format'"
+            );
         }
 
+        $validator->key('step', $valueValidator);
         return $this;
     }
 }

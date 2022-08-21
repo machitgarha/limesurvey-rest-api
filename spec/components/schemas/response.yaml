@@ -10,29 +10,8 @@ response_list_item:
 
 response_new:
   allOf:
-    - oneOf:
-      - $ref: "#/response_all_in_one"
-      - $ref: "#/response_specific_question_group"
-      - $ref: "#/response_specific_question"
     - $ref: "#/common_properties"
     - $ref: "#/write_properties"
-
-response_all_in_one:
-  type: object
-
-response_specific_question_group:
-  type: object
-  required: [question_group_id]
-  properties:
-    question_group_id:
-      $ref: "../../components/schemas/question_group.yaml#/question_group_id"
-
-response_specific_question:
-  type: object
-  required: [question_id]
-  properties:
-    question_id:
-        $ref: "../../components/schemas/question.yaml#/question_id"
 
 id:
   type: integer
@@ -59,8 +38,16 @@ read_properties:
 write_properties:
   type: object
   required:
+    - step
     - relevances
   properties:
+    step:
+      type: integer
+      description: |
+        The step of the response, based on survey format.
+
+        For "all in one" surveys, its only possible value is 1. For "group by group" or "question by question" surveys, it must be up to total count of groups or questions, respectively. 
+
     relevances:
       type: object
       required:

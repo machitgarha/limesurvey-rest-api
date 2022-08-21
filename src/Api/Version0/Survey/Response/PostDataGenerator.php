@@ -49,23 +49,7 @@ class PostDataGenerator
 
     private function generateStep(): int
     {
-        $format = $this->surveyInfo['format'];
-        switch ($format) {
-            case 'A':
-                return 1;
-                // No break
-            case 'G':
-                return $this->responseData['question_group_id'];
-                // No break
-            case 'S':
-                return $this->responseData['question_id'];
-                // No break
-            default:
-                throw new RuntimeException(
-                    "Unknown survey format '$format'"
-                );
-                // No break
-        }
+        return $this->responseData['step'];
     }
 
     private function generateStartEndTimes(): array
@@ -224,7 +208,9 @@ class AnswerGenerator
             yield "{$fieldName}_filecount" => 0;
         } else {
             // TODO
-            throw new NotImplementedError();
+            throw new NotImplementedError(
+                'Sending file as response is not implemented yet'
+            );
         }
     }
 
