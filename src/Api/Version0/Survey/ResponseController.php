@@ -251,7 +251,11 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
     public function renderPartial($twigPath, $data)
     {
-        $twigName = \str_replace(['/survey/questions/question_help/', '.twig'], '', $twigPath);
+        $twigName = \str_replace([
+            '/survey/questions/question_help/',
+            '/subviews/privacy/',
+            '.twig'
+        ], '', $twigPath);
 
         switch ($twigName) {
             case 'mandatory_tip':
@@ -266,9 +270,14 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                 break;
 
             case 'error_tip':
-                $this->errorBucket->addItem(
-                    new InvalidAnswerError($data['qid'], $data['vtip'])
-                );
+                $this->errorBucket->addItem(new InvalidAnswerError(
+                    $data['qid'],
+                    self::normalizeMessage($data['vtip'])
+                ));
+                break;
+
+            case 'privacy_datasecurity_notice_label':
+                // Nothing to do
                 break;
 
             default:
@@ -276,6 +285,11 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                     "Unhandled Twig path '$twigPath'"
                 );
         }
+    }
+
+    private static function normalizeMessage(string $message): string
+    {
+        return \strip_tags($message);
     }
 
     public function renderHtmlPage($html, $template): void

@@ -47,7 +47,7 @@ class ApiDataValidator
             ->addAnswersValidator($validator)
             ->addSurveyFormatValidator($validator);
 
-        $validator->check($answersData);
+        $validator->check($this->responseData);
     }
 
     private function addAnswersValidator(Validator $validator): self
