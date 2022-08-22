@@ -113,6 +113,8 @@ class Plugin extends PluginBase
             new ResponseValidator($response, new PathInfo($pathInfoValue), $validatorBuilder, $request->getMethod())
         ));
 
+        $this->removeUnnecessaryHeaders();
+
         /** @var Response $response */
         $response->send();
     }
