@@ -272,8 +272,8 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     /** @var ErrorBucket */
     private $errorBucket;
 
-    /** @var true[] Used map for faster checks */
-    private $missingMandatoryQuestionIds = [];
+    /** @var string[] Mandatory tip message for each question */
+    private $mandatoryTips = [];
 
     public function __construct()
     {
@@ -282,6 +282,42 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
     public function init()
     {
+    }
+
+    public function renderPartial($twigPath, $data)
+    {
+        $twigName = \str_replace([
+            '/survey/questions/question_help/',
+            '/subviews/privacy/',
+            '.twig'
+        ], '', $twigPath);
+
+        switch ($twigName) {
+            case 'error_tip':
+                $this->errorBucket->addItem(new InvalidAnswerError(
+                    $data['qid'],
+                    self::normalizeMessage($data['vtip'])
+                ));
+                break;
+
+            case 'mandatory_tip':
+                $questionId = $data['qInfo']['qid'];
+                $this->mandatoryTips[$questionId] = $data['sMandatoryText'];
+                break;
+
+            case 'em_tip':
+                // TODO: What to do here?
+                break;
+
+            case 'privacy_datasecurity_notice_label':
+                // Nothing to do
+                break;
+
+            default:
+                throw new InvalidArgumentException(
+                    "Unhandled Twig path '$twigPath'"
+                );
+        }
     }
 
     public function renderTemplateFromFile($layout, $data, $return)
@@ -295,9 +331,21 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                 // No break
 
             case 'layout_global':
-                // This means the move is 'movesubmit'
-                if ($return) {
-                    return '';
+                $questionIndexInfo = LimeExpressionManager::GetQuestionIndexInfo() ?? [];
+
+                foreach ($questionIndexInfo as $item) {
+                    $questionId = $item['qid'];
+
+                    if (!$item['valid']) {
+                        // TODO: What to do here?
+                    } elseif ($item['mandViolation']) {
+                        $this->errorBucket->addItem(
+                            new MandatoryQuestionMissingError(
+                                $questionId,
+                                $this->mandatoryTips[$questionId]
+                            )
+                        );
+                    }
                 }
 
                 if ($this->errorBucket->isEmpty()) {
@@ -325,53 +373,6 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                     "Unhandled Twig layout '$layout'"
                 );
                 // No break
-        }
-    }
-
-    public function renderPartial($twigPath, $data)
-    {
-        $twigName = \str_replace([
-            '/survey/questions/question_help/',
-            '/subviews/privacy/',
-            '.twig'
-        ], '', $twigPath);
-
-        switch ($twigName) {
-            case 'mandatory_tip':
-                // TODO: Support for skipping soft mandatory questions
-                $questionId = (int) $data['qInfo']['qid'];
-
-                if (!isset($this->missingMandatoryQuestionIds[$questionId])) {
-                    $this->errorBucket->addItem(
-                        new MandatoryQuestionMissingError(
-                            $questionId,
-                            $data['sMandatoryText']
-                        )
-                    );
-                    $this->missingMandatoryQuestionIds[$questionId] = true;
-                }
-
-                break;
-
-            case 'em_tip':
-                // TODO: What to do here?
-                break;
-
-            case 'error_tip':
-                $this->errorBucket->addItem(new InvalidAnswerError(
-                    $data['qid'],
-                    self::normalizeMessage($data['vtip'])
-                ));
-                break;
-
-            case 'privacy_datasecurity_notice_label':
-                // Nothing to do
-                break;
-
-            default:
-                throw new InvalidArgumentException(
-                    "Unhandled Twig path '$twigPath'"
-                );
         }
     }
 
