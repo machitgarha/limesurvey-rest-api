@@ -22,6 +22,8 @@ get:
 
 post:
   summary: Pushes a new response to a survey
+  description: |
+    In the case of a 422 (Unprocessable Entity) error, unlike other errors, the Location header exists.
   parameters:
     - $ref: "../../components/parameters.yaml#/survey_id"
   requestBody:

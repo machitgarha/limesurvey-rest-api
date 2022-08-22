@@ -197,21 +197,25 @@ class JsonErrorResponseGenerator
     {
         return new JsonResponse(
             error(self::generateDataForError($error)),
-            $error->getHttpStatusCode()
+            $error->getHttpStatusCode(),
+            $error->getHeaders()
         );
     }
 
     private static function generateForErrorBucket(ErrorBucket $errorBucket): JsonResponse
     {
+        $headers = $errorBucket->getHeaders();
         $errorDataList = [];
 
         foreach ($errorBucket->getItems() as $error) {
             $errorDataList[] = self::generateDataForError($error);
+            $headers += $error->getHeaders();
         }
 
         return new JsonResponse(
             errors($errorDataList),
-            $errorBucket->getHttpStatusCode()
+            $errorBucket->getHttpStatusCode(),
+            $headers
         );
     }
 }

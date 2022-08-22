@@ -12,6 +12,9 @@ abstract class Error extends \Exception
     /** @var mixed[] */
     protected $extraParams = [];
 
+    /** @var string[] */
+    protected $headers = [];
+
     abstract public function getHttpStatusCode(): int;
 
     public function __construct(string $message = null, int $code = 0, ?Throwable $previous = null)
@@ -28,5 +31,15 @@ abstract class Error extends \Exception
     public function getExtraParams(): array
     {
         return $this->extraParams;
+    }
+
+    public function addHeader(string $name, string $value): void
+    {
+        $this->headers[$name] = $value;
+    }
+
+    public function getHeaders(): array
+    {
+        return $this->headers;
     }
 }

@@ -34,6 +34,7 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\SurveyR
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
 use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
+use MAChitgarha\LimeSurveyRestApi\Error\UnprocessableEntityErrorBucket;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
@@ -109,7 +110,18 @@ class ResponseController implements Controller
     {
         [$data, $surveyInfo] = $this->prepareNewOrUpdate(__FUNCTION__);
 
-        $responseUri = $this->submitResponse($data, $surveyInfo);
+        try {
+            $responseUri = $this->submitResponse($data, $surveyInfo);
+        } catch (UnprocessableEntityErrorBucket $error) {
+            $surveyId = $surveyInfo['sid'];
+
+            $error->addHeader('Location', self::makeNewResponseUri(
+                $surveyId,
+                $_SESSION["survey_$surveyId"]['srid']
+            ));
+
+            throw $error;
+        }
 
         return new EmptyResponse(
             Response::HTTP_CREATED,
@@ -259,17 +271,17 @@ use SurveyRuntimeHelper;
 use LimeExpressionManager;
 use InvalidArgumentException;
 
-use MAChitgarha\LimeSurveyRestApi\Error\ErrorBucket;
 use MAChitgarha\LimeSurveyRestApi\Error\InvalidAnswerError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyExpiredError;
 use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 use MAChitgarha\LimeSurveyRestApi\Error\MaintenanceModeError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotStartedError;
 use MAChitgarha\LimeSurveyRestApi\Error\MandatoryQuestionMissingError;
+use MAChitgarha\LimeSurveyRestApi\Error\UnprocessableEntityErrorBucket;
 
 class CustomTwigRenderer extends LSETwigViewRenderer
 {
-    /** @var ErrorBucket */
+    /** @var UnprocessableEntityErrorBucket */
     private $errorBucket;
 
     /** @var string[] Mandatory tip message for each question */
@@ -277,7 +289,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
     public function __construct()
     {
-        $this->errorBucket = new ErrorBucket();
+        $this->errorBucket = new UnprocessableEntityErrorBucket();
     }
 
     public function init()
@@ -361,7 +373,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                      * (one-time) exception as a workaround.
                      */
                     throw new SurveyResponseIdHolder(
-                        $_SESSION["survey_$surveyId"]['srid']
+                        $_SESSION["survey_$surveyId"]['srid'] ?? 1
                     );
                 } else {
                     throw $this->errorBucket;

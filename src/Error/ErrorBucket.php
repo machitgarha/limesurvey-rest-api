@@ -31,6 +31,9 @@ class ErrorBucket extends Error
         return $this;
     }
 
+    /**
+     * @return Error[]
+     */
     public function getItems(): array
     {
         return $this->bucket;
