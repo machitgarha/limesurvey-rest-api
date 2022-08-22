@@ -40,8 +40,6 @@ use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
-use Respect\Validation\Exceptions\ValidationException;
-
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
@@ -96,9 +94,6 @@ class JsonErrorResponseGenerator
         }
         elseif ($throwable instanceof NoContentType) {
             $error = new UnsupportedMediaTypeError();
-        }
-        elseif ($throwable instanceof ValidationException) {
-            $error = self::convertValidationExceptionToError($throwable);
         }
         // For the sake of being similar to try/catch blocks
         elseif ($throwable instanceof Throwable) {
@@ -168,11 +163,6 @@ class JsonErrorResponseGenerator
         }
 
         return $this->makeInternalServerError($exception);
-    }
-
-    private static function convertValidationExceptionToError(ValidationException $exception): Error
-    {
-        return new QuestionTypeMismatchError($exception->getMessage());
     }
 
     private function makeInternalServerError(Throwable $throwable): InternalServerError

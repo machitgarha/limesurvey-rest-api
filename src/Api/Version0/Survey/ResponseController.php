@@ -203,7 +203,7 @@ class ResponseController implements Controller
                 $indexPage->action();
             } catch (SurveyResponseIdHolder $holder) {
                 return self::makeNewResponseUri(
-                    $surveyid ?? 197545,
+                    $surveyid,
                     $holder->getResponseId()
                 );
             }
@@ -310,7 +310,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                      * (one-time) exception as a workaround.
                      */
                     throw new SurveyResponseIdHolder(
-                        $_SESSION["survey_$surveyId"]['srid'] ?? 1
+                        $_SESSION["survey_$surveyId"]['srid']
                     );
                 } else {
                     throw $this->errorBucket;

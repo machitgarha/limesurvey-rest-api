@@ -10,6 +10,10 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator\
     AnswerValidatorBuilder
 };
 
+use MAChitgarha\LimeSurveyRestApi\Error\QuestionTypeMismatchError;
+
+use Respect\Validation\Exceptions\ValidationException;
+
 use Respect\Validation\Validator as v;
 use Respect\Validation\Validator;
 
@@ -41,26 +45,26 @@ class ApiDataValidator
      */
     public function validate(): void
     {
-        $validator = v::create();
-
         $this
-            ->addAnswersValidator($validator)
-            ->addSurveyFormatValidator($validator);
-
-        $validator->check($this->responseData);
+            ->validateAnswers()
+            ->validateSurveyFormat()
+        ;
     }
 
-    private function addAnswersValidator(Validator $validator): self
+    private function validateAnswers(): self
     {
-        $validator->key(
-            'answers',
-            (new AnswerValidatorBuilder())->buildAll($this->survey)
-        );
+        try {
+            (new AnswerValidatorBuilder())
+                ->buildAll($this->survey)
+                ->check($this->responseData['answers']);
+        } catch (ValidationException $exception) {
+            throw new QuestionTypeMismatchError($exception->getMessage());
+        }
 
         return $this;
     }
 
-    private function addSurveyFormatValidator(Validator $validator): self
+    private function validateSurveyFormat(): self
     {
         $valueValidatorList = [
             'A' => v::identical(1),
@@ -82,7 +86,10 @@ class ApiDataValidator
             );
         }
 
-        $validator->key('step', $valueValidator);
+        v::create()
+            ->key('step', $valueValidator)
+            ->check($this->responseData);
+
         return $this;
     }
 }
