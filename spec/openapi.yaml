@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: LimeSurvey REST API
-  version: 0.1.0-alpha.9
+  version: 0.1.0-alpha.10
   license:
     name: GPL-2.0
     url: "https://www.gnu.org/licenses/gpl-2.0.html"
