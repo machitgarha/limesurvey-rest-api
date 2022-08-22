@@ -190,7 +190,7 @@ class ResponseController implements Controller
 
     private function submitResponse(array $apiResponseData, array $surveyInfo, int $responseId = null): string
     {
-        $indexPage = self::prepareCoreSurveyIndexClass();
+        $indexPage = self::prepareCoreSurveyIndexClass($apiResponseData);
 
         /** @var Survey $survey */
         $survey = $surveyInfo['oSurvey'];
@@ -206,6 +206,7 @@ class ResponseController implements Controller
             // TODO: maxstep, datestamp, startingValues.seed?
             $_SESSION["survey_$surveyid"]['step'] = $_POST['thisstep'];
             $_SESSION["survey_$surveyid"]['totalsteps'] = $_POST['thisstep'];
+            $_SESSION["survey_$surveyId"]['maxstep'] = $_POST['thisstep'];
             if ($responseId !== null) {
                 $_SESSION["survey_$surveyid"]['srid'] = $responseId;
             }
@@ -240,9 +241,15 @@ class ResponseController implements Controller
         }
     }
 
-    private static function prepareCoreSurveyIndexClass(): Index
+    private static function prepareCoreSurveyIndexClass(array $apiResponseData): Index
     {
-        \App()->setComponent('twigRenderer', new CustomTwigRenderer(), false);
+        \App()->setComponent(
+            'twigRenderer',
+            new CustomTwigRenderer(
+                $apiResponseData['skip_soft_mandatory'] ?? false
+            ),
+            false
+        );
 
         Yii::import('application.controllers.survey.index', true);
 
@@ -287,9 +294,13 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     /** @var string[] Mandatory tip message for each question */
     private $mandatoryTips = [];
 
-    public function __construct()
+    /** @var bool */
+    private $skipSoftMandatory;
+
+    public function __construct(bool $skipSoftMandatory)
     {
         $this->errorBucket = new UnprocessableEntityErrorBucket();
+        $this->skipSoftMandatory = $skipSoftMandatory;
     }
 
     public function init()
@@ -351,18 +362,12 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                     if (!$item['valid']) {
                         // TODO: What to do here?
                     } elseif ($item['mandViolation']) {
-                        $this->errorBucket->addItem(
-                            new MandatoryQuestionMissingError(
-                                $questionId,
-                                $this->mandatoryTips[$questionId]
-                            )
-                        );
+                        $this->handleMandatoryViolation($questionId, $item);
                     }
                 }
 
                 if ($this->errorBucket->isEmpty()) {
                     $surveyId = $data['aSurveyInfo']['sid'];
-
                     /*
                      * As the parent implementation of current method ends the
                      * app (using App()->end()), to prevent any problems and/or
@@ -385,6 +390,23 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                     "Unhandled Twig layout '$layout'"
                 );
                 // No break
+        }
+    }
+
+    private function handleMandatoryViolation(int $questionId, array $questionIndexInfo): void
+    {
+        $addErrorBucketItem = function (string $message) use ($questionId) {
+            $this->errorBucket->addItem(
+                new MandatoryQuestionMissingError($questionId, $message)
+            );
+        };
+
+        if ($questionIndexInfo['mandSoft']) {
+            if (!$this->skipSoftMandatory) {
+                $addErrorBucketItem($this->mandatoryTips[$questionId]);
+            }
+        } else {
+            $addErrorBucketItem($this->mandatoryTips[$questionId]);
         }
     }
 

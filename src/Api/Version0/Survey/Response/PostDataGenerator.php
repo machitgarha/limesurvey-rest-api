@@ -31,19 +31,27 @@ class PostDataGenerator
         // TODO: start_time, lastanswer?
         return [
             'sid' => $this->survey->sid,
-            'thisstep' => self::generateStep(),
-            'move' => 'movenext',
             'ajax' => 'off',
         ]
+            + $this->generateMoveAndSkipSoftMandatory()
+            + $this->generateStep()
             + $this->generateAnswers()
             + $this->generateRelevances()
             + $this->generateStartEndTimes()
         ;
     }
 
-    private function generateStep(): int
+    private function generateMoveAndSkipSoftMandatory(): array
     {
-        return $this->responseData['step'];
+        $move = 'movenext';
+        return [
+            'move' => $move,
+        ];
+    }
+
+    private function generateStep(): array
+    {
+        return ['thisstep' => $this->responseData['step']];
     }
 
     private function generateAnswers(): array
