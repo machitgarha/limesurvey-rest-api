@@ -272,6 +272,9 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     /** @var ErrorBucket */
     private $errorBucket;
 
+    /** @var true[] Used map for faster checks */
+    private $missingMandatoryQuestionIds = [];
+
     public function __construct()
     {
         $this->errorBucket = new ErrorBucket();
@@ -336,9 +339,18 @@ class CustomTwigRenderer extends LSETwigViewRenderer
         switch ($twigName) {
             case 'mandatory_tip':
                 // TODO: Support for skipping soft mandatory questions
-                $this->errorBucket->addItem(
-                    new MandatoryQuestionMissingError($data['qid'])
-                );
+                $questionId = (int) $data['qInfo']['qid'];
+
+                if (!isset($this->missingMandatoryQuestionIds[$questionId])) {
+                    $this->errorBucket->addItem(
+                        new MandatoryQuestionMissingError(
+                            $questionId,
+                            $data['sMandatoryText']
+                        )
+                    );
+                    $this->missingMandatoryQuestionIds[$questionId] = true;
+                }
+
                 break;
 
             case 'em_tip':

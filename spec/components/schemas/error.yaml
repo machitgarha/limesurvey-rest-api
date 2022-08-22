@@ -204,26 +204,20 @@ unauthorized_list:
                   - InvalidSecurity
 
 unprocessable_response:
-  allOf:
-    - required: [question_id]
-      properties:
-        question_id:
-          type: integer
-    - oneOf:
-      - title: mandatory_question_missing
-        properties:
-          id:
-            enum:
-              - MandatoryQuestionMissing
-      - title: invalid_answer
-        required: [message]
-        properties:
-          id:
-            enum:
-              - InvalidAnswer
-          message:
-            type: string
-            description: Localized message of the error
+  type: object
+  required:
+    - question_id
+    - message
+  properties:
+    question_id:
+      type: integer
+    message:
+      type: string
+      description: Localized message of the error
+    id:
+      enum:
+        - MandatoryQuestionMissing
+        - InvalidAnswer
 
 unprocessable_response_list:
   allOf:
