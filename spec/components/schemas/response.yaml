@@ -207,7 +207,6 @@ answer_list:
       - List (radio)
       - List (dropdown)
   required:
-    - other
     - value
   properties:
     value:
