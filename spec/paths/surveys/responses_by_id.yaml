@@ -24,6 +24,8 @@ patch:
       $ref: "../../components/responses.yaml#/permission_denied"
     "404":
       $ref: "../../components/responses.yaml#/resource_not_found"
+    "409":
+      $ref: "../../components/responses.yaml#/survey_unaccessible"
     "422":
       $ref: "../../components/responses.yaml#/unprocessable_response"
     "503":

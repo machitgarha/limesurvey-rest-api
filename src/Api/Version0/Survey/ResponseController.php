@@ -157,13 +157,16 @@ class ResponseController implements Controller
         $surveyInfo = SurveyHelper::getInfo(
             $this->getPathParameterAsInt('survey_id')
         );
+        $survey = $surveyInfo['oSurvey'];
 
         PermissionChecker::assertHasSurveyPermission(
-            $surveyInfo['oSurvey'],
+            $survey,
             $type === 'new' ? Permission::CREATE : Permission::UPDATE,
             $userId,
             'responses'
         );
+
+        SurveyHelper::assertIsActive($survey);
 
         $data = $this->decodeJsonRequestBodyInnerData();
         (new ApiDataValidator($data, $surveyInfo))->validate();
@@ -222,19 +225,19 @@ class ResponseController implements Controller
             }
         } catch (CHttpException $exception) {
             /**
-             * We know the survey exists, because no exceptions thrown before.
-             * So, in this case, it's an unexpected error instead.
+             * We know the survey exists and is active, because no exceptions
+             * was thrown before. So, in this case, it's an unexpected error
+             * instead.
              */
-            if ($exception->statusCode === Response::HTTP_NOT_FOUND) {
+            if (
+                $exception->statusCode === Response::HTTP_NOT_FOUND ||
+                $exception->statusCode === Response::HTTP_UNAUTHORIZED
+            ) {
                 throw new InternalServerError(
                     $exception->getMessage(),
                     $exception->getCode(),
                     $exception
                 );
-            }
-
-            if ($exception->statusCode === Response::HTTP_UNAUTHORIZED) {
-                SurveyHelper::assertIsActive($survey);
             }
 
             throw $exception;
