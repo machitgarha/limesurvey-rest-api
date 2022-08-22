@@ -60,7 +60,7 @@ class ApiDataValidator
                 ->check($this->responseData['answers']);
         } catch (KeySetException $exception) {
             throw new QuestionTypeMismatchError(
-                'Invalid (sub)question code. ' . $exception->getMessage()
+                'Invalid (sub)question code(s). ' . $exception->getMessage()
             );
         } catch (ValidationException $exception) {
             throw new QuestionTypeMismatchError($exception->getMessage());

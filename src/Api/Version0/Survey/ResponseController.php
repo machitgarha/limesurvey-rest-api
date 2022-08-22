@@ -294,6 +294,14 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     /** @var string[] Mandatory tip message for each question */
     private $mandatoryTips = [];
 
+    /**
+     * EM tips for each question. Mapping of question IDs to an array of tips,
+     * in which, the keys are the tips and values are just true. This is for
+     * preventing from message duplication.
+     * @var true[][]
+     */
+    private $expressionManagerTips = [];
+
     /** @var bool */
     private $skipSoftMandatory;
 
@@ -315,21 +323,22 @@ class CustomTwigRenderer extends LSETwigViewRenderer
             '.twig'
         ], '', $twigPath);
 
+        $questionId = $data['qid'] ?? $data['qInfo']['qid'];
+
         switch ($twigName) {
             case 'error_tip':
                 $this->errorBucket->addItem(new InvalidAnswerError(
-                    $data['qid'],
+                    $questionId,
                     self::normalizeMessage($data['vtip'])
                 ));
                 break;
 
             case 'mandatory_tip':
-                $questionId = $data['qInfo']['qid'];
                 $this->mandatoryTips[$questionId] = $data['sMandatoryText'];
                 break;
 
             case 'em_tip':
-                // TODO: What to do here?
+                $this->expressionManagerTips[$questionId][$data['vtip']] = true;
                 break;
 
             case 'privacy_datasecurity_notice_label':
@@ -359,10 +368,11 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                 foreach ($questionIndexInfo as $item) {
                     $questionId = $item['qid'];
 
-                    if (!$item['valid']) {
-                        // TODO: What to do here?
-                    } elseif ($item['mandViolation']) {
+                    if ($item['mandViolation']) {
                         $this->handleMandatoryViolation($questionId, $item);
+                    }
+                    if (!$item['valid']) {
+                        $this->addExpressionManagerTipsAsErrors($questionId);
                     }
                 }
 
@@ -407,6 +417,15 @@ class CustomTwigRenderer extends LSETwigViewRenderer
             }
         } else {
             $addErrorBucketItem($this->mandatoryTips[$questionId]);
+        }
+    }
+
+    private function addExpressionManagerTipsAsErrors(int $questionId): void
+    {
+        foreach ($this->expressionManagerTips[$questionId] as $tip => $true) {
+            $this->errorBucket->addItem(
+                new InvalidAnswerError($questionId, $tip)
+            );
         }
     }
 
