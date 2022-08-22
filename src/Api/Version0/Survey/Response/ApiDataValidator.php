@@ -12,6 +12,7 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator\
 
 use MAChitgarha\LimeSurveyRestApi\Error\QuestionTypeMismatchError;
 
+use Respect\Validation\Exceptions\KeySetException;
 use Respect\Validation\Exceptions\ValidationException;
 
 use Respect\Validation\Validator as v;
@@ -57,6 +58,10 @@ class ApiDataValidator
             (new AnswerValidatorBuilder())
                 ->buildAll($this->survey)
                 ->check($this->responseData['answers']);
+        } catch (KeySetException $exception) {
+            throw new QuestionTypeMismatchError(
+                'Invalid (sub)question code. ' . $exception->getMessage()
+            );
         } catch (ValidationException $exception) {
             throw new QuestionTypeMismatchError($exception->getMessage());
         }
@@ -310,7 +315,7 @@ class AnswerValidatorBuilder
         });
     }
 
-    private static function buildForMultipleChoiceInnerKeys(): array
+    private static function buildForMultipleChoiceInnerKeys(): Validator
     {
         return v::create()
             ->key('selected', v::boolType())
