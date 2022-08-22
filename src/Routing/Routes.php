@@ -51,6 +51,10 @@ class Routes
             'name' => V0\Survey\ResponseController::class . '.new',
             'path' => V0\Survey\ResponseController::PATH,
             'http_method' => HttpMethod::POST,
+        ], [
+            'name' => V0\Survey\ResponseController::class . '.update',
+            'path' => V0\Survey\ResponseController::PATH_BY_ID,
+            'http_method' => HttpMethod::PATCH,
         ],
 
         [

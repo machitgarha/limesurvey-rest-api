@@ -6,4 +6,5 @@ class Permission
 {
     public const CREATE = 'create';
     public const READ = 'read';
+    public const UPDATE = 'update';
 }

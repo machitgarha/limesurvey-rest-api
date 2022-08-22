@@ -33,6 +33,7 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\SurveyR
 
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
 use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
+use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
@@ -106,24 +107,7 @@ class ResponseController implements Controller
 
     public function new(): EmptyResponse
     {
-        $this->validateNewOrUpdate();
-
-        $userId = $this->authorize()->getId();
-
-        $surveyInfo = SurveyHelper::getInfo(
-            $this->getPathParameterAsInt('survey_id')
-        );
-        $survey = $surveyInfo['oSurvey'];
-
-        PermissionChecker::assertHasSurveyPermission(
-            $survey,
-            Permission::CREATE,
-            $userId,
-            'responses'
-        );
-
-        $data = $this->decodeJsonRequestBodyInnerData();
-        (new ApiDataValidator($data, $surveyInfo))->validate();
+        [$data, $surveyInfo] = $this->prepareNewOrUpdate(__FUNCTION__);
 
         $responseUri = $this->submitResponse($data, $surveyInfo);
 
@@ -131,6 +115,48 @@ class ResponseController implements Controller
             Response::HTTP_CREATED,
             ['Location' => $responseUri]
         );
+    }
+
+    public function update(): EmptyResponse
+    {
+        [$data, $surveyInfo] = $this->prepareNewOrUpdate(__FUNCTION__);
+        $responseId = $this->getPathParameterAsInt('response_id');
+
+        $response = SurveyDynamic::model($surveyInfo['sid'])
+            ->findByPk($responseId);
+
+        if ($response === null) {
+            throw new ResourceIdNotFoundError('response', $responseId);
+        }
+
+        // TODO: Disallow backward navigation if needed
+
+        $this->submitResponse($data, $surveyInfo, $responseId);
+
+        return new EmptyResponse(Response::HTTP_OK);
+    }
+
+    private function prepareNewOrUpdate(string $type): array
+    {
+        $this->validateNewOrUpdate();
+
+        $userId = $this->authorize()->getId();
+
+        $surveyInfo = SurveyHelper::getInfo(
+            $this->getPathParameterAsInt('survey_id')
+        );
+
+        PermissionChecker::assertHasSurveyPermission(
+            $surveyInfo['oSurvey'],
+            $type === 'new' ? Permission::CREATE : Permission::UPDATE,
+            $userId,
+            'responses'
+        );
+
+        $data = $this->decodeJsonRequestBodyInnerData();
+        (new ApiDataValidator($data, $surveyInfo))->validate();
+
+        return [$data, $surveyInfo];
     }
 
     private function validateNewOrUpdate(): void
@@ -150,7 +176,7 @@ class ResponseController implements Controller
         }
     }
 
-    private function submitResponse(array $apiResponseData, array $surveyInfo): string
+    private function submitResponse(array $apiResponseData, array $surveyInfo, int $responseId = null): string
     {
         $indexPage = self::prepareCoreSurveyIndexClass();
 
@@ -164,14 +190,20 @@ class ResponseController implements Controller
             $surveyid = $survey->sid;
             $thissurvey = $surveyInfo;
             $clienttoken = '';
+
+            // TODO: maxstep, datestamp, startingValues.seed?
             $_SESSION["survey_$surveyid"]['step'] = $_POST['thisstep'];
+            $_SESSION["survey_$surveyid"]['totalsteps'] = $_POST['thisstep'];
+            if ($responseId !== null) {
+                $_SESSION["survey_$surveyid"]['srid'] = $responseId;
+            }
 
             // See CustomTwigRenderer::renderTemplateFromFile() for more info
             try {
                 $indexPage->action();
             } catch (SurveyResponseIdHolder $holder) {
                 return self::makeNewResponseUri(
-                    $surveyid,
+                    $surveyid ?? 197545,
                     $holder->getResponseId()
                 );
             }
@@ -223,6 +255,8 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 use Exception;
 use CComponent;
 use LSETwigViewRenderer;
+use SurveyRuntimeHelper;
+use LimeExpressionManager;
 use InvalidArgumentException;
 
 use MAChitgarha\LimeSurveyRestApi\Error\ErrorBucket;
@@ -247,16 +281,22 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     {
     }
 
-    public function renderTemplateFromFile($layout, $data, $return): void
+    public function renderTemplateFromFile($layout, $data, $return)
     {
         $layoutName = \str_replace('.twig', '', $layout);
 
+        // TODO: Handle surveyls_policy_error and datasecurity_error
         switch ($layoutName) {
             case 'layout_maintenance':
                 throw new MaintenanceModeError();
                 // No break
 
             case 'layout_global':
+                // This means the move is 'movesubmit'
+                if ($return) {
+                    return '';
+                }
+
                 if ($this->errorBucket->isEmpty()) {
                     $surveyId = $data['aSurveyInfo']['sid'];
 
@@ -270,7 +310,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                      * (one-time) exception as a workaround.
                      */
                     throw new SurveyResponseIdHolder(
-                        $_SESSION["survey_$surveyId"]['srid']
+                        $_SESSION["survey_$surveyId"]['srid'] ?? 1
                     );
                 } else {
                     throw $this->errorBucket;
@@ -331,6 +371,11 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     public function renderHtmlPage($html, $template): void
     {
     }
+
+    public function renderQuestion($view, $render)
+    {
+        return '';
+    }
 }
 
 class IndexOutputController
@@ -339,7 +384,7 @@ class IndexOutputController
         int $surveyId,
         string $type,
         array $messages = [],
-        string $url = null,
+        array $url = null,
         array $errors = null
     ): void {
         switch ($type) {

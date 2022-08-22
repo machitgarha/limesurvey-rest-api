@@ -28,28 +28,36 @@ class PostDataGenerator
 
     public function generate(): array
     {
-        $result = [
+        // TODO: start_time, lastanswer?
+        return [
             'sid' => $this->survey->sid,
             'thisstep' => self::generateStep(),
-            // TODO: Maybe other things as well?
             'move' => 'movenext',
-        ];
-
-        $result += \iterator_to_array(
-            (new AnswerGenerator($this->responseData['answers']))
-                ->generateAll($this->survey)
-        );
-
-        $result = $result
-            + self::generateStartEndTimes()
-            + self::generateRelevances();
-
-        return $result;
+            'ajax' => 'off',
+        ]
+            + $this->generateAnswers()
+            + $this->generateRelevances()
+            + $this->generateStartEndTimes()
+        ;
     }
 
     private function generateStep(): int
     {
         return $this->responseData['step'];
+    }
+
+    private function generateAnswers(): array
+    {
+        $answers = \iterator_to_array(
+            (new AnswerGenerator($this->responseData['answers']))
+                ->generateAll($this->survey)
+        );
+
+        $fieldNames = \implode('|', \array_keys($answers));
+
+        return $answers + [
+            'fieldnames' => $fieldNames,
+        ];
     }
 
     private function generateStartEndTimes(): array
@@ -173,12 +181,15 @@ class AnswerGenerator
     {
         foreach ($survey->baseQuestions as $question) {
             $method = $this->questionTypeToMethodMapping[$question->type];
+            $answer = $this->answersData[$question->qid] ?? null;
 
-            yield from self::{$method}(
-                $this->answersData[$question->qid] ?? null,
-                FieldNameGenerator::generate($question),
-                $question
-            );
+            if ($answer !== null) {
+                yield from self::{$method}(
+                    $answer,
+                    FieldNameGenerator::generate($question),
+                    $question
+                );
+            }
         }
     }
 
