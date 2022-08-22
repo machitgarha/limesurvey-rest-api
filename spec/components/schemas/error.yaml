@@ -65,7 +65,7 @@ bad_request_for_response_list:
     - properties:
         errors:
           items:
-            oneOf:
+            allOf:
               - $ref: "#/bad_request"
               - title: question_type_mismatch
                 allOf:
@@ -165,18 +165,29 @@ resource_not_found_list:
                 enum:
                   - ResourceIdNotFound
 
+response_completed:
+  type: object
+  properties:
+    id:
+      enum:
+        - ResponseCompleted
+
+survey_unaccessible:
+  type: object
+  properties:
+    id:
+      enum:
+        - SurveyNotActive
+        - SurveyNotStarted
+        - SurveyExpired
+
 survey_unaccessible_list:
   allOf:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
           items:
-            properties:
-              id:
-                enum:
-                  - SurveyNotActive
-                  - SurveyNotStarted
-                  - SurveyExpired
+            $ref: "#/survey_unaccessible"
 
 too_many_authentication_failures_list:
   allOf:
@@ -222,8 +233,7 @@ unprocessable_response:
 unprocessable_response_list:
   allOf:
     - $ref: "#/error_list_base_with_one_item"
-    - required: [question_id]
-      properties:
+    - properties:
         errors:
           items:
             $ref: "#/unprocessable_response"

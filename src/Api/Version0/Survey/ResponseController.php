@@ -33,6 +33,7 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\SurveyR
 
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
 use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
+use MAChitgarha\LimeSurveyRestApi\Error\ResponseCompletedError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
 use MAChitgarha\LimeSurveyRestApi\Error\UnprocessableEntityErrorBucket;
 
@@ -139,6 +140,9 @@ class ResponseController implements Controller
 
         if ($response === null) {
             throw new ResourceIdNotFoundError('response', $responseId);
+        }
+        if ($response->isCompleted($responseId)) {
+            throw new ResponseCompletedError();
         }
 
         // TODO: Disallow backward navigation if needed

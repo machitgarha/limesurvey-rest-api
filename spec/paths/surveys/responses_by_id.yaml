@@ -25,7 +25,18 @@ patch:
     "404":
       $ref: "../../components/responses.yaml#/resource_not_found"
     "409":
-      $ref: "../../components/responses.yaml#/survey_unaccessible"
+      description: Bad request, mostly malformed or invalid request body
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../../components/schemas/error.yaml#/error_list_base_with_one_item"
+              - properties:
+                  errors:
+                    items:
+                      allOf:
+                        - $ref: "../../components/schemas/error.yaml#/survey_unaccessible"
+                        - $ref: "../../components/schemas/error.yaml#/response_completed"
     "422":
       $ref: "../../components/responses.yaml#/unprocessable_response"
     "503":
