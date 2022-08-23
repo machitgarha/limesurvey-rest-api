@@ -29,10 +29,12 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\PostDataGenerator
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\CustomTwigRenderer;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\IndexOutputController;
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\CoreSurveyIndexInvoker;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\SurveyResponseIdHolder;
 
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
 use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
+use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResponseCompletedError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
 use MAChitgarha\LimeSurveyRestApi\Error\UnprocessableEntityErrorBucket;
@@ -111,33 +113,46 @@ class ResponseController implements Controller
 
     public function new(): EmptyResponse
     {
-        [$data, $surveyInfo] = $this->prepareNewOrUpdate(__FUNCTION__);
+        $this->validateRequest();
+
+        [$apiData, $surveyInfo] = $this->prepareNewOrUpdate(Permission::CREATE);
+        $surveyId = $surveyInfo['sid'];
 
         try {
-            $responseUri = $this->submitResponse($data, $surveyInfo);
-        } catch (UnprocessableEntityErrorBucket $error) {
-            $surveyId = $surveyInfo['sid'];
-
-            $error->addHeader('Location', self::makeNewResponseUri(
-                $surveyId,
-                $_SESSION["survey_$surveyId"]['srid']
-            ));
-
-            throw $error;
+            // This must not return
+            // TODO: Maybe move the first invoke() arg move to PostDataGenerator?
+            (new CoreSurveyIndexInvoker([], $surveyInfo))->invoke([
+                'sid' => $surveyId,
+                'move' => 'movenext',
+                'fieldnames' => '',
+                'start_time' => $apiData['start_time']
+            ], [
+                // TODO: startingValues.seed
+            ], true);
+        } catch (SurveyResponseIdHolder $error) {
+            return new EmptyResponse(
+                Response::HTTP_CREATED,
+                ['Location' => self::makeNewResponseUri(
+                    $surveyId,
+                    $error->getResponseId()
+                )]
+            );
         }
 
-        return new EmptyResponse(
-            Response::HTTP_CREATED,
-            ['Location' => $responseUri]
-        );
+        throw new InternalServerError();
     }
 
     public function update(): EmptyResponse
     {
-        [$data, $surveyInfo] = $this->prepareNewOrUpdate(__FUNCTION__);
-        $responseId = $this->getPathParameterAsInt('response_id');
+        $this->validateUpdateRequest();
 
-        $response = SurveyDynamic::model($surveyInfo['sid'])
+        [$apiData, $surveyInfo] = $this->prepareNewOrUpdate(Permission::UPDATE);
+        [$surveyId, $responseId] = $this->getPathParameterListAsInt(
+            'survey_id',
+            'response_id'
+        );
+
+        $response = SurveyDynamic::model($surveyId)
             ->findByPk($responseId);
 
         if ($response === null) {
@@ -149,15 +164,25 @@ class ResponseController implements Controller
 
         // TODO: Disallow backward navigation if needed
 
-        $this->submitResponse($data, $surveyInfo, $responseId);
+        (new ApiDataValidator($apiData, $surveyInfo))->validate();
+        $postData = (new PostDataGenerator($apiData, $surveyInfo))->generate();
+
+        // TODO: maxstep, datestamp?
+        $sessionData["survey_$surveyId"] = [
+            'step' => $postData['thisstep'],
+            'totalsteps' => $postData['thisstep'],
+            'maxstep' => $postData['thisstep'],
+            'srid' => $responseId,
+        ];
+
+        (new CoreSurveyIndexInvoker($apiData, $surveyInfo))
+            ->invoke($postData, $sessionData, false);
 
         return new EmptyResponse(Response::HTTP_OK);
     }
 
-    private function prepareNewOrUpdate(string $type): array
+    private function prepareNewOrUpdate(string $permission): array
     {
-        $this->validateNewOrUpdate();
-
         $userId = $this->authorize()->getId();
 
         $surveyInfo = SurveyHelper::getInfo(
@@ -167,20 +192,17 @@ class ResponseController implements Controller
 
         PermissionChecker::assertHasSurveyPermission(
             $survey,
-            $type === 'new' ? Permission::CREATE : Permission::UPDATE,
+            $permission,
             $userId,
             'responses'
         );
 
         SurveyHelper::assertIsActive($survey);
 
-        $data = $this->decodeJsonRequestBodyInnerData();
-        (new ApiDataValidator($data, $surveyInfo))->validate();
-
-        return [$data, $surveyInfo];
+        return [$this->decodeJsonRequestBodyInnerData(), $surveyInfo];
     }
 
-    private function validateNewOrUpdate(): void
+    private function validateUpdateRequest(): void
     {
         try {
             $this->validateRequest();
@@ -197,38 +219,67 @@ class ResponseController implements Controller
         }
     }
 
-    private function submitResponse(array $apiResponseData, array $surveyInfo, int $responseId = null): string
+    private static function makeNewResponseUri(int $surveyId, int $responseId): string
     {
-        $indexPage = self::prepareCoreSurveyIndexClass($apiResponseData);
+        return \str_replace(
+            ['{survey_id}', '{response_id}'],
+            [$surveyId, $responseId],
+            self::PATH_BY_ID
+        );
+    }
+}
+
+namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
+
+use Yii;
+use Index;
+use Exception;
+use CComponent;
+use LSETwigViewRenderer;
+use SurveyRuntimeHelper;
+use LimeExpressionManager;
+use InvalidArgumentException;
+
+use MAChitgarha\LimeSurveyRestApi\Error\InvalidAnswerError;
+use MAChitgarha\LimeSurveyRestApi\Error\SurveyExpiredError;
+use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
+use MAChitgarha\LimeSurveyRestApi\Error\MaintenanceModeError;
+use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotStartedError;
+use MAChitgarha\LimeSurveyRestApi\Error\MandatoryQuestionMissingError;
+use MAChitgarha\LimeSurveyRestApi\Error\UnprocessableEntityErrorBucket;
+
+class CoreSurveyIndexInvoker
+{
+    /** @var array */
+    private $apiData;
+
+    /** @var array */
+    private $surveyInfo;
+
+    public function __construct(array $apiData, array $surveyInfo)
+    {
+        $this->apiData = $apiData;
+        $this->surveyInfo = $surveyInfo;
+    }
+
+    public function invoke(array $postData, array $sessionData, bool $isPostRequest): void
+    {
+        $indexPage = $this->prepareCoreSurveyIndexClass($isPostRequest);
 
         /** @var Survey $survey */
-        $survey = $surveyInfo['oSurvey'];
+        $survey = $this->surveyInfo['oSurvey'];
 
         try {
-            $_POST = (new PostDataGenerator($apiResponseData, $surveyInfo))
-                ->generate();
+            $_POST = $postData;
+            $_SESSION = $sessionData;
 
             $surveyid = $survey->sid;
-            $thissurvey = $surveyInfo;
+            $thissurvey = $this->surveyInfo;
             $clienttoken = '';
 
-            // TODO: maxstep, datestamp, startingValues.seed?
-            $_SESSION["survey_$surveyid"]['step'] = $_POST['thisstep'];
-            $_SESSION["survey_$surveyid"]['totalsteps'] = $_POST['thisstep'];
-            $_SESSION["survey_$surveyId"]['maxstep'] = $_POST['thisstep'];
-            if ($responseId !== null) {
-                $_SESSION["survey_$surveyid"]['srid'] = $responseId;
-            }
-
             // See CustomTwigRenderer::renderTemplateFromFile() for more info
-            try {
-                $indexPage->action();
-            } catch (SurveyResponseIdHolder $holder) {
-                return self::makeNewResponseUri(
-                    $surveyid,
-                    $holder->getResponseId()
-                );
-            }
+            $indexPage->action();
+
         } catch (CHttpException $exception) {
             /**
              * We know the survey exists and is active, because no exceptions
@@ -250,12 +301,13 @@ class ResponseController implements Controller
         }
     }
 
-    private static function prepareCoreSurveyIndexClass(array $apiResponseData): Index
+    private function prepareCoreSurveyIndexClass(bool $isPostRequest): Index
     {
         \App()->setComponent(
             'twigRenderer',
             new CustomTwigRenderer(
-                $apiResponseData['skip_soft_mandatory'] ?? false
+                $isPostRequest,
+                $this->apiData['skip_soft_mandatory'] ?? false
             ),
             false
         );
@@ -267,38 +319,15 @@ class ResponseController implements Controller
 
         return new Index($controller, 'index');
     }
-
-    private static function makeNewResponseUri(int $surveyId, int $responseId): string
-    {
-        return \str_replace(
-            ['{survey_id}', '{response_id}'],
-            [$surveyId, $responseId],
-            self::PATH_BY_ID
-        );
-    }
 }
-
-namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
-
-use Exception;
-use CComponent;
-use LSETwigViewRenderer;
-use SurveyRuntimeHelper;
-use LimeExpressionManager;
-use InvalidArgumentException;
-
-use MAChitgarha\LimeSurveyRestApi\Error\InvalidAnswerError;
-use MAChitgarha\LimeSurveyRestApi\Error\SurveyExpiredError;
-use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
-use MAChitgarha\LimeSurveyRestApi\Error\MaintenanceModeError;
-use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotStartedError;
-use MAChitgarha\LimeSurveyRestApi\Error\MandatoryQuestionMissingError;
-use MAChitgarha\LimeSurveyRestApi\Error\UnprocessableEntityErrorBucket;
 
 class CustomTwigRenderer extends LSETwigViewRenderer
 {
     /** @var UnprocessableEntityErrorBucket */
     private $errorBucket;
+
+    /** @var bool */
+    private $isPostRequest;
 
     /** @var string[] Mandatory tip message for each question */
     private $mandatoryTips = [];
@@ -314,9 +343,10 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     /** @var bool */
     private $skipSoftMandatory;
 
-    public function __construct(bool $skipSoftMandatory)
+    public function __construct(bool $isPostRequest, bool $skipSoftMandatory)
     {
         $this->errorBucket = new UnprocessableEntityErrorBucket();
+        $this->isPostRequest = $isPostRequest;
         $this->skipSoftMandatory = $skipSoftMandatory;
     }
 
@@ -372,36 +402,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                 // No break
 
             case 'layout_global':
-                $questionIndexInfo = LimeExpressionManager::GetQuestionIndexInfo() ?? [];
-
-                foreach ($questionIndexInfo as $item) {
-                    $questionId = $item['qid'];
-
-                    if ($item['mandViolation']) {
-                        $this->handleMandatoryViolation($questionId, $item);
-                    }
-                    if (!$item['valid']) {
-                        $this->addExpressionManagerTipsAsErrors($questionId);
-                    }
-                }
-
-                if ($this->errorBucket->isEmpty()) {
-                    $surveyId = $data['aSurveyInfo']['sid'];
-                    /*
-                     * As the parent implementation of current method ends the
-                     * app (using App()->end()), to prevent any problems and/or
-                     * inconsistencies, we should return here too. However,
-                     * returning a value is not possible, because the program
-                     * control returns to SurveyRuntimeHelper instead of our
-                     * dedicated controller. So we need to throw an special
-                     * (one-time) exception as a workaround.
-                     */
-                    throw new SurveyResponseIdHolder(
-                        $_SESSION["survey_$surveyId"]['srid'] ?? 1
-                    );
-                } else {
-                    throw $this->errorBucket;
-                }
+                $this->handleGlobalLayoutRenderRequest($data, $return);
                 break;
 
             default:
@@ -409,6 +410,43 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                     "Unhandled Twig layout '$layout'"
                 );
                 // No break
+        }
+    }
+
+    private function handleGlobalLayoutRenderRequest(array $data, bool $return)
+    {
+        $surveyInfo = $data['aSurveyInfo'];
+        $surveyId = $surveyInfo['sid'];
+        $surveySession = $_SESSION["survey_$surveyId"];
+
+        if ($this->isPostRequest) {
+            /*
+             * We cannot do anything but throwing an exception, because
+             * otherwise the program control returns to the core (e.g.
+             * to the display_first_page() function in frontend helper),
+             * not what it expected (because $return in this case is false,
+             * so the app should end).
+             */
+            throw new SurveyResponseIdHolder($surveySession['srid']);
+        }
+
+        $questionIndexInfo = LimeExpressionManager::GetQuestionIndexInfo() ?? [];
+
+        foreach ($questionIndexInfo as $item) {
+            $questionId = $item['qid'];
+
+            if ($item['mandViolation']) {
+                $this->handleMandatoryViolation($questionId, $item);
+            }
+            if (!$item['valid']) {
+                $this->addExpressionManagerTipsAsErrors($questionId);
+            }
+        }
+
+        if ($this->errorBucket->isEmpty()) {
+            // TODO
+        } else {
+            throw $this->errorBucket;
         }
     }
 
