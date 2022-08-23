@@ -293,6 +293,7 @@ use Index;
 use Exception;
 use CComponent;
 use CHttpException;
+use RuntimeException;
 use LSETwigViewRenderer;
 use SurveyRuntimeHelper;
 use LimeExpressionManager;
@@ -473,10 +474,8 @@ class CustomTwigRenderer extends LSETwigViewRenderer
         }
     }
 
-    private function handleGlobalLayoutRenderRequest(array $data, bool $return)
+    private function handleGlobalLayoutRenderRequest(array $data, bool $return): void
     {
-        var_dump(LimeExpressionManager::GetQuestionIndexInfo());
-
         $surveyInfo = $data['aSurveyInfo'];
         $surveyId = $surveyInfo['sid'];
         $surveySession = $_SESSION["survey_$surveyId"];
@@ -492,41 +491,108 @@ class CustomTwigRenderer extends LSETwigViewRenderer
             throw new SurveyResponseIdHolder($surveySession['srid']);
         }
 
-        $questionIndexInfo = LimeExpressionManager::GetQuestionIndexInfo() ?? [];
+        $lastMoveResult = LimeExpressionManager::GetLastMoveResult();
 
-        foreach ($questionIndexInfo as $item) {
-            $questionId = $item['qid'];
-
-            if ($item['mandViolation']) {
-                $this->handleMandatoryViolation($questionId, $item);
+        if ($lastMoveResult !== null) {
+            if ($lastMoveResult['mandViolation']) {
+                $this->handleMandatoryViolations($lastMoveResult);
             }
-            if (!$item['valid']) {
-                $this->addExpressionManagerTipsAsErrors($questionId);
+            if (!$lastMoveResult['valid']) {
+                $this->handleInvalidAnswers($lastMoveResult);
             }
+        } else {
+            // TODO: Right to leave without any actions?
         }
 
-        if ($this->errorBucket->isEmpty()) {
-            // TODO
-        } else {
+        if (!$this->errorBucket->isEmpty()) {
             throw $this->errorBucket;
         }
     }
 
-    private function handleMandatoryViolation(int $questionId, array $questionIndexInfo): void
+    private static function splitPipeSeparatedQuestionFieldNames(string $fieldNames)
     {
-        $addErrorBucketItem = function (string $message) use ($questionId) {
+        if (empty($fieldNames)) {
+            return [];
+        }
+        return \explode('|', $fieldNames);
+    }
+
+    private static function isQuestionFieldNameSameAsQuestionId(string $questionFieldName, int $questionId): bool
+    {
+        [,, $questionIdConcatOtherNonSense] = \explode('X', $questionFieldName);
+
+        return \str_starts_with($questionIdConcatOtherNonSense, $questionId);
+    }
+
+    private function handleLastMoveResultError(string $pipeSeparatedQuestionFieldNameList, callable $fn): void
+    {
+        $questionFieldNameList = self::splitPipeSeparatedQuestionFieldNames(
+            $pipeSeparatedQuestionFieldNameList
+        );
+        $questionIndexInfoList = LimeExpressionManager::GetQuestionIndexInfo();
+
+        foreach ($questionFieldNameList as $questionFieldName) {
+            foreach ($questionIndexInfoList as $questionIndexInfo) {
+                if (self::isQuestionFieldNameSameAsQuestionId(
+                    $questionFieldName,
+                    $questionId = (int) $questionIndexInfo['qid']
+                )) {
+                    $fn($questionId, $questionIndexInfo);
+                }
+            }
+        }
+    }
+
+
+    private function handleMandatoryViolations(array $lastMoveResult): void
+    {
+        $isSoft = $lastMoveResult['mandNonSoft'] ?: $lastMoveResult['mandSoft'];
+        if ($isSoft && $this->skipSoftMandatory) {
+            return;
+        }
+
+        $addError = function (int $questionId) {
             $this->errorBucket->addItem(
-                new MandatoryQuestionMissingError($questionId, $message)
+                new MandatoryQuestionMissingError(
+                    $questionId,
+                    $this->mandatoryTips[$questionId]
+                )
             );
         };
 
-        if ($questionIndexInfo['mandSoft']) {
-            if (!$this->skipSoftMandatory) {
-                $addErrorBucketItem($this->mandatoryTips[$questionId]);
+        // TODO: Fix all passed questions being checked
+        $fn = function (int $questionId, array $questionIndexInfo) use ($addError) {
+            $isSoft = $questionIndexInfo['mandNonSoft'] ?: $questionIndexInfo['mandSoft'];
+
+            if ($isSoft) {
+                if (!$this->skipSoftMandatory) {
+                    $addError($questionId);
+                }
+            } else {
+                $addError($questionId);
             }
-        } else {
-            $addErrorBucketItem($this->mandatoryTips[$questionId]);
-        }
+        };
+
+        $this->handleLastMoveResultError($lastMoveResult['unansweredSQs'], $fn);
+    }
+
+    private function handleInvalidAnswers(array $lastMoveResult): void
+    {
+        $addError = function (int $questionId) {
+            foreach ($this->expressionManagerTips[$questionId] as $tip => $true) {
+                $this->errorBucket->addItem(
+                    new InvalidAnswerError($questionId, $tip)
+                );
+            }
+        };
+
+        $fn = function (int $questionId, array $questionIndexInfo) use ($addError) {
+            if (!$questionIndexInfo['valid']) {
+                $addError($questionId);
+            }
+        };
+
+        $this->handleLastMoveResultError($lastMoveResult['invalidSQs'], $fn);
     }
 
     private function addExpressionManagerTipsAsErrors(int $questionId): void
