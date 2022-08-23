@@ -2,22 +2,16 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey;
 
-use Question;
-
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
+use MAChitgarha\LimeSurveyRestApi\Helper\SurveyHelper;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
 
 use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
-use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
-
-use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
 
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
@@ -38,7 +32,7 @@ class QuestionController implements Controller
 
         $userId = $this->getAuthorizer()->authorize()->getId();
 
-        $survey = SurveyController::get(
+        $survey = SurveyHelper::get(
             $surveyId = $this->getPathParameter('survey_id')
         );
 
