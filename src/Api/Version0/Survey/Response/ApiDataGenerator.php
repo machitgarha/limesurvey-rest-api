@@ -203,27 +203,32 @@ class AnswerGenerator
 
     private function generateFile(Question $question, string $fieldName): array
     {
-        $fileInfoEncoded = $this->getRecordField($fieldName);
+        $fileInfoListEncoded = $this->getRecordField($fieldName);
         $fileCount = (int) $this->getRecordField($fieldName . '_filecount');
 
-        if ($fileCount === 0 || $fileInfoEncoded === null) {
+        if ($fileCount === 0 || $fileInfoListEncoded === null) {
             return [];
         }
 
-        $fileInfo = (new JsonEncoder())->decode($fileInfoEncoded, '');
+        $fileInfoList = (new JsonEncoder())->decode($fileInfoListEncoded, '');
 
-        return [
-            'title' => $fileInfo['title'],
-            'comment' => $fileInfo['comment'],
-            'size' => $fileInfo['size'],
-            'name' => $fileInfo['name'],
-            'extension' => $fileInfo['ext'],
-            'uri' => FileController::makeRelativePath(
-                $question->sid,
-                $this->recordData['id'],
-                $fileInfo['filename']
-            ),
-        ];
+        $result = [];
+        foreach ($fileInfoList as $fileInfo) {
+            $result[] = [
+                'title' => $fileInfo['title'],
+                'comment' => $fileInfo['comment'],
+                'size' => $fileInfo['size'],
+                'name' => $fileInfo['name'],
+                'extension' => $fileInfo['ext'],
+                'uri' => FileController::makeRelativePath(
+                    $question->sid,
+                    $this->recordData['id'],
+                    $fileInfo['filename']
+                ),
+            ];
+        }
+
+        return $result;
     }
 
     private function generateList(Question $question, string $fieldName): array
