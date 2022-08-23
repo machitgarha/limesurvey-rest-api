@@ -167,9 +167,9 @@ answer_file:
       - comment
       - size
       - name
+      - filename
       - extension
       - uri
-      - contents
     properties:
       title:
         type: string
@@ -181,7 +181,11 @@ answer_file:
         format: double
       name:
         type: string
-        description: The name of the file just before upload
+        description: The actual name of the file (i.e. just before upload)
+      filename:
+        type: string
+        description: The name of the temporary file located on the server (from file creation endpoint)
+        writeOnly: true
       extension:
         type: string
         description: File extension (e.g. PNG)
@@ -189,10 +193,6 @@ answer_file:
         type: string
         description: The relative URI to retrieve the file contents
         readOnly: true
-      contents:
-        allOf:
-          - $ref: "#/file_contents"
-          - writeOnly: true
 
 answer_list:
   type: object

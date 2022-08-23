@@ -112,6 +112,8 @@ use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\ResponseGeneratorHelper;
 
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+
 /**
  * @internal
  */
@@ -226,10 +228,13 @@ class AnswerGenerator
             yield $fieldName => '';
             yield "{$fieldName}_filecount" => 0;
         } else {
-            // TODO
-            throw new NotImplementedError(
-                'Sending file as response is not implemented yet'
-            );
+            foreach ($answer as &$fileInfo) {
+                $fileInfo['ext'] = $fileInfo['extension'];
+                unset($fileInfo['extension']);
+            }
+
+            yield $fieldName => JsonEncoder::encode($answer, '');
+            yield "{$fieldName}_filecount" => \count($answer);
         }
     }
 

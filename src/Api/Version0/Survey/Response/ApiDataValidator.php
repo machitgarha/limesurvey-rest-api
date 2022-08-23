@@ -252,14 +252,14 @@ class AnswerValidatorBuilder
 
     private function buildForFile(): Validator
     {
-        return v::create()
-            ->key('title', v::stringType())
-            ->key('comment', v::stringType())
-            ->key('size', v::floatType())
-            ->key('name', v::stringType())
-            ->key('extension', v::stringType())
-            // TODO: Performance?
-            ->key('contents', v::base64());
+        return v::keySet(
+            v::key('title', v::stringType()),
+            v::key('comment', v::stringType()),
+            v::key('size', v::floatType()),
+            v::key('name', v::stringType()),
+            v::key('filename', v::base64()),
+            v::key('extension', v::stringType())
+        );
     }
 
     private function buildForList(Question $question): Validator
