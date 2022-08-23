@@ -8,15 +8,24 @@ use Survey;
 use Question;
 use Response as SurveyResponse;
 use CController;
+use LSFileHelper;
+use SplFileObject;
 use SurveyDynamic;
 use CHttpException;
 use LogicException;
 use RuntimeException;
+use UploaderController;
+use remotecontrol_handle;
 use LimeExpressionManager;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FileController\EndRequestPreventer;
+
+use MAChitgarha\LimeSurveyRestApi\Error\Error;
+use MAChitgarha\LimeSurveyRestApi\Error\UnprocessableEntityError;
+
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\ResponseHelper;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
@@ -51,6 +60,8 @@ use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
 
 use Symfony\Component\HttpFoundation\Response;
+
+use Symfony\Component\Serializer\Encoder\JsonDecode;
 
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
@@ -111,17 +122,48 @@ class FileController implements Controller
         );
     }
 
-    private function getFileIdPathParameter(): string
+    public function new(): JsonResponse
     {
-        $param = $this->getPathParameter('file_id');
+        $this->validateRequest();
+
+        $userId = $this->authorize()->getId();
+
+        [$surveyId, $responseId] = $this->getPathParameterListAsInt(
+            'survey_id',
+            'response_id',
+        );
+
+        $survey = SurveyHelper::get($surveyId);
+
+        PermissionChecker::assertHasSurveyPermission(
+            $survey,
+            Permission::CREATE,
+            $userId,
+            'responses'
+        );
+
+        SurveyHelper::assertIsActive($survey);
+
+        $data = $this->decodeJsonRequestBodyInnerData();
+
+        $tmpFile = $this->makeTempFile($data['extension']);
+        $tmpFile->fwrite(
+            $fileContents = \base64_decode($data['contents'])
+        );
+        $tmpFilePath = $tmpFile->getPathname();
 
         try {
-            v::alnum('_')->check($param);
-        } catch (AlnumException $exception) {
-            throw new InvalidPathParameterError('file_id');
+            self::validateUsingCoreUploader($data['question_id'], $survey, $tmpFilePath, $fileContents);
+        } catch (UnprocessableEntityError $error) {
+            \unlink($tmpFilePath);
+            throw $error;
         }
 
-        return $param;
+        return new JsonResponse(
+            data([
+                'tmp_name' => $tmpFile->getBasename()
+            ]),
+        );
     }
 
     private static function assertFileExistsInResponse(SurveyResponse $response, string $fileId): void
@@ -152,4 +194,64 @@ class FileController implements Controller
             throw new RuntimeException("File '$filePath' is not readable");
         }
     }
+
+    private static function makeTempFile(string $extension): SplFileObject
+    {
+        $tempUploadDir = \App()->getConfig('tempdir') . '/upload/';
+        $filename = 'fupratmp_' . \randomChars(15);
+
+        return new SplFileObject("$tempUploadDir/$filename.$extension", "w");
+    }
+
+    private static function validateUsingCoreUploader(
+        int $questionId,
+        Survey $survey,
+        string $tmpFilePath,
+        string $fileContents
+    ): void {
+        $_POST = [
+            'mode' => 'upload',
+            'fieldname' => FieldNameGenerator::generate(
+                SurveyHelper::getQuestionInSurveyById($survey, $questionId)
+            ),
+        ];
+
+        $_FILES['uploadfile'] = [
+            'tmp_name' => $tmpFilePath,
+            'name' => $tmpFilePath,
+            'size' => \strlen($fileContents),
+            'error' => 0,
+        ];
+
+        \App()->session['LEMsid'] = $survey->sid;
+
+        \App()->attachEventHandler('onEndRequest', function () {
+            throw new EndRequestPreventer();
+        });
+
+        \ob_start();
+        try {
+            (new UploaderController('dummy'))->run('dummy');
+        } catch (CHttpException $exception) {
+            // TODO: Maybe the error message is useful?
+        } catch (EndRequestPreventer $e) {
+        }
+        $output = \ob_get_clean();
+
+        $result = (new JsonDecode())->decode($output, '', [
+            JsonDecode::ASSOCIATIVE => true,
+        ]);
+
+        if (!$result['success'] && $result['msg'] !== gT('An unknown error occured')) {
+            throw new UnprocessableEntityError($result['msg']);
+        }
+    }
+}
+
+namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FileController;
+
+use Exception;
+
+class EndRequestPreventer extends Exception
+{
 }

@@ -214,6 +214,19 @@ unauthorized_list:
                   - AccessTokenInvalid
                   - InvalidSecurity
 
+unprocessable_entity_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          items:
+            allOf:
+              - $ref: "#/error_optional_message"
+              - properties:
+                  id:
+                    enum:
+                      - UnprocessableEntity
+
 unprocessable_response:
   type: object
   required:

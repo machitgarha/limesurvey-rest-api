@@ -13,11 +13,19 @@ post:
           properties:
             data:
               type: object
+              required:
+                - question_id
+                - contents
+                - extension
               properties:
                 question_id:
                   $ref: "../../../components/schemas/question.yaml#/question_id"
                 contents:
                   $ref: "../../../components/schemas/response.yaml#/file_contents"
+                extension:
+                  type: string
+                  description: File extension
+                  pattern: '^[a-zA-Z0-9_-]+$'
   responses:
     "201":
       description: Created
@@ -31,7 +39,7 @@ post:
                 type: object
                 required: [tmp_filename]
                 properties:
-                  tmp_filename:
+                  tmp_name:
                     $ref: "../../../components/schemas/response.yaml#/file_tmp_name"
     "400":
       $ref: "../../../components/responses.yaml#/bad_request"
@@ -39,6 +47,10 @@ post:
       $ref: "../../../components/responses.yaml#/unauthorized"
     "403":
       $ref: "../../../components/responses.yaml#/permission_denied"
+    "404":
+      $ref: "../../../components/responses.yaml#/resource_not_found"
     "409":
       $ref: "../../../components/responses.yaml#/survey_unaccessible"
+    "422":
+      $ref: "../../../components/responses.yaml#/unprocessable_entity"
     # TODO: Add maintenance error

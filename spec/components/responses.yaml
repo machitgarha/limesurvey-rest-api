@@ -106,6 +106,13 @@ unauthorized:
       schema:
         $ref: "./schemas/error.yaml#/unauthorized_list"
 
+unprocessable_entity:
+  description: Faield file upload as response answer upload
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/unprocessable_entity_list"
+
 unprocessable_response:
   description: Cannot process response because of semantic errors, e.g. invalid or missing answers
   content:

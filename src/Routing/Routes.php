@@ -61,6 +61,10 @@ class Routes
             'name' => V0\Survey\Response\FileController::class . '.get',
             'path' => V0\Survey\Response\FileController::PATH_BY_ID,
             'http_method' => HttpMethod::GET,
+        ], [
+            'name' => V0\Survey\Response\FileController::class . '.new',
+            'path' => V0\Survey\Response\FileController::PATH,
+            'http_method' => HttpMethod::POST,
         ],
     ];
 

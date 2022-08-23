@@ -36,4 +36,14 @@ class SurveyHelper
             }
         }
     }
+
+    public static function getQuestionInSurveyById(Survey $survey, int $questionId)
+    {
+        foreach ($survey->baseQuestions as $question) {
+            if ($question->qid === $questionId) {
+                return $question;
+            }
+        }
+        throw new ResourceIdNotFoundError('question', $questionId);
+    }
 }

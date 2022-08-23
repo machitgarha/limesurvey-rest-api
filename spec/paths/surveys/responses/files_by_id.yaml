@@ -13,9 +13,16 @@ get:
             type: object
             required: [data]
             properties:
-              contents:
-                $ref: "../../../components/schemas/response.yaml#/file_contents"
+              data:
+                type: object
+                required:
+                  - contents
+                properties:
+                  contents:
+                    $ref: "../../../components/schemas/response.yaml#/file_contents"
     "401":
       $ref: "../../../components/responses.yaml#/unauthorized"
     "403":
       $ref: "../../../components/responses.yaml#/permission_denied"
+    "404":
+      $ref: "../../../components/responses.yaml#/resource_not_found"
