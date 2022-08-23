@@ -55,7 +55,5 @@ post:
       $ref: "../../components/responses.yaml#/permission_denied"
     "409":
       $ref: "../../components/responses.yaml#/survey_unaccessible"
-    "422":
-      $ref: "../../components/responses.yaml#/unprocessable_response"
     "503":
       $ref: "../../components/responses.yaml#/maintenance_mode"

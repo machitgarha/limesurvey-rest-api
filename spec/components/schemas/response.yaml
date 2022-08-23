@@ -1,41 +1,44 @@
 response_list:
   type: array
   items:
-    $ref: "#/response_list_item"
+    $ref: "#/response_get"
 
-response_list_item:
-  allOf:
-    - $ref: "#/read_properties"
-    - $ref: "#/common_properties"
-
-response_new:
-  allOf:
-    - $ref: "#/common_properties"
-    - $ref: "#/write_properties"
-
-id:
-  type: integer
-  description: Survey response ID
-
-read_properties:
+response_get:
   type: object
   required:
     - id
     - submit_time
+    - answers
   properties:
     id:
-      allOf:
-        - $ref: "#/id"
-        - readOnly: true
+      $ref: "#/id"
 
     submit_time:
       allOf:
         - $ref: "./types.yaml#/date_time"
         - description: Submission time, a value of null means an incomplete response
           nullable: true
-          readOnly: true
 
-write_properties:
+    answers:
+        $ref: "#/answers"
+
+    start_time:
+      $ref: "#/start_time"
+
+    end_time:
+      allOf:
+        - description: The time responder did the last action
+        - $ref: "./types.yaml#/date_time"
+
+response_new:
+  type: object
+  required:
+    - start_time
+  properties:
+    start_time:
+      $ref: "#/start_time"
+
+response_update:
   type: object
   required:
     - step
@@ -47,6 +50,9 @@ write_properties:
         The step of the response, based on survey format.
 
         For "all in one" surveys, its only possible value is 1. For "group by group" or "question by question" surveys, it must be up to total count of groups or questions, respectively.
+
+    answers:
+      $ref: "#/answers"
 
     relevances:
       type: object
@@ -73,41 +79,33 @@ write_properties:
       type: boolean
       description: Whether to skip soft mandatory questions or not; a null value is identical to false
 
-common_properties:
+id:
+  type: integer
+  description: Survey response ID
+
+start_time:
+  allOf:
+    - description: The time responding has been started
+    - $ref: "./types.yaml#/date_time"
+
+answers:
   type: object
-  required:
-    - answers
-  properties:
-    start_time:
-      allOf:
-        - description: The time responding has been started
-          default: now
-        - $ref: "./types.yaml#/date_time"
-
-    end_time:
-      allOf:
-        - description: The time responder did the last action
-          default: now
-        - $ref: "./types.yaml#/date_time"
-
-    answers:
-      type: object
-      description: Mappings of question IDs to the answers
-      additionalProperties:
-        anyOf:
-          - $ref: "#/unanswered"
-          - $ref: "#/answer_yes_no"
-          - $ref: "#/answer_5_point_choice"
-          - $ref: "#/answer_numerical_input"
-          - $ref: "#/answer_text"
-          - $ref: "#/answer_gender"
-          - $ref: "#/answer_date"
-          - $ref: "#/answer_equation"
-          - $ref: "#/answer_ranking"
-          - $ref: "#/answer_file"
-          - $ref: "#/answer_list"
-          - $ref: "#/answer_list_with_comment"
-          - $ref: "#/answer_with_sub_questions"
+  description: Mappings of question IDs to the answers
+  additionalProperties:
+    anyOf:
+      - $ref: "#/unanswered"
+      - $ref: "#/answer_yes_no"
+      - $ref: "#/answer_5_point_choice"
+      - $ref: "#/answer_numerical_input"
+      - $ref: "#/answer_text"
+      - $ref: "#/answer_gender"
+      - $ref: "#/answer_date"
+      - $ref: "#/answer_equation"
+      - $ref: "#/answer_ranking"
+      - $ref: "#/answer_file"
+      - $ref: "#/answer_list"
+      - $ref: "#/answer_list_with_comment"
+      - $ref: "#/answer_with_sub_questions"
 
 answer_yes_no:
   type: boolean
