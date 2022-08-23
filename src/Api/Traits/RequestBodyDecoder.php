@@ -2,7 +2,11 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Traits;
 
+use MAChitgarha\LimeSurveyRestApi\Error\MalformedRequestBodyError;
+
 use Symfony\Component\HttpFoundation\Request;
+
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 use Symfony\Component\Serializer\Serializer;
 
@@ -13,10 +17,14 @@ trait RequestBodyDecoder
 
     public function decodeJsonRequestBody()
     {
-        return $this->getSerializer()->decode(
-            $this->getRequest()->getContent(),
-            'json'
-        );
+        try {
+            return $this->getSerializer()->decode(
+                $this->getRequest()->getContent(),
+                'json'
+            );
+        } catch (NotEncodableValueException $e) {
+            throw new MalformedRequestBodyError();
+        }
     }
 
     /**

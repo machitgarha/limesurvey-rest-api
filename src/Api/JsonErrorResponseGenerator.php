@@ -79,9 +79,6 @@ class JsonErrorResponseGenerator
             $error = new MethodNotAllowedError();
             $extraHeaders[] = ['Allow' => \implode(', ', $throwable->getAllowedMethods())];
         }
-        elseif ($throwable instanceof NotEncodableValueException) {
-            $error = new MalformedRequestBodyError();
-        }
         elseif ($throwable instanceof InvalidBody) {
             $error = self::convertInvalidBodyToError($throwable);
         }
