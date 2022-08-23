@@ -2,37 +2,25 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey;
 
-use Yii;
-use Index;
-use Survey;
-use Question;
-use CController;
 use SurveyDynamic;
-use CHttpException;
 use LogicException;
-use RuntimeException;
-use LSYii_Application;
+use ReflectionProperty;
 use LimeExpressionManager;
 
 use League\OpenAPIValidation\PSR7\Exception\Validation\InvalidBody;
 
-use League\OpenAPIValidation\Schema\Exception\TooManyValidSchemas;
 use League\OpenAPIValidation\Schema\Exception\NotEnoughValidSchemas;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\AnswersValidator;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\PostDataGenerator;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\CustomTwigRenderer;
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\IndexOutputController;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\CoreSurveyIndexInvoker;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\SurveyResponseIdHolder;
 
-use MAChitgarha\LimeSurveyRestApi\Error\Error;
 use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
 use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResponseCompletedError;
@@ -175,10 +163,79 @@ class ResponseController implements Controller
             'srid' => $responseId,
         ];
 
+        $this->prepareLimeExpressionManager($surveyInfo, $postData, $sessionData, $response);
+
         (new CoreSurveyIndexInvoker($apiData, $surveyInfo))
             ->invoke($postData, $sessionData, false);
 
+        $response->updateByPk($responseId, [
+            'lastpage' => $postData['thisstep']
+        ]);
+
         return new EmptyResponse(Response::HTTP_OK);
+    }
+
+    private function prepareLimeExpressionManager(
+        array $surveyInfo,
+        array $postData,
+        array $sessionData,
+        SurveyDynamic $response
+    ): void {
+        $surveyId = $surveyInfo['sid'];
+        $surveyMode = [
+            'A' => 'survey',
+            'G' => 'group',
+            'S' => 'question',
+        ][$surveyInfo['format']];
+
+        $surveyOptions = [
+            'active' => $surveyInfo['active'] === 'Y',
+            'allowsave' => $surveyInfo['allowsave'] === 'Y',
+            'anonymized' => $surveyInfo['anonymized'] !== 'N',
+            'assessments' => $surveyInfo['assessments'] === 'Y',
+            'datestamp' => $surveyInfo['datestamp'] === 'Y',
+            'deletenonvalues' => \App()->getConfig('deletenonvalues'),
+            'hyperlinkSyntaxHighlighting' => false,
+            'ipaddr' => $surveyInfo['ipaddr'] === 'Y',
+            'radix' => \getRadixPointData($surveyInfo['surveyls_numberformat'])['separator'],
+            'refurl' => '',
+            'savetimings' => $surveyInfo['savetimings'] === "Y",
+            'surveyls_dateformat' => $surveyInfo['surveyls_dateformat'] ?? 1,
+            'startlanguage' => \App()->language ?? $surveyInfo['language'],
+            'target' => \App()->getConfig('uploaddir')
+                . DIRECTORY_SEPARATOR . 'surveys'
+                . DIRECTORY_SEPARATOR . $surveyId
+                . DIRECTORY_SEPARATOR . 'files'
+                . DIRECTORY_SEPARATOR,
+            'tempdir' => \App()->getConfig('tempdir') . DIRECTORY_SEPARATOR,
+            'timeadjust' => \App()->getConfig("timeadjust"),
+            'token' => '',
+        ];
+
+        $_SESSION = $sessionData;
+
+        LimeExpressionManager::StartSurvey($surveyId, $surveyMode, $surveyOptions, true);
+
+        $expressionManager = LimeExpressionManager::singleton();
+        $currentSequence = ($response->lastpage ?? 0) - 1;
+
+        foreach ([
+            'currentGroupSeq' => $currentSequence,
+            'currentQuestionSeq' => $currentSequence,
+        ] as $propertyName => $propertyValue) {
+            $reflection = new ReflectionProperty(
+                $expressionManager,
+                $propertyName
+            );
+            $reflection->setAccessible(true);
+            $reflection->setValue($expressionManager, $propertyValue);
+        }
+
+        /*
+         * We don't process POST here, because we want the validations and
+         * other steps done in Index class and SurveyRuntimeHelper.
+         */
+        LimeExpressionManager::JumpTo($postData['thisstep'], false, false);
     }
 
     private function prepareNewOrUpdate(string $permission): array
@@ -235,6 +292,7 @@ use Yii;
 use Index;
 use Exception;
 use CComponent;
+use CHttpException;
 use LSETwigViewRenderer;
 use SurveyRuntimeHelper;
 use LimeExpressionManager;
@@ -247,6 +305,8 @@ use MAChitgarha\LimeSurveyRestApi\Error\MaintenanceModeError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotStartedError;
 use MAChitgarha\LimeSurveyRestApi\Error\MandatoryQuestionMissingError;
 use MAChitgarha\LimeSurveyRestApi\Error\UnprocessableEntityErrorBucket;
+
+use Symfony\Component\HttpFoundation\Response;
 
 class CoreSurveyIndexInvoker
 {
@@ -415,6 +475,8 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
     private function handleGlobalLayoutRenderRequest(array $data, bool $return)
     {
+        var_dump(LimeExpressionManager::GetQuestionIndexInfo());
+
         $surveyInfo = $data['aSurveyInfo'];
         $surveyId = $surveyInfo['sid'];
         $surveySession = $_SESSION["survey_$surveyId"];
