@@ -327,39 +327,14 @@ class CoreSurveyIndexInvoker
     {
         $indexPage = $this->prepareCoreSurveyIndexClass($isPostRequest);
 
-        /** @var Survey $survey */
-        $survey = $this->surveyInfo['oSurvey'];
+        $_POST = $postData;
+        $_SESSION = $sessionData;
 
-        try {
-            $_POST = $postData;
-            $_SESSION = $sessionData;
+        $thissurvey = $this->surveyInfo;
+        $clienttoken = '';
 
-            $surveyid = $survey->sid;
-            $thissurvey = $this->surveyInfo;
-            $clienttoken = '';
-
-            // See CustomTwigRenderer::renderTemplateFromFile() for more info
-            $indexPage->action();
-
-        } catch (CHttpException $exception) {
-            /**
-             * We know the survey exists and is active, because no exceptions
-             * was thrown before. So, in this case, it's an unexpected error
-             * instead.
-             */
-            if (
-                $exception->statusCode === Response::HTTP_NOT_FOUND ||
-                $exception->statusCode === Response::HTTP_UNAUTHORIZED
-            ) {
-                throw new InternalServerError(
-                    $exception->getMessage(),
-                    $exception->getCode(),
-                    $exception
-                );
-            }
-
-            throw $exception;
-        }
+        // See CustomTwigRenderer::renderTemplateFromFile() for more info
+        $indexPage->action();
     }
 
     private function prepareCoreSurveyIndexClass(bool $isPostRequest): Index
