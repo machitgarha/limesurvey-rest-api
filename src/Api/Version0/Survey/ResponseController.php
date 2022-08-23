@@ -79,6 +79,8 @@ class ResponseController implements Controller
 
     public function list(): JsonResponse
     {
+        $this->validateRequest();
+
         $userId = $this->authorize()->getId();
 
         $survey = SurveyHelper::get(
