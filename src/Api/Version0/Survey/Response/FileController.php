@@ -18,6 +18,7 @@ use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
+use MAChitgarha\LimeSurveyRestApi\Helper\ResponseHelper;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ResponseRecordGenerator;
@@ -85,10 +86,9 @@ class FileController implements Controller
             'survey_id',
             'response_id',
         );
+        $fileId = $this->getPathParameter('file_id');
 
-        $fileId = $this->getFileIdPathParameter();
-
-        $survey = SurveyController::get($surveyId);
+        $survey = SurveyHelper::get($surveyId);
 
         PermissionChecker::assertHasSurveyPermission(
             $survey,
@@ -97,7 +97,7 @@ class FileController implements Controller
             'responses'
         );
 
-        $response = ResponseController::getResponse($surveyId, $responseId);
+        $response = ResponseHelper::get($surveyId, $responseId);
 
         self::assertFileExistsInResponse($response, $fileId);
 
@@ -131,7 +131,6 @@ class FileController implements Controller
                 return;
             }
         }
-
         throw new ResourceIdNotFoundError('file', $fileId);
     }
 
