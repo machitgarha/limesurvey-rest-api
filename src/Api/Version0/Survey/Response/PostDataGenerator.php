@@ -230,10 +230,11 @@ class AnswerGenerator
         } else {
             foreach ($answer as &$fileInfo) {
                 $fileInfo['ext'] = $fileInfo['extension'];
-                unset($fileInfo['extension']);
+                $fileInfo['filename'] = $fileInfo['tmp_name'];
+                unset($fileInfo['extension'], $fileInfo['tmp_name']);
             }
 
-            yield $fieldName => JsonEncoder::encode($answer, '');
+            yield $fieldName => (new JsonEncoder())->encode($answer, '');
             yield "{$fieldName}_filecount" => \count($answer);
         }
     }
