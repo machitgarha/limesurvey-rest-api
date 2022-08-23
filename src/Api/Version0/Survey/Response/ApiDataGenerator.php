@@ -2,10 +2,7 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 
-use Answer;
 use Survey;
-use Question;
-use Generator;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataGenerator\AnswerGenerator;
 
@@ -23,8 +20,8 @@ class ApiDataGenerator
 
         if ($survey->isDateStamp) {
             $result += [
-                'start_time' => $responseData['startdata'],
-                'end_time' => $responseData['datestamp'],
+                'start_time' => $recordData['startdata'],
+                'end_time' => $recordData['datestamp'],
             ];
         }
 
@@ -36,8 +33,8 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataGene
 
 use Survey;
 use Question;
+use Exception;
 use Generator;
-use LogicException;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FileController;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FieldNameGenerator;
@@ -114,10 +111,10 @@ class AnswerGenerator
         ],
     ];
 
-    /** @var array[] */
+    /** @var string[] */
     private $questionTypeToMethodMapping;
 
-    /** @var array[] */
+    /** @var (string|null)[] */
     private $recordData;
 
     public function __construct(array $recordData)
@@ -166,7 +163,7 @@ class AnswerGenerator
         }
 
         // TODO: Improve this
-        throw new \Exception();
+        throw new Exception();
     }
 
     private function generateBool(Question $question, string $fieldName): ?bool
@@ -222,7 +219,7 @@ class AnswerGenerator
                 'extension' => $fileInfo['ext'],
                 'uri' => FileController::makeRelativePath(
                     $question->sid,
-                    $this->recordData['id'],
+                    (int) $this->recordData['id'],
                     $fileInfo['filename']
                 ),
             ];
@@ -294,7 +291,7 @@ class AnswerGenerator
 
     private function generateArrayDual(Question $question, string $fieldNameBase): array
     {
-        return $this->generateTypedSubQuestions($question, $fieldNameBase, function (string $fieldName): array {
+        return $this->generateSubQuestions($question, $fieldNameBase, function (string $fieldName): array {
             return [
                 $this->getRecordField("$fieldName#0", 'string'),
                 $this->getRecordField("$fieldName#1", 'string'),

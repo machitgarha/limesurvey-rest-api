@@ -33,7 +33,7 @@ class QuestionController implements Controller
         $userId = $this->getAuthorizer()->authorize()->getId();
 
         $survey = SurveyHelper::get(
-            $surveyId = $this->getPathParameter('survey_id')
+            $surveyId = $this->getPathParameterAsInt('survey_id')
         );
 
         PermissionChecker::assertHasSurveyPermission($survey, Permission::READ, $userId);
@@ -44,7 +44,7 @@ class QuestionController implements Controller
 
         $data = [];
         foreach ($questionList as $question) {
-            $l10n = $question->questionl10ns[$sLanguage];
+            $l10n = $question->questionl10ns[$language];
             $data[] = [
                 'id' => $question->qid,
                 'group_id' => $question->gid,

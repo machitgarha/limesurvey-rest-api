@@ -3,7 +3,6 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey;
 
 use SurveyDynamic;
-use LogicException;
 use ReflectionProperty;
 use LimeExpressionManager;
 
@@ -25,30 +24,16 @@ use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
 use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResponseCompletedError;
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
-use MAChitgarha\LimeSurveyRestApi\Error\UnprocessableEntityErrorBucket;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataGenerator;
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\RecordGenerator;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerFieldGenerator;
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerValidatorBuilder;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\SurveyHelper;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
-
-use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
-
-use Respect\Validation\Exceptions\ValidatorException;
-
-use Respect\Validation\Validator;
-use Respect\Validation\Validator as v;
 
 use Symfony\Component\HttpFoundation\Response;
 
@@ -91,7 +76,7 @@ class ResponseController implements Controller
                     $survey
                 );
             },
-            SurveyDynamic::model($surveyId)->findAll()
+            SurveyDynamic::model((string) $surveyId)->findAll()
         );
 
         return new JsonResponse(
@@ -140,7 +125,7 @@ class ResponseController implements Controller
             'response_id'
         );
 
-        $response = SurveyDynamic::model($surveyId)
+        $response = SurveyDynamic::model((string) $surveyId)
             ->findByPk($responseId);
 
         if ($response === null) {
@@ -156,6 +141,7 @@ class ResponseController implements Controller
         $postData = (new PostDataGenerator($apiData, $surveyInfo))->generate();
 
         // TODO: maxstep, datestamp?
+        $sessionData = [];
         $sessionData["survey_$surveyId"] = [
             'step' => $postData['thisstep'],
             'totalsteps' => $postData['thisstep'],
@@ -291,23 +277,18 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 use Yii;
 use Index;
 use Exception;
-use CComponent;
-use CHttpException;
-use RuntimeException;
+use CController;
 use LSETwigViewRenderer;
-use SurveyRuntimeHelper;
 use LimeExpressionManager;
 use InvalidArgumentException;
 
+use MAChitgarha\LimeSurveyRestApi\Error\ErrorBucket;
 use MAChitgarha\LimeSurveyRestApi\Error\InvalidAnswerError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyExpiredError;
 use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 use MAChitgarha\LimeSurveyRestApi\Error\MaintenanceModeError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotStartedError;
 use MAChitgarha\LimeSurveyRestApi\Error\MandatoryQuestionMissingError;
-use MAChitgarha\LimeSurveyRestApi\Error\UnprocessableEntityErrorBucket;
-
-use Symfony\Component\HttpFoundation\Response;
 
 class CoreSurveyIndexInvoker
 {
@@ -359,7 +340,7 @@ class CoreSurveyIndexInvoker
 
 class CustomTwigRenderer extends LSETwigViewRenderer
 {
-    /** @var UnprocessableEntityErrorBucket */
+    /** @var ErrorBucket */
     private $errorBucket;
 
     /** @var bool */
@@ -381,7 +362,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
     public function __construct(bool $isPostRequest, bool $skipSoftMandatory)
     {
-        $this->errorBucket = new UnprocessableEntityErrorBucket();
+        $this->errorBucket = new ErrorBucket();
         $this->isPostRequest = $isPostRequest;
         $this->skipSoftMandatory = $skipSoftMandatory;
     }
@@ -425,6 +406,8 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                     "Unhandled Twig path '$twigPath'"
                 );
         }
+
+        return '';
     }
 
     public function renderTemplateFromFile($layout, $data, $return)
@@ -447,6 +430,8 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                 );
                 // No break
         }
+
+        return '';
     }
 
     private function handleGlobalLayoutRenderRequest(array $data, bool $return): void
@@ -496,7 +481,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     {
         [,, $questionIdConcatOtherNonSense] = \explode('X', $questionFieldName);
 
-        return \str_starts_with($questionIdConcatOtherNonSense, $questionId);
+        return \str_starts_with($questionIdConcatOtherNonSense, (string) $questionId);
     }
 
     private function handleLastMoveResultError(string $pipeSeparatedQuestionFieldNameList, callable $fn): void
@@ -594,7 +579,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     }
 }
 
-class IndexOutputController
+class IndexOutputController extends CController
 {
     public function renderExitMessage(
         int $surveyId,
@@ -619,24 +604,25 @@ class IndexOutputController
         }
     }
 
-    public function createAbsoluteUrl(): string
+    public function createAbsoluteUrl($a, $b = [], $c = '', $d = '&'): string
     {
         return '';
     }
 
-    public function createUrl(): string
+    public function createUrl($a, $b = [], $c = '&'): string
     {
         return '';
     }
 
-    public function createAction(string $action)
+    public function createAction($actionId)
     {
-        if ($action === 'captcha') {
+        if ($actionId === 'captcha') {
             throw new NotImplementedError('Captcha is not implemented yet');
         }
+        return parent::createAction($actionId);
     }
 
-    public function recordCachingAction()
+    public function recordCachingAction($a, $b, $c)
     {
     }
 }

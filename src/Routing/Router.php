@@ -2,9 +2,6 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Routing;
 
-use MAChitgarha\LimeSurveyRestApi\Config;
-
-use MAChitgarha\LimeSurveyRestApi\Error\ApiVersionMissingError;
 use MAChitgarha\LimeSurveyRestApi\Error\ApiVersionNotFoundError;
 
 use Symfony\Component\HttpFoundation\Request;

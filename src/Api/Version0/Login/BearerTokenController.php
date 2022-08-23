@@ -16,13 +16,7 @@ use MAChitgarha\LimeSurveyRestApi\Error\InvalidCredentialsError;
 use MAChitgarha\LimeSurveyRestApi\Error\TooManyAuthenticationFailuresError;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
-
-use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
-
-use Respect\Validation\Validator as v;
-
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 

@@ -6,8 +6,6 @@ use Throwable;
 use PluginBase;
 use CLogger as Logger;
 
-use LimeSurvey\PluginManager\PluginManager;
-
 use MAChitgarha\LimeSurveyRestApi\Api\JsonErrorResponseGenerator;
 
 use MAChitgarha\LimeSurveyRestApi\Config;
@@ -31,13 +29,10 @@ use MAChitgarha\LimeSurveyRestApi\Validation\ResponseValidator;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 use Symfony\Component\Serializer\Serializer;
-
-use function MAChitgarha\LimeSurveyRestApi\Utility\Response\error;
 
 class Plugin extends PluginBase
 {
@@ -76,17 +71,18 @@ class Plugin extends PluginBase
     private function setDebugging(): void
     {
         if (Config::DEBUG_MODE === DebugMode::FULL) {
-            $handler = function (int $code, string $message, string $file, int $line) {
+            $handler = function (int $code, string $message, string $file, int $line): bool {
                 $this->log(
                     "$message (at $file:$line, code: $code)",
                     Logger::LEVEL_ERROR
                 );
+                return true;
             };
             \set_error_handler($handler, \E_ALL);
 
             // Logging is not possible for some odd reason
             \error_reporting(\E_ALL);
-            \ini_set('display_errors', 1);
+            \ini_set('display_errors', 'On');
         }
     }
 

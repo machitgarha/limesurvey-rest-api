@@ -40,7 +40,7 @@ class RequestValidator
 
     public function validate(): void
     {
-        $validator = $this->validatorBuilder->getServerRequestValidator();
+        $validator = $this->validatorBuilder->getRequestValidator();
 
         $validator->validate(
             $this->request->withUri($this->request->getUri()->withPath(

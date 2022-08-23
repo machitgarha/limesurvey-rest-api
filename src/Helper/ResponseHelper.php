@@ -13,7 +13,7 @@ class ResponseHelper
         $response = Response::model($surveyId)->findByPk($responseId);
 
         if ($response === null) {
-            throw new ResourceIdNotFoundError('survey', $id);
+            throw new ResourceIdNotFoundError('survey', $surveyId);
         }
         return $response;
     }

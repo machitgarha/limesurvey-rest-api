@@ -3,7 +3,6 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 
 use Survey;
-use SurveysGroups;
 use RuntimeException;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator\{
@@ -16,7 +15,6 @@ use Respect\Validation\Exceptions\KeySetException;
 use Respect\Validation\Exceptions\ValidationException;
 
 use Respect\Validation\Validator as v;
-use Respect\Validation\Validator;
 
 class ApiDataValidator
 {
@@ -182,7 +180,7 @@ class AnswerValidatorBuilder
         ],
     ];
 
-    /** @var array[] */
+    /** @var string[] */
     private $questionTypeToMethodMapping;
 
     public function __construct()
@@ -198,7 +196,7 @@ class AnswerValidatorBuilder
             // TODO: How nice it would look if we were able to use arrow functions! :)
             function (Question $question): Validator {
                 return v::key(
-                    $question->qid,
+                    (string) $question->qid,
                     $this->build($question),
                     false
                 );
@@ -312,8 +310,8 @@ class AnswerValidatorBuilder
             return v::create()
                 ->arrayType()
                 ->length(1, 2, true)
-                ->key(0, v::stringType(), false)
-                ->key(1, v::stringType(), false);
+                ->key('0', v::stringType(), false)
+                ->key('1', v::stringType(), false);
         });
     }
 

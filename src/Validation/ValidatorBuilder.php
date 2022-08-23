@@ -4,7 +4,7 @@ namespace MAChitgarha\LimeSurveyRestApi\Validation;
 
 use League\OpenAPIValidation\PSR7\ValidatorBuilder as LeagueValidatorBuilder;
 use League\OpenAPIValidation\PSR7\ResponseValidator;
-use League\OpenAPIValidation\PSR7\ServerRequestValidator;
+use League\OpenAPIValidation\PSR7\RequestValidator;
 
 use MAChitgarha\LimeSurveyRestApi\Config;
 
@@ -28,10 +28,10 @@ class ValidatorBuilder extends LeagueValidatorBuilder
         }
     }
 
-    public function getServerRequestValidator(): ServerRequestValidator
+    public function getRequestValidator(): RequestValidator
     {
         $this->clearCacheIfNeeded();
-        return parent::getServerRequestValidator();
+        return parent::getRequestValidator();
     }
 
     public function getResponseValidator(): ResponseValidator

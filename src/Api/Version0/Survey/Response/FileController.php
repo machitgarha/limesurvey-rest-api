@@ -2,62 +2,29 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 
-use Yii;
-use Index;
 use Survey;
-use Question;
 use Response as SurveyResponse;
-use CController;
-use LSFileHelper;
 use SplFileObject;
-use SurveyDynamic;
 use CHttpException;
 use LogicException;
 use RuntimeException;
 use UploaderController;
-use remotecontrol_handle;
-use LimeExpressionManager;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FileController\EndRequestPreventer;
 
-use MAChitgarha\LimeSurveyRestApi\Error\Error;
+use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
 use MAChitgarha\LimeSurveyRestApi\Error\UnprocessableEntityError;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\ResponseHelper;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ResponseRecordGenerator;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerFieldGenerator;
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController\AnswerValidatorBuilder;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\SurveyController;
-
-use MAChitgarha\LimeSurveyRestApi\Error\InternalServerError;
-use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
-use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotActiveError;
-use MAChitgarha\LimeSurveyRestApi\Error\RequiredKeyMissingError;
-use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
-use MAChitgarha\LimeSurveyRestApi\Error\InvalidPathParameterError;
-
 use MAChitgarha\LimeSurveyRestApi\Helper\SurveyHelper;
 
-use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
-
-use MAChitgarha\LimeSurveyRestApi\Utility\ContentTypeValidator;
-
-use Respect\Validation\Exceptions\AlnumException;
-use Respect\Validation\Exceptions\ValidatorException;
-
-use Respect\Validation\Validator;
-use Respect\Validation\Validator as v;
 
 use Symfony\Component\HttpFoundation\Response;
 
@@ -163,6 +130,7 @@ class FileController implements Controller
             data([
                 'tmp_name' => $tmpFile->getBasename()
             ]),
+            Response::HTTP_CREATED
         );
     }
 
@@ -231,7 +199,7 @@ class FileController implements Controller
 
         \ob_start();
         try {
-            (new UploaderController('dummy'))->run('dummy');
+            (new UploaderController('dummy'))->run(0);
         } catch (CHttpException $exception) {
             // TODO: Maybe the error message is useful?
         } catch (EndRequestPreventer $e) {

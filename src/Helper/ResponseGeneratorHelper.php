@@ -3,12 +3,12 @@
 namespace MAChitgarha\LimeSurveyRestApi\Helper;
 
 use Question;
+use LogicException;
 
 class ResponseGeneratorHelper
 {
-    public static function makeQuestionTypeToMethodMap(
-        array $methodToQuestionTypeListMapping
-    ): array {
+    public static function makeQuestionTypeToMethodMap(array $methodToQuestionTypeListMapping): array
+    {
         $result = [];
 
         foreach ($methodToQuestionTypeListMapping as $methodName => $questionTypeList) {

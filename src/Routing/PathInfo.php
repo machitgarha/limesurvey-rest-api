@@ -2,10 +2,6 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Routing;
 
-use BadMethodCallException;
-
-use MAChitgarha\LimeSurveyRestApi\Config;
-
 use MAChitgarha\LimeSurveyRestApi\Error\ApiVersionMissingError;
 
 class PathInfo

@@ -3,7 +3,6 @@
 namespace MAChitgarha\LimeSurveyRestApi\Helper;
 
 use Survey;
-use Permission;
 
 use MAChitgarha\LimeSurveyRestApi\Error\PermissionDeniedError;
 

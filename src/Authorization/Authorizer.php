@@ -2,8 +2,6 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Authorization;
 
-use Session;
-
 interface Authorizer
 {
     /**

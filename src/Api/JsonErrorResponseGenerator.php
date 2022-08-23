@@ -3,7 +3,6 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api;
 
 use Throwable;
-use CLogger as Logger;
 
 use League\OpenAPIValidation\PSR7\Exception\NoContentType;
 
@@ -15,12 +14,7 @@ use League\OpenAPIValidation\PSR7\Exception\Validation\InvalidParameter;
 
 use League\OpenAPIValidation\Schema\Exception\TypeMismatch;
 use League\OpenAPIValidation\Schema\Exception\KeywordMismatch;
-use League\OpenAPIValidation\Schema\Exception\TooManyValidSchemas;
-use League\OpenAPIValidation\Schema\Exception\NotEnoughValidSchemas;
 
-use League\OpenAPIValidation\Schema\Keywords\Required;
-
-use MAChitgarha\LimeSurveyRestApi\Config;
 use MAChitgarha\LimeSurveyRestApi\Plugin;
 
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
@@ -32,11 +26,8 @@ use MAChitgarha\LimeSurveyRestApi\Error\KeywordMismatchError;
 use MAChitgarha\LimeSurveyRestApi\Error\MalformedRequestBodyError;
 use MAChitgarha\LimeSurveyRestApi\Error\MethodNotAllowedError;
 use MAChitgarha\LimeSurveyRestApi\Error\PathNotFoundError;
-use MAChitgarha\LimeSurveyRestApi\Error\QuestionTypeMismatchError;
 use MAChitgarha\LimeSurveyRestApi\Error\TypeMismatchError;
 use MAChitgarha\LimeSurveyRestApi\Error\UnsupportedMediaTypeError;
-
-use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
@@ -44,8 +35,6 @@ use Respect\Validation\Exceptions\ValidationException;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-
-use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\{error, errors};
 
@@ -77,7 +66,7 @@ class JsonErrorResponseGenerator
         }
         elseif ($throwable instanceof MethodNotAllowedException) {
             $error = new MethodNotAllowedError();
-            $extraHeaders[] = ['Allow' => \implode(', ', $throwable->getAllowedMethods())];
+            $extraHeaders['Allow'] = \implode(', ', $throwable->getAllowedMethods());
         }
         elseif ($throwable instanceof InvalidBody) {
             $error = self::convertInvalidBodyToError($throwable);
@@ -97,8 +86,7 @@ class JsonErrorResponseGenerator
         elseif ($throwable instanceof ValidationException) {
             $error = self::convertValidationExceptionToError($throwable);
         }
-        // For the sake of being similar to try/catch blocks
-        elseif ($throwable instanceof Throwable) {
+        else /* if ($throwable instanceof Throwable) */ {
             $error = $this->makeInternalServerError($throwable);
         }
 

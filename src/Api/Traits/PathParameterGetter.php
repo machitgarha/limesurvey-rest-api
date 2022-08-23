@@ -2,10 +2,7 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Api\Traits;
 
-use Closure;
 use RuntimeException;
-
-use MAChitgarha\LimeSurveyRestApi\Error\InvalidPathParameterError;
 
 use Symfony\Component\HttpFoundation\Request;
 

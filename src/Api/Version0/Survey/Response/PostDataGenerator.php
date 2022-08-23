@@ -3,8 +3,6 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 
 use Survey;
-use Question;
-use RuntimeException;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\RecordGenerator\AnswerGenerator;
 
@@ -108,8 +106,6 @@ use Generator;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FieldNameGenerator;
 
-use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
-
 use MAChitgarha\LimeSurveyRestApi\Helper\ResponseGeneratorHelper;
 
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -172,7 +168,7 @@ class AnswerGenerator
         ],
     ];
 
-    /** @var array[] */
+    /** @var string[] */
     private $questionTypeToMethodMapping;
 
     /** @var array */
@@ -289,8 +285,8 @@ class AnswerGenerator
             $fieldNameBase,
             $question,
             function (string $fieldName, ?string $subAnswer): Generator {
-                yield "$subQuestionFieldName#0" => $subAnswer[0] ?? '';
-                yield "$subQuestionFieldName#1" => $subAnswer[1] ?? '';
+                yield "$fieldName#0" => $subAnswer[0] ?? '';
+                yield "$fieldName#1" => $subAnswer[1] ?? '';
             }
         );
     }

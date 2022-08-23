@@ -4,8 +4,6 @@ namespace MAChitgarha\LimeSurveyRestApi\Api;
 
 use MAChitgarha\LimeSurveyRestApi\Authorization\Authorizer;
 
-use MAChitgarha\LimeSurveyRestApi\Routing\PathInfo;
-
 use MAChitgarha\LimeSurveyRestApi\Validation\RequestValidator;
 
 use Symfony\Component\HttpFoundation\Request;
