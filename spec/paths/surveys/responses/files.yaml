@@ -1,0 +1,44 @@
+post:
+  summary: Upload a new file as a response answer
+  parameters:
+    - $ref: "../../../components/parameters.yaml#/survey_id"
+    - $ref: "../../../components/parameters.yaml#/response_id"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              properties:
+                question_id:
+                  $ref: "../../../components/schemas/question.yaml#/question_id"
+                contents:
+                  $ref: "../../../components/schemas/response.yaml#/file_contents"
+  responses:
+    "201":
+      description: Created
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: object
+                required: [tmp_filename]
+                properties:
+                  tmp_filename:
+                    $ref: "../../../components/schemas/response.yaml#/file_tmp_name"
+    "400":
+      $ref: "../../../components/responses.yaml#/bad_request"
+    "401":
+      $ref: "../../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../../components/responses.yaml#/permission_denied"
+    "409":
+      $ref: "../../../components/responses.yaml#/survey_unaccessible"
+    # TODO: Add maintenance error

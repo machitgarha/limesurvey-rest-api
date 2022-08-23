@@ -163,14 +163,16 @@ answer_file:
   items:
     type: object
     required:
+      - id
       - title
       - comment
       - size
       - name
-      - filename
+      - tmp_name
       - extension
       - uri
     properties:
+      # TODO: Maybe add ID?
       title:
         type: string
         description: User-entered file title
@@ -181,18 +183,17 @@ answer_file:
         format: double
       name:
         type: string
-        description: The actual name of the file (i.e. just before upload)
-      filename:
-        type: string
-        description: The name of the temporary file located on the server (from file creation endpoint)
+        description: The client name of the file (i.e. just before upload)
+      tmp_name:
         writeOnly: true
+        type: string
       extension:
         type: string
         description: File extension (e.g. PNG)
       uri:
+        readOnly: true
         type: string
         description: The relative URI to retrieve the file contents
-        readOnly: true
 
 answer_list:
   type: object
@@ -364,6 +365,14 @@ unanswered:
   minLength: 0
   maxLength: 0
   description: If question (i.e. parent question of the current subquestion) is *not* mandatory, giving a null value means the question was leaved unanswered
+
+file_id:
+  type: string
+  description: File ID
+
+file_tmp_name:
+  type: string
+  description: Temporary name of the uploaded file (via file creation endpoint). The difference between this and file ID is that the later is permanent
 
 file_contents:
   type: string

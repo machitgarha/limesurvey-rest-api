@@ -252,13 +252,15 @@ class AnswerValidatorBuilder
 
     private function buildForFile(): Validator
     {
-        return v::keySet(
-            v::key('title', v::stringType()),
-            v::key('comment', v::stringType()),
-            v::key('size', v::floatType()),
-            v::key('name', v::stringType()),
-            v::key('filename', v::base64()),
-            v::key('extension', v::stringType())
+        return v::each(
+            v::keySet(
+                v::key('title', v::stringType()),
+                v::key('comment', v::stringType()),
+                v::key('size', v::floatVal()),
+                v::key('name', v::stringType()),
+                v::key('tmp_name', v::stringType()),
+                v::key('extension', v::stringType())
+            )
         );
     }
 

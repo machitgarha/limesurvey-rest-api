@@ -61,7 +61,9 @@ class FileController implements Controller
     use Traits\RequestGetter;
     use Traits\SerializerGetter;
     use Traits\RequestBodyDecoder;
+    use Traits\RequestValidator;
 
+    public const PATH = '/surveys/{survey_id}/responses/{response_id}/files';
     public const PATH_BY_ID = '/surveys/{survey_id}/responses/{response_id}/files/{file_id}';
 
     public static function makeRelativePath(int $surveyId, int $responseId, string $fileId): string
@@ -73,9 +75,9 @@ class FileController implements Controller
         );
     }
 
-    public function get()
+    public function get(): JsonResponse
     {
-        ContentTypeValidator::validateIsJson($this->getRequest());
+        $this->validateRequest();
 
         $userId = $this->authorize()->getId();
 
@@ -84,7 +86,7 @@ class FileController implements Controller
             'response_id',
         );
 
-        $filename = $this->getFileIdPathParameter();
+        $fileId = $this->getFileIdPathParameter();
 
         $survey = SurveyController::get($surveyId);
 
@@ -97,9 +99,9 @@ class FileController implements Controller
 
         $response = ResponseController::getResponse($surveyId, $responseId);
 
-        self::assertFileExistsInResponse($response, $filename);
+        self::assertFileExistsInResponse($response, $fileId);
 
-        $filePath = self::getFileAbsolutePath($surveyId, $filename);
+        $filePath = self::getFileAbsolutePath($surveyId, $fileId);
         self::assertFileExistsAndReadable($filePath);
 
         return new JsonResponse(
@@ -122,25 +124,23 @@ class FileController implements Controller
         return $param;
     }
 
-    private static function assertFileExistsInResponse(
-        SurveyResponse $response,
-        string $filename
-    ): void {
+    private static function assertFileExistsInResponse(SurveyResponse $response, string $fileId): void
+    {
         foreach ($response->getFiles() as $fileInfo) {
-            if ($fileInfo['filename'] === $filename) {
+            if ($fileInfo['filename'] === $fileId) {
                 return;
             }
         }
 
-        throw new ResourceIdNotFoundError('file', $filename);
+        throw new ResourceIdNotFoundError('file', $fileId);
     }
 
-    private static function getFileAbsolutePath(int $surveyId, string $filename): string
+    private static function getFileAbsolutePath(int $surveyId, string $fileId): string
     {
         App()->loadHelper('common');
 
         return get_absolute_path(
-            App()->getConfig('uploaddir') . "/surveys/$surveyId/files/$filename"
+            App()->getConfig('uploaddir') . "/surveys/$surveyId/files/$fileId"
         );
     }
 

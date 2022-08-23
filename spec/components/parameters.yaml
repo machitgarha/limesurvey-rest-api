@@ -5,6 +5,13 @@ answer_id:
   schema:
     $ref: "./schemas/answer.yaml#/answer_id"
 
+file_id:
+  name: file_id
+  in: path
+  required: true
+  schema:
+    $ref: "./schemas/response.yaml#/file_id"
+
 question_id:
   name: question_id
   in: path
