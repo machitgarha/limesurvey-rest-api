@@ -163,7 +163,6 @@ answer_file:
   items:
     type: object
     required:
-      - id
       - title
       - comment
       - size
@@ -181,15 +180,20 @@ answer_file:
       size:
         type: number
         format: double
+        description: The size of the file in KiloBytes
+        minimum: 1
       name:
         type: string
         description: The client name of the file (i.e. just before upload)
+        minLength: 1
       tmp_name:
         writeOnly: true
         type: string
+        minLength: 1
       extension:
         type: string
         description: File extension (e.g. PNG)
+        minLength: 1
       uri:
         readOnly: true
         type: string
@@ -369,6 +373,7 @@ unanswered:
 file_id:
   type: string
   description: File ID
+  pattern: '^[a-zA-Z0-9_]+$'
 
 file_tmp_name:
   type: string
