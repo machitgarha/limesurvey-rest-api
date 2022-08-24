@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "07368fffc3d35355fcd0ae01e2d3ba6f",
+    "content-hash": "141a3ca2fc48c29013ac4ca5245c37e9",
     "packages": [
         {
             "name": "cebe/php-openapi",
@@ -2628,16 +2628,16 @@
         },
         {
             "name": "phan/phan",
-            "version": "5.3.2",
+            "version": "5.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phan/phan.git",
-                "reference": "b7697eb811e912c038f709f8e1c4911c7ada3edc"
+                "reference": "d37335833cee86e06c0e16789cc86a86bd272ab8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phan/phan/zipball/b7697eb811e912c038f709f8e1c4911c7ada3edc",
-                "reference": "b7697eb811e912c038f709f8e1c4911c7ada3edc",
+                "url": "https://api.github.com/repos/phan/phan/zipball/d37335833cee86e06c0e16789cc86a86bd272ab8",
+                "reference": "d37335833cee86e06c0e16789cc86a86bd272ab8",
                 "shasum": ""
             },
             "require": {
@@ -2701,9 +2701,9 @@
             ],
             "support": {
                 "issues": "https://github.com/phan/phan/issues",
-                "source": "https://github.com/phan/phan/tree/5.3.2"
+                "source": "https://github.com/phan/phan/tree/5.4.0"
             },
-            "time": "2022-02-01T00:17:36+00:00"
+            "time": "2022-08-08T23:57:02+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -3283,16 +3283,16 @@
         },
         {
             "name": "tysonandre/var_representation_polyfill",
-            "version": "0.1.1",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TysonAndre/var_representation_polyfill.git",
-                "reference": "0a942e74e18af5514749895507bc6ca7ab96399a"
+                "reference": "e925b7b0806b39f26aa899202ee065decbabafdb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TysonAndre/var_representation_polyfill/zipball/0a942e74e18af5514749895507bc6ca7ab96399a",
-                "reference": "0a942e74e18af5514749895507bc6ca7ab96399a",
+                "url": "https://api.github.com/repos/TysonAndre/var_representation_polyfill/zipball/e925b7b0806b39f26aa899202ee065decbabafdb",
+                "reference": "e925b7b0806b39f26aa899202ee065decbabafdb",
                 "shasum": ""
             },
             "require": {
@@ -3300,7 +3300,7 @@
                 "php": "^7.2.0|^8.0.0"
             },
             "require-dev": {
-                "phan/phan": "^4.0",
+                "phan/phan": "^5.1",
                 "phpunit/phpunit": "^8.5.0"
             },
             "suggest": {
@@ -3331,9 +3331,9 @@
             ],
             "support": {
                 "issues": "https://github.com/TysonAndre/var_representation_polyfill/issues",
-                "source": "https://github.com/TysonAndre/var_representation_polyfill/tree/0.1.1"
+                "source": "https://github.com/TysonAndre/var_representation_polyfill/tree/0.1.2"
             },
-            "time": "2021-08-16T00:12:50+00:00"
+            "time": "2022-08-11T12:33:19+00:00"
         }
     ],
     "aliases": [],

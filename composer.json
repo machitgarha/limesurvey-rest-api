@@ -12,18 +12,18 @@
     "require": {
         "php": "^7.2.5|^8.0",
         "symfony/polyfill-php80": "^1.26",
-        "symfony/routing": "^5.4|^6.0",
-        "symfony/http-foundation": "^5.4|^6.0",
+        "symfony/routing": "^5.4.11|^6.0",
+        "symfony/http-foundation": "^5.4.11|^6.0",
         "respect/validation": "^2.0.17",
-        "symfony/serializer": "^5.4|^6.0",
+        "symfony/serializer": "^5.4.11|^6.0",
         "league/openapi-psr7-validator": "^0.18.0",
-        "symfony/psr-http-message-bridge": "^2.1",
-        "nyholm/psr7": "^1.5",
-        "symfony/cache": "^5.4"
+        "symfony/psr-http-message-bridge": "^2.1.2",
+        "nyholm/psr7": "^1.5.1",
+        "symfony/cache": "^5.4.11"
     },
     "require-dev": {
-        "cebe/php-openapi": "^1.0",
-        "phan/phan": "^5.3"
+        "cebe/php-openapi": "^1.7",
+        "phan/phan": "^5.3.2"
     },
     "autoload": {
         "psr-4": {
