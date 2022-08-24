@@ -16,6 +16,8 @@ use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Authorization\BearerTokenAuthorizer;
 
+use MAChitgarha\LimeSurveyRestApi\Error\DebugError;
+
 use MAChitgarha\LimeSurveyRestApi\Routing\PathInfo;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
@@ -29,6 +31,7 @@ use MAChitgarha\LimeSurveyRestApi\Validation\ResponseValidator;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
@@ -105,9 +108,13 @@ class Plugin extends PluginBase
             $response = (new JsonErrorResponseGenerator($this))->generate($error);
         }
 
-        assert($this->isResponseValid(
-            new ResponseValidator($response, new PathInfo($pathInfoValue), $validatorBuilder, $request->getMethod())
-        ));
+        try {
+            if (Config::DEBUG_MODE === DebugMode::FULL) {
+                $this->assertIsResponseValid($response, $pathInfoValue, $validatorBuilder, $request);
+            }
+        } catch (DebugError $error) {
+            $response = (new JsonErrorResponseGenerator($this))->generate($error);
+        }
 
         $this->removeUnnecessaryHeaders();
 
@@ -140,15 +147,24 @@ class Plugin extends PluginBase
             ->setContainer($container);
     }
 
-    private function isResponseValid(ResponseValidator $responseValidator): bool
-    {
+    private function assertIsResponseValid(
+        Response $response,
+        string $pathInfoValue,
+        ValidatorBuilder $validatorBuilder,
+        Request $request
+    ): void {
         try {
-            $responseValidator->validate();
+            (new ResponseValidator(
+                $response,
+                new PathInfo($pathInfoValue),
+                $validatorBuilder,
+                $request->getMethod()
+            ))->validate(
+            );
         } catch (Throwable $throwable) {
             $this->logThrowable($throwable);
-            return false;
+            throw DebugError::buildInvalidResponse($response);
         }
-        return true;
     }
 
     public function logThrowable(Throwable $error): void
