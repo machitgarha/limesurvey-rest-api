@@ -76,7 +76,7 @@ class SurveyController implements Controller
         return [
             'id' => $survey->sid,
             'is_active' => $survey->active !== 'N',
-            'creation_time' => \strtotime($survey->datecreated),
+            'creation_time' => $survey->datecreated,
             'owner_id' => $survey->owner_id,
             'l10n' => [
                 'title' => $survey->languagesettings[$survey->language]->surveyls_title ?? ''

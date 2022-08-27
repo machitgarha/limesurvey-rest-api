@@ -17,8 +17,9 @@ survey_list_item:
       type: boolean
       description: Whether the survey is active or not
     creation_time:
-      type: integer
-      description: Creation time in Unix time format
+      allOf:
+        - ref: "./types.yaml#/date_time"
+        - description: The time where survey is created 
     owner_id:
       type: integer
       description: Owner user ID
