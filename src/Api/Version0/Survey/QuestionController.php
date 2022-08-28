@@ -9,6 +9,7 @@ use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
+use MAChitgarha\LimeSurveyRestApi\Error\InvalidPathParameterError;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\SurveyHelper;
@@ -45,7 +46,7 @@ class QuestionController implements Controller
 
         // TODO: Add support for multilingual
         $language = $survey->language;
-        $questionList = $survey->allQuestions;
+        $questionList = $survey->baseQuestions;
 
         $data = [];
         foreach ($questionList as $question) {
@@ -81,7 +82,11 @@ class QuestionController implements Controller
             throw new ResourceIdNotFoundError('question', $questionId);
         }
 
-        // TODO: Ignore parent_qid !== 0
+        if ($question->parent_qid !== 0) {
+            throw new InvalidPathParameterError(
+                'Only base questions can be retrieved, and subquestions can be accessed via their parent questions'
+            );
+        }
 
         return new JsonResponse(
             data(
