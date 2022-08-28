@@ -68,24 +68,37 @@ question:
 
     subquestions:
       type: array
+      description: A null value means not applicable regarding question type (e.g. L (List) question type)
       nullable: true
-        items:
-          type: object
-          properties:
-            code:
-              $ref: "#/code"
-            relevance:
-              $ref: "#/relevance"
-            scale:
-              type: integer
-              summary: The dimension of the subquestion
-              minimum: 0
-              maximum: 1
-            l10n:
-              type: object
-              properties:
-                text:
-                  type: string
+      minItems: 1
+      items:
+        type: object
+        properties:
+          code:
+            $ref: "#/code"
+          relevance:
+            $ref: "#/relevance"
+          scale:
+            type: integer
+            minimum: 0
+            maximum: 1
+          l10n:
+            type: object
+            properties:
+              text:
+                type: string
+
+    answers:
+      type: array
+      description: A null value means not applicable regarding question type (e.g. A (Array 5 point choice) question type)
+      nullable: true
+      items:
+        $ref: "#/answer"
+
+question_list:
+  type: array
+  items:
+    $ref: "#/question"
 
 question_id:
   $ref: "#/id"
@@ -167,8 +180,27 @@ type:
     :: Array numbers
     ;: Array text
 
+answer:
+  type: object
+  properties:
+    code:
+      $ref: "#/answer_code"
+    order:
+      type: integer
+      description: Answer sort order
+    scale:
+      type: integer
+      minimum: 0
+      maximum: 1
+    l10n:
+      type: object
+      properties:
+        text:
+          type: string
+          description: The answer text
 
-question_list:
-  type: array
-  items:
-    $ref: "#/question"
+answer_code:
+  type: string
+  description: The answer code
+  minLength: 1
+  maxLength: 5

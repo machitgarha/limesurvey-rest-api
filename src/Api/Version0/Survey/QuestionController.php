@@ -119,7 +119,9 @@ class QuestionController implements Controller
 
             'attributes' => self::makeQuestionAttributeData($question, $language),
 
-            'subquestions' => self::makeSubQuestionsData($question, $language)
+            'subquestions' => self::makeSubQuestionsData($question, $language),
+
+            'answers' => self::makeAnswersData($question, $language)
         ];
     }
 
@@ -136,9 +138,13 @@ class QuestionController implements Controller
         return $result;
     }
 
-    private static function makeSubQuestionsData(Question $question, string $language): array
+    private static function makeSubQuestionsData(Question $question, string $language): ?array
     {
         $result = [];
+
+        if (empty($question->subquestions)) {
+            return null;
+        }
 
         foreach ($question->subquestions as $subQuestion) {
             $result[] = [
@@ -148,6 +154,28 @@ class QuestionController implements Controller
                 'l10n' => [
                     'text' => $subQuestion->questionl10ns[$language]->question,
                 ],
+            ];
+        }
+
+        return $result;
+    }
+
+    private static function makeAnswersData(Question $question, string $language): ?array
+    {
+        $result = [];
+
+        if (empty($question->answers)) {
+            return null;
+        }
+
+        foreach ($question->answers as $answer) {
+            $result[] = [
+                'code' => $answer->code,
+                'order' => $answer->sortorder,
+                'scale' => $answer->scale_id,
+                'l10n' => [
+                    'text' => $answer->answerl10ns[$language]->answer,
+                ]
             ];
         }
 
