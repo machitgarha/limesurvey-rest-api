@@ -95,7 +95,7 @@ class BearerTokenController implements Controller
         UserIdentity $identity,
         string $username,
         string $password,
-        string $authPlugin,
+        string $authPlugin
     ): void {
         $event = new PluginEvent('remoteControlLogin');
         $event->set('identity', $identity);
