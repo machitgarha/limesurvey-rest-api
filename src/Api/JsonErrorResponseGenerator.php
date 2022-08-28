@@ -50,9 +50,9 @@ class JsonErrorResponseGenerator
         $this->plugin = $plugin;
     }
 
-    public function generate(Throwable $throwable): JsonResponse
+    public function generate(Throwable $throwable, bool $toLog = true): JsonResponse
     {
-        if (!$throwable instanceof DebugError) {
+        if ($toLog) {
             $this->plugin->logThrowable($throwable);
         }
 

@@ -113,7 +113,7 @@ class Plugin extends PluginBase
                 $this->assertIsResponseValid($response, $pathInfoValue, $validatorBuilder, $request);
             }
         } catch (DebugError $error) {
-            $response = (new JsonErrorResponseGenerator($this))->generate($error);
+            $response = (new JsonErrorResponseGenerator($this))->generate($error, false);
         }
 
         $this->removeUnnecessaryHeaders();
@@ -159,8 +159,7 @@ class Plugin extends PluginBase
                 new PathInfo($pathInfoValue),
                 $validatorBuilder,
                 $request->getMethod()
-            ))->validate(
-            );
+            ))->validate();
         } catch (Throwable $throwable) {
             $this->logThrowable($throwable);
             throw DebugError::buildInvalidResponse($response);
