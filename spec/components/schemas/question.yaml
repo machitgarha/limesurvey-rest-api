@@ -69,3 +69,8 @@ question_l10n:
       description: 'Question script to be executed on runtime'
     language:
       type: string
+
+question_list:
+  type: array
+  items:
+    $ref: "#/question"

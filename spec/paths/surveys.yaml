@@ -10,9 +10,7 @@ get:
             required: [data]
             properties:
               data:
-                type: array
-                items:
-                  $ref: "../components/schemas/survey.yaml#/survey_list_item"
+                $ref: "../components/schemas/survey.yaml#/survey"
     "401":
       $ref: "../components/responses.yaml#/unauthorized"
     "403":

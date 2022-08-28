@@ -12,9 +12,7 @@ get:
             required: [data]
             properties:
               data:
-                type: array
-                items:
-                  $ref: "../../components/schemas/question.yaml#/question"
+                $ref: "../../components/schemas/question.yaml#/question_list"
     "401":
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":

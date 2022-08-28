@@ -1,14 +1,9 @@
 survey:
-  allOf:
-    - $ref: "#/survey_list_item"
-
-survey_list_item:
   type: object
   required:
     - id
     - is_active
     - creation_time
-    - owner_id
     - l10n
   properties:
     id:
@@ -19,10 +14,7 @@ survey_list_item:
     creation_time:
       allOf:
         - ref: "./types.yaml#/date_time"
-        - description: The time where survey is created 
-    owner_id:
-      type: integer
-      description: Owner user ID
+        - description: The time where survey is created
     l10n:
       type: object
       required:
@@ -34,6 +26,11 @@ survey_list_item:
 
 survey_id:
   type: integer
+
+survey_list:
+  type: array
+  items:
+    $ref: "#/survey"
 
 survey_language_setting:
   type: object
