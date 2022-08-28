@@ -153,7 +153,7 @@ answer_ranking:
   type: array
   description: The answers (i.e. choices) sorted by their rankings. Specific to Ranking question types. If a choice is not ranked, then it must be excluded
   items:
-    $ref: "./answer.yaml#/answer_code"
+    $ref: "./question.yaml#/answer_code"
 
 answer_file:
   type: array
@@ -214,7 +214,7 @@ answer_list:
   properties:
     value:
       anyOf:
-        - $ref: "./answer.yaml#/answer_code"
+        - $ref: "./question.yaml#/answer_code"
         - type: string
           nullable: true
           description: The text value of the other option. It must *not* be null if question's Other option is mandatory
@@ -230,7 +230,7 @@ answer_list_with_comment:
     - code
   properties:
     code:
-      $ref: "./answer.yaml#/answer_code"
+      $ref: "./question.yaml#/answer_code"
     comment:
       type: string
       nullable: true
@@ -304,7 +304,7 @@ answer_item_multiple_short_free_texts:
 answer_item_array_answer_code:
   allOf:
     - description: The answer code; specific to 'Array (using flexible labels)' and 'Array, column' question types
-    - $ref: "./answer.yaml#/answer_code"
+    - $ref: "./question.yaml#/answer_code"
 
 answer_item_array_dual:
   type: array
@@ -314,7 +314,7 @@ answer_item_array_dual:
   items:
     oneOf:
       - $ref: "#/unanswered"
-      - $ref: "./answer.yaml#/answer_code"
+      - $ref: "./question.yaml#/answer_code"
 
 answer_item_multiple_choice:
   type: object

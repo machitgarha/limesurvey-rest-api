@@ -24,7 +24,6 @@ question:
       properties:
         text:
           type: string
-          # TODO: Convert all these across the spec to summary
           description: Question text
         help:
           type: string
@@ -51,8 +50,9 @@ question:
       $ref: "#/relevance"
     theme_name:
       type: string
-      summary: Theme name of the question; specifies how the question is displayed
       description: |
+        Theme name of the question; specifies how the question is displayed.
+
         For example, if the question type is M (Multiple choice), the difference between 'bootstrap_buttons_multi' and 'multiplechoice' theme names is that the former is shown as normal buttons, but the later as radio buttons.
     type:
       $ref: "#/type"
@@ -63,7 +63,7 @@ question:
 
     attributes:
       type: object
-      summary: Attributes specific to the question (i.e. based on question type). Mapping of attribute names to their values
+      description: Attributes specific to the question (i.e. based on question type). Mapping of attribute names to their values
       additionalProperties: {}
 
     subquestions:
@@ -115,7 +115,7 @@ code:
 
 relevance:
   type: string
-  summary: The expression evaluated to determine whether the (sub)question must be displayed or not
+  description: The expression evaluated to determine whether the (sub)question must be displayed or not
 
 type:
   type: string
@@ -144,11 +144,11 @@ type:
     - U
     - X
     - Y
-    - !
-    - |
-    - *
-    - :
-    - ;
+    - '!'
+    - '|'
+    - '*'
+    - ':'
+    - ';'
   description: |
     1: Array dual
     5: 5 Point choice

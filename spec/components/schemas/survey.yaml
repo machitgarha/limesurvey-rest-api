@@ -54,11 +54,13 @@ survey:
     creation_time:
       $ref: "./types.yaml#/date_time"
     start_time:
-      - $ref: "./types.yaml#/date_time"
-      - nullable: true
+      allOf:
+        - $ref: "./types.yaml#/date_time"
+        - nullable: true
     expiry_time:
-      - $ref: "./types.yaml#/date_time"
-      - nullable: true
+      allOf:
+        - $ref: "./types.yaml#/date_time"
+        - nullable: true
 
     format:
       type: string
@@ -66,7 +68,7 @@ survey:
         - A
         - G
         - S
-        description: |
+      description: |
         - A: All in one
         - G: Group by group
         - S: Question by question
@@ -76,16 +78,16 @@ survey:
       description: Whether the survey is activated
     is_backward_navigation_allowed:
       type: boolean
-      summary: Whether backwards navigation is allowed
+      description: Whether backwards navigation is allowed
     is_datestamps_stored:
       type: boolean
-      summary: Whether to store datestamps (i.e. the start and end time) for each response
+      description: Whether to store datestamps (i.e. the start and end time) for each response
     is_ip_address_stored:
       type: boolean
-      summary: Whether to store IP address for each response
+      description: Whether to store IP address for each response
     is_timings_stored:
       type: boolean
-      summary: Whether to store the time spent on each page for each response
+      description: Whether to store the time spent on each page for each response
     is_progress_shown:
       type: boolean
     is_welcome_message_shown:
