@@ -1,26 +1,36 @@
 question_group:
   type: object
+  required:
+    - id
+    - order
+    - randomization_id
+    - relevance
+    - l10n
   properties:
     id:
       $ref: "#/question_group_id"
-    survey_id:
-      $ref: "./survey.yaml#/survey_id"
+    order:
+      type: integer
+    randomization_id:
+      type: string
+    relevance:
+      type: string
+    l10n:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
 
 question_group_id:
   type: integer
   description: Question group ID
 
-question_group_l10n:
-  type: object
-  properties:
-    id:
-      type: integer
-    group_id:
-      type: integer
-    group_name:
-      type: string
-      description: 'QuestionGroup display text. The actual question.'
-    description:
-      type: string
-    language:
-      type: string
+question_group_list:
+  type: array
+  items:
+    type: object
+
+    # $ref: "#/question_group"

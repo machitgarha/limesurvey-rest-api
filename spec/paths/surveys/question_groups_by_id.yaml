@@ -9,7 +9,11 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../../components/schemas/question_group.yaml#/question_group"
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: "../../components/schemas/question_group.yaml#/question_group"
     "401":
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":
