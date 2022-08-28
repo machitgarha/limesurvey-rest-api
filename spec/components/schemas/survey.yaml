@@ -3,6 +3,7 @@ survey:
   required:
     - id
     - group_id
+    - l10n
     - creation_time
     - start_time
     - expiry_time
@@ -15,13 +16,40 @@ survey:
     - is_progress_shown
     - is_welcome_message_shown
     - navigation_delay
-    - l10n
   properties:
     id:
       $ref: "#/survey_id"
     group_id:
       type: integer
       description: Survey group ID, from which this survey belongs to
+
+    l10n:
+      type: object
+      required:
+        - title
+        - description
+        - welcome_message
+        - end_message
+        - end_url
+        - end_url_title
+      description: Localized texts
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+
+        welcome_message:
+          type: string
+        end_message:
+          type: string
+          description: The text to be shown at the end of survey
+        end_url:
+          type: string
+          description: The URL to be shown at the end of survey
+        end_url_title:
+          type: string
+          description: The title of the end_url
 
     creation_time:
       $ref: "./types.yaml#/date_time"
@@ -65,34 +93,6 @@ survey:
 
     navigation_delay:
       type: integer
-
-    l10n:
-      type: object
-      required:
-        - title
-        - description
-        - welcome_message
-        - end_message
-        - end_url
-        - end_url_title
-      description: Localized texts
-      properties:
-        title:
-          type: string
-        description:
-          type: string
-
-        welcome_message:
-          type: string
-        end_message:
-          type: string
-          description: The text to be shown at the end of survey
-        end_url:
-          type: string
-          description: The URL to be shown at the end of survey
-        end_url_title:
-          type: string
-          description: The title of the end_url
 
 survey_id:
   type: integer

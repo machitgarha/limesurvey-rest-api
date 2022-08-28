@@ -103,7 +103,7 @@ class QuestionController implements Controller
             'group_id' => $question->gid,
 
             'l10n' => [
-                'question' => $l10n->question,
+                'text' => $l10n->question,
                 'help' => $l10n->help,
             ],
 
@@ -118,22 +118,37 @@ class QuestionController implements Controller
             'validation_pattern' => $question->preg,
 
             'attributes' => self::makeQuestionAttributeData($question, $language),
+
+            'subquestions' => self::makeSubQuestionsData($question, $language)
         ];
     }
 
     private static function makeQuestionAttributeData(Question $question, string $language): array
     {
-        $questionAttributeList = QuestionAttribute::model()->findAll(
-            'qid = :question_id',
-            ['question_id' => $question->qid]
-        );
-
         $result = [];
 
         foreach ($question->questionattributes as $questionAttribute) {
             if (\in_array($questionAttribute->language, ['', $language])) {
                 $result[$questionAttribute->attribute] = $questionAttribute->value;
             }
+        }
+
+        return $result;
+    }
+
+    private static function makeSubQuestionsData(Question $question, string $language): array
+    {
+        $result = [];
+
+        foreach ($question->subquestions as $subQuestion) {
+            $result[] = [
+                'code' => $subQuestion->title,
+                'relevance' => $subQuestion->relevance,
+                'scale' => $subQuestion->scale_id,
+                'l10n' => [
+                    'text' => $subQuestion->questionl10ns[$language]->question,
+                ],
+            ];
         }
 
         return $result;
