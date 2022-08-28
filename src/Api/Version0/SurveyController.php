@@ -84,6 +84,16 @@ class SurveyController implements Controller
             'id' => $surveyInfo['sid'],
             'group_id' => $surveyInfo['gsid'],
 
+            'l10n' => [
+                'title' => $surveyInfo['surveyls_title'],
+                'description' => $surveyInfo['surveyls_description'],
+
+                'welcome_message' => $surveyInfo['surveyls_welcometext'],
+                'end_message' => $surveyInfo['surveyls_endtext'],
+                'end_url' => $surveyInfo['surveyls_url'],
+                'end_url_title' => $surveyInfo['surveyls_urldescription'],
+            ],
+
             'creation_time' => $surveyInfo['datecreated'],
             'start_time' => $surveyInfo['startdate'],
             'expiry_time' => $surveyInfo['expires'],
@@ -98,16 +108,6 @@ class SurveyController implements Controller
             'is_welcome_message_shown' => $surveyInfo['showwelcome'] === 'Y',
 
             'navigation_delay' => $surveyInfo['navigationdelay'],
-
-            'l10n' => [
-                'title' => $surveyInfo['surveyls_title'],
-                'description' => $surveyInfo['surveyls_description'],
-
-                'welcome_message' => $surveyInfo['surveyls_welcometext'],
-                'end_message' => $surveyInfo['surveyls_endtext'],
-                'end_url' => $surveyInfo['surveyls_url'],
-                'end_url_title' => $surveyInfo['surveyls_urldescription'],
-            ],
         ];
     }
 }
