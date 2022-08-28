@@ -3,6 +3,7 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey;
 
 use Question;
+use QuestionAttribute;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
@@ -80,6 +81,8 @@ class QuestionController implements Controller
             throw new ResourceIdNotFoundError('question', $questionId);
         }
 
+        // TODO: Ignore parent_qid !== 0
+
         return new JsonResponse(
             data(
                 self::makeQuestionData($question, $survey->language)
@@ -93,14 +96,41 @@ class QuestionController implements Controller
         return [
             'id' => $question->qid,
             'group_id' => $question->gid,
-            'type' => $question->type,
-            'mandatory' => $question->mandatory,
-            'code' => $question->title,
-            'order_in_group' => $question->question_order,
+
             'l10n' => [
                 'question' => $l10n->question,
                 'help' => $l10n->help,
             ],
+
+            'type' => $question->type,
+
+            'code' => $question->title,
+            'is_other_enabled' => $question->other,
+            'mandatory' => $question->mandatory,
+            'order' => $question->question_order,
+            'relevance' => $question->relevance,
+            'theme_name' => $question->getQuestionTheme()->name,
+            'validation_pattern' => $question->preg,
+
+            'attributes' => self::makeQuestionAttributeData($question, $language),
         ];
+    }
+
+    private static function makeQuestionAttributeData(Question $question, string $language): array
+    {
+        $questionAttributeList = QuestionAttribute::model()->findAll(
+            'qid = :question_id',
+            ['question_id' => $question->qid]
+        );
+
+        $result = [];
+
+        foreach ($question->questionattributes as $questionAttribute) {
+            if (\in_array($questionAttribute->language, ['', $language])) {
+                $result[$questionAttribute->attribute] = $questionAttribute->value;
+            }
+        }
+
+        return $result;
     }
 }

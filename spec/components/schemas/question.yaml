@@ -5,25 +5,8 @@ question:
       $ref: "#/question_id"
     group_id:
       type: integer
-      description: Question group ID where question is displayed
-    type:
-      type: string
-      description: Question type
-    mandatory:
-      type: string
-      description: Y means mandatory, S means soft, and N means not mandatory
-      minLength: 1
-      maxLength: 1
-      enum:
-        - Y
-        - S
-        - N
-    code:
-      type: string
-      description: The unique code of the question
-    order_in_group:
-      type: integer
-      description: Question order in group
+      description: Question group ID, from which the question belongs to
+
     l10n:
       type: object
       properties:
@@ -32,6 +15,105 @@ question:
           description: Question text
         help:
           type: string
+
+    type:
+      type: string
+      enum:
+        - '1'
+        - '5'
+        - A
+        - B
+        - C
+        - D
+        - E
+        - F
+        - G
+        - H
+        - I
+        - K
+        - L
+        - M
+        - N
+        - O
+        - P
+        - Q
+        - R
+        - S
+        - T
+        - U
+        - X
+        - Y
+        - !
+        - |
+        - *
+        - :
+        - ;
+      description: |
+        1: Array dual
+        5: 5 Point choice
+        A: Array 5 point choice
+        B: Array 10 point choice
+        C: Array yes/uncertain/no
+        D: Date
+        E: Array increase/same/decrease
+        F: Array
+        G: Gender
+        H: Array column
+        I: Language
+        K: Multiple numerical
+        L: List
+        M: Multiple choice
+        N: Numerical
+        O: List with comment
+        P: Multiple choice with comments
+        Q: Multiple short text
+        R: Ranking
+        S: Short free text
+        T: Long free text
+        U: Huge free text
+        X: Text display
+        Y: Yes no radio
+        !: List dropdown
+        |: File upload
+        *: Equation
+        :: Array numbers
+        ;: Array text
+
+    code:
+      type: string
+      description: The unique code of the question
+    is_other_enabled:
+      type: boolean
+      description: Whether the other option is enabled (e.g. for dropdown list question type)
+    mandatory:
+      type: string
+      enum:
+        - Y
+        - S
+        - N
+      description: |
+        - Y: Mandatory
+        - S: Soft mandatory
+        - N: Not mandatory
+    order:
+      type: integer
+      description: Question order in group
+    relevance:
+      type: string
+    theme_name:
+      type: string
+      summary: Theme name of the question; specifies how the question is displayed
+      description: |
+        For example, if the question type is M (Multiple choice), the difference between 'bootstrap_buttons_multi' and 'multiplechoice' theme names is that the former is shown as normal buttons, but the later as radio buttons.
+    validation_pattern:
+      type: string
+      nullable: true
+      description: PCRE-formatted regex for input validation
+
+    attributes:
+      type: object
+      summary: Attributes specific to the question (i.e. based on question type). Mapping of attribute names to their values
+      additionalProperties: {}
 
 question_attribute:
   type: object
