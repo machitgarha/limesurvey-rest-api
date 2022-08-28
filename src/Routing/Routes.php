@@ -44,6 +44,16 @@ class Routes
         ],
 
         [
+            'name' => V0\Survey\QuestionGroupController::class . '.list',
+            'path' => V0\Survey\QuestionGroupController::PATH,
+            'http_method' => HttpMethod::GET,
+        ], [
+            'name' => V0\Survey\QuestionGroupController::class . '.get',
+            'path' => V0\Survey\QuestionGroupController::PATH_BY_ID,
+            'http_method' => HttpMethod::GET,
+        ],
+
+        [
             'name' => V0\Survey\ResponseController::class . '.list',
             'path' => V0\Survey\ResponseController::PATH,
             'http_method' => HttpMethod::GET,
