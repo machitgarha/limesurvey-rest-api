@@ -31,6 +31,4 @@ question_group_id:
 question_group_list:
   type: array
   items:
-    type: object
-
-    # $ref: "#/question_group"
+    $ref: "#/question_group"
