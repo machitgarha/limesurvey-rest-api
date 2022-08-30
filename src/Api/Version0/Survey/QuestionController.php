@@ -110,7 +110,7 @@ class QuestionController implements Controller
             'type' => $question->type,
 
             'code' => $question->title,
-            'is_other_enabled' => $question->other,
+            'is_other_enabled' => $question->other === 'Y',
             'mandatory' => $question->mandatory,
             'order' => $question->question_order,
             'relevance' => $question->relevance,
