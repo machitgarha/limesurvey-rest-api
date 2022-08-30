@@ -331,7 +331,7 @@ class CoreSurveyIndexInvoker
 
         Yii::import('application.controllers.survey.index', true);
 
-        $controller = new IndexOutputController();
+        $controller = new IndexOutputController('index');
         \App()->setController($controller);
 
         return new Index($controller, 'index');
