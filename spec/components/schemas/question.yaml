@@ -6,6 +6,7 @@ question:
     - l10n
     - type
     - code
+    - is_hidden
     - is_other_enabled
     - order
     - relevance
@@ -30,6 +31,9 @@ question:
 
     code:
       $ref: "#/code"
+    is_hidden:
+      type: boolean
+      description: Whether the question must be shown
     is_other_enabled:
       type: boolean
       description: Whether the other option is enabled (useful for e.g. dropdown list question type)
@@ -46,6 +50,9 @@ question:
     order:
       type: integer
       description: Question order in group
+    randomization_id:
+      type: string
+      nullable: true
     relevance:
       $ref: "#/relevance"
     theme_name:

@@ -98,6 +98,8 @@ class QuestionController implements Controller
     private static function makeQuestionData(Question $question, string $language): array
     {
         $l10n = $question->questionl10ns[$language];
+        $attributes = self::makeAttributesData($question, $language);
+
         return [
             'id' => $question->qid,
             'group_id' => $question->gid,
@@ -110,28 +112,28 @@ class QuestionController implements Controller
             'type' => $question->type,
 
             'code' => $question->title,
+            'is_hidden' => $attributes['hidden'] == '1',
             'is_other_enabled' => $question->other === 'Y',
             'mandatory' => $question->mandatory,
             'order' => $question->question_order,
+            'randomization_id' => $attributes['random_group'],
             'relevance' => $question->relevance,
             'theme_name' => $question->getQuestionTheme()->name,
             'validation_pattern' => $question->preg,
 
-            'attributes' => self::makeQuestionAttributeData($question, $language),
-
+            'attributes' => $attributes,
             'subquestions' => self::makeSubQuestionsData($question, $language),
-
             'answers' => self::makeAnswersData($question, $language)
         ];
     }
 
-    private static function makeQuestionAttributeData(Question $question, string $language): array
+    private static function makeAttributesData(Question $question, string $language): array
     {
         $result = [];
 
-        foreach ($question->questionattributes as $questionAttribute) {
-            if (\in_array($questionAttribute->language, ['', $language])) {
-                $result[$questionAttribute->attribute] = $questionAttribute->value;
+        foreach ($question->questionattributes as $attribute) {
+            if (\in_array($attribute->language, ['', $language])) {
+                $result[$attribute->attribute] = $attribute->value;
             }
         }
 
