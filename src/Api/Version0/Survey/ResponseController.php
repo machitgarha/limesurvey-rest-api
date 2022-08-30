@@ -394,7 +394,17 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                 break;
 
             case 'em_tip':
-                $this->expressionManagerTips[$questionId][$data['vtip']] = true;
+                $tip = LimeExpressionManager::ProcessString(
+                    $data['vtip'],
+                    $questionId,
+                    null,
+                    1,
+                    1,
+                    false,
+                    false,
+                    true
+                );
+                $this->expressionManagerTips[$questionId][$tip] = true;
                 break;
 
             case 'privacy_datasecurity_notice_label':
@@ -491,18 +501,24 @@ class CustomTwigRenderer extends LSETwigViewRenderer
         );
         $questionIndexInfoList = LimeExpressionManager::GetQuestionIndexInfo();
 
-        foreach ($questionFieldNameList as $questionFieldName) {
-            foreach ($questionIndexInfoList as $questionIndexInfo) {
+        foreach ($questionIndexInfoList as $questionIndexInfo) {
+            foreach ($questionFieldNameList as $questionFieldName) {
                 if (self::isQuestionFieldNameSameAsQuestionId(
                     $questionFieldName,
                     $questionId = (int) $questionIndexInfo['qid']
                 )) {
                     $fn($questionId, $questionIndexInfo);
+
+                    /*
+                     * Prevent from repetitive errors. If a question has
+                     * subquestions, then for each one, the above function
+                     * would be called, and this is undesired.
+                     */
+                    break;
                 }
             }
         }
     }
-
 
     private function handleMandatoryViolations(array $lastMoveResult): void
     {
