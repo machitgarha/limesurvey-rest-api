@@ -8,6 +8,7 @@ question:
     - code
     - is_hidden
     - is_other_enabled
+    - mandatory
     - order
     - relevance
     - theme_name
@@ -99,6 +100,7 @@ question:
       type: array
       description: A null value means not applicable regarding question type (e.g. A (Array 5 point choice) question type)
       nullable: true
+      minItems: 1
       items:
         $ref: "#/answer"
 
