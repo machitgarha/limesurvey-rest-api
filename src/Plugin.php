@@ -24,6 +24,9 @@ use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
 
 use MAChitgarha\LimeSurveyRestApi\Routing\Router;
 
+use MAChitgarha\LimeSurveyRestApi\Utility\DebugOption;
+use MAChitgarha\LimeSurveyRestApi\Utility\LogVerbosity;
+
 use MAChitgarha\LimeSurveyRestApi\Validation\RequestValidator;
 use MAChitgarha\LimeSurveyRestApi\Validation\ValidatorBuilder;
 use MAChitgarha\LimeSurveyRestApi\Validation\ResponseValidator;
@@ -109,7 +112,7 @@ class Plugin extends PluginBase
         }
 
         try {
-            if (Config::getInstance()->getDebugMode() === DebugMode::FULL) {
+            if (Config::getInstance()->hasDebugOption(DebugOption::VALIDATE_RESPONSE)) {
                 $this->assertIsResponseValid($response, $pathInfoValue, $validatorBuilder, $request);
             }
         } catch (DebugError $error) {
@@ -168,7 +171,7 @@ class Plugin extends PluginBase
 
     public function logThrowable(Throwable $error): void
     {
-        $message = (Config::getInstance()->getDebugMode() === DebugMode::FULL)
+        $message = (Config::getInstance()->getLogVerbosity() === LogVerbosity::FULL)
             ? $error->__toString()
             : $error->getMessage();
 

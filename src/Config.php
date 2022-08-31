@@ -5,6 +5,7 @@ namespace MAChitgarha\LimeSurveyRestApi;
 use Dotenv\Dotenv;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
+use MAChitgarha\LimeSurveyRestApi\Utility\LogVerbosity;
 
 class Config
 {
@@ -12,10 +13,15 @@ class Config
     private $debugMode = DebugMode::OFF;
 
     /**
-     * Whether to rebuild the cache or not (e.g. for validation). Useful for development.
+     * Whether to rebuild the cache on every request (e.g. for validation).
+     * Enabling this causes the OpenAPI spec cache (used in request validation)
+     * to rebuild, which is useful for development purposes.
      * @var bool
      */
     private $cacheRebuild = false;
+
+    /** @var int */
+    private $logVerbosity = LogVerbosity::MINIMAL;
 
     /** @var ?static */
     private static $instance = null;
@@ -26,6 +32,7 @@ class Config
 
         $this->debugMode = (int)($_ENV['DEBUG_MODE']) ?? $this->debugMode;
         $this->cacheRebuild = (bool)($_ENV['CACHE_REBUILD']) ?? $this->cacheRebuild;
+        $this->logVerbosity = (bool)($_ENV['LOG_VERBOSITY']) ?? $this->logVerbosity;
     }
 
     public static function getInstance(): self
@@ -49,5 +56,10 @@ class Config
     public function getCacheRebuild(): bool
     {
         return $this->cacheRebuild;
+    }
+
+    public function getLogVerbosity(): int
+    {
+        return $this->logVerbosity;
     }
 }
