@@ -14,8 +14,13 @@ class ValidatorBuilder extends LeagueValidatorBuilder
 {
     private const OPENAPI_SPEC_FILE_PATH = __DIR__ . '/../../spec/openapi.yaml';
 
-    public function __construct(CacheItemPoolInterface $cachePool)
+    /** @var Config */
+    private $config;
+
+    public function __construct(CacheItemPoolInterface $cachePool, Config $config)
     {
+        $this->config = $config;
+
         $this
             ->fromYamlFile(self::OPENAPI_SPEC_FILE_PATH)
             ->setCache($cachePool);
@@ -23,7 +28,7 @@ class ValidatorBuilder extends LeagueValidatorBuilder
 
     private function clearCacheIfNeeded(): void
     {
-        if (Config::getInstance()->getCacheRebuild()) {
+        if ($this->config->getCacheRebuild()) {
             $this->cache->clear();
         }
     }

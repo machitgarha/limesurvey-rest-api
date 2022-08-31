@@ -24,9 +24,9 @@ function jsonDecode(string $json)
     ]);
 }
 
-function convertThrowableToLogMessage(Throwable $throwable): string
+function convertThrowableToLogMessage(Throwable $throwable, Config $config): string
 {
-    return (Config::getInstance()->getLogVerbosity() === LogVerbosity::FULL)
+    return ($config->getLogVerbosity() === LogVerbosity::FULL)
         ? $throwable->__toString()
         : $throwable->getMessage();
 }
@@ -34,9 +34,9 @@ function convertThrowableToLogMessage(Throwable $throwable): string
 /**
  * Pushes a debug message to a JsonResponse, if the related config is enabled.
  */
-function addDebugMessageToResponse(Response $response, string $debugMessage): Response
+function addDebugMessageToResponse(Response $response, string $debugMessage, Config $config): Response
 {
-    if (!Config::getInstance()->hasDebugOption(DebugOption::IN_RESPONSE)) {
+    if (!$config->hasDebugOption(DebugOption::IN_RESPONSE)) {
         return $response;
     }
 
@@ -61,7 +61,7 @@ function addDebugMessageToResponse(Response $response, string $debugMessage): Re
     throw new InvalidArgumentException('Unhandled response type: ' . \get_class($response));
 }
 
-function addThrowableAsDebugMessageToResponse(Response $response, Throwable $throwable): Response
+function addThrowableAsDebugMessageToResponse(Response $response, Throwable $throwable, Config $config): Response
 {
-    return addDebugMessageToResponse($response, convertThrowableToLogMessage($throwable));
+    return addDebugMessageToResponse($response, convertThrowableToLogMessage($throwable, $config), $config);
 }

@@ -45,6 +45,30 @@ class Plugin extends PluginBase
     protected static $name = 'LimeSurveyRestApi';
     protected static $description = 'LimeSurvey REST API provider';
 
+    protected $settings = [
+        Config::KEY_DEBUG_MODE => [
+            'type' => 'int',
+            'label' => 'Debug mode',
+            'help' => '0: Disable (default), -1: Full',
+            'default' => Config::DEFAULT_DEBUG_MODE,
+        ],
+        Config::KEY_CACHE_REBUILD => [
+            'type' => 'checkbox',
+            'label' => 'Disable cache',
+            'help' => 'Negatively impacts performance, but useful for development purposes',
+            'default' => Config::DEFAULT_CACHE_REBUILD,
+        ],
+        Config::KEY_LOG_VERBOSITY => [
+            'type' => 'int',
+            'label' => 'How verbose the logs and debug messages should be',
+            'help' => '1: Minimal (default), -1: Full',
+            'default' => Config::DEFAULT_LOG_VERBOSITY,
+        ],
+    ];
+
+    /** @var Config */
+    private $_config;
+
     public function init(): void
     {
         $this->subscribe('beforeControllerAction');
@@ -60,6 +84,7 @@ class Plugin extends PluginBase
         // Else, disable default request handling
         $this->event->set('run', false);
 
+        $this->_config = self::makeConfig();
         $request = Request::createFromGlobals();
 
         $this->setDebugging();
@@ -74,9 +99,22 @@ class Plugin extends PluginBase
         App()->end();
     }
 
+    /**
+     * @phan-suppress PhanTypeMismatchArgumentProbablyReal
+     * @return Config
+     */
+    private function makeConfig(): Config
+    {
+        return new Config(
+            (int) $this->get(Config::KEY_DEBUG_MODE, null, null, Config::DEFAULT_DEBUG_MODE),
+            (bool) $this->get(Config::KEY_CACHE_REBUILD, null, null, Config::DEFAULT_CACHE_REBUILD),
+            (int) $this->get(Config::KEY_LOG_VERBOSITY, null, null, Config::DEFAULT_LOG_VERBOSITY)
+        );
+    }
+
     private function setDebugging(): void
     {
-        if (Config::getInstance()->getDebugMode() === DebugMode::FULL) {
+        if ($this->_config->getDebugMode() === DebugMode::FULL) {
             $handler = function (int $code, string $message, string $file, int $line): bool {
                 $this->log(
                     "$message (at $file:$line, code: $code)",
@@ -94,7 +132,7 @@ class Plugin extends PluginBase
 
     private function handleRequest(Request $request, string $pathInfoValue): void
     {
-        $validatorBuilder = new ValidatorBuilder(new FilesystemAdapter());
+        $validatorBuilder = new ValidatorBuilder(new FilesystemAdapter(), $this->_config);
 
         try {
             $router = new Router(
@@ -108,15 +146,15 @@ class Plugin extends PluginBase
                 ->$method();
 
         } catch (Throwable $error) {
-            $response = (new JsonErrorResponseGenerator($this))->generate($error);
+            $response = (new JsonErrorResponseGenerator($this, $this->_config))->generate($error);
         }
 
         try {
-            if (Config::getInstance()->hasDebugOption(DebugOption::VALIDATE_RESPONSE)) {
+            if ($this->_config->hasDebugOption(DebugOption::VALIDATE_RESPONSE)) {
                 $this->assertIsResponseValid($response, $pathInfoValue, $validatorBuilder, $request);
             }
         } catch (Throwable $throwable) {
-            $response = addThrowableAsDebugMessageToResponse($response, $throwable);
+            $response = addThrowableAsDebugMessageToResponse($response, $throwable, $this->_config);
             $this->logThrowable($throwable);
         }
 
@@ -167,7 +205,7 @@ class Plugin extends PluginBase
 
     public function logThrowable(Throwable $throwable): void
     {
-        $message = convertThrowableToLogMessage($throwable);
+        $message = convertThrowableToLogMessage($throwable, $this->_config);
         $this->log(\get_class($throwable) . ": $message", Logger::LEVEL_ERROR);
     }
 

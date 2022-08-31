@@ -15,6 +15,7 @@ use League\OpenAPIValidation\PSR7\Exception\Validation\InvalidParameter;
 use League\OpenAPIValidation\Schema\Exception\TypeMismatch;
 use League\OpenAPIValidation\Schema\Exception\KeywordMismatch;
 
+use MAChitgarha\LimeSurveyRestApi\Config;
 use MAChitgarha\LimeSurveyRestApi\Plugin;
 
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
@@ -45,9 +46,13 @@ class JsonErrorResponseGenerator
     /** @var Plugin */
     private $plugin;
 
-    public function __construct(Plugin $plugin)
+    /** @var Config */
+    private $config;
+
+    public function __construct(Plugin $plugin, Config $config)
     {
         $this->plugin = $plugin;
+        $this->config = $config;
     }
 
     public function generate(Throwable $throwable): JsonResponse
@@ -97,7 +102,7 @@ class JsonErrorResponseGenerator
             : self::generateForError($error);
 
         if ($error instanceof InternalServerError) {
-            $response = addThrowableAsDebugMessageToResponse($response, $throwable);
+            $response = addThrowableAsDebugMessageToResponse($response, $throwable, $this->config);
         }
 
         foreach ($extraHeaders as $headerName => $headerValue) {

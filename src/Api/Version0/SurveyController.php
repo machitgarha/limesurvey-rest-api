@@ -8,8 +8,6 @@ use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 
-use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
-
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\SurveyHelper;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
