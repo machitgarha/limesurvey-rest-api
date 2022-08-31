@@ -199,10 +199,10 @@ class AnswerGenerator
         }
     }
 
-    private function generateBool(?bool $answer, string $fieldName): Generator
+    private function generateBool(?bool $answer, string $fieldName, string $falseResult = 'N'): Generator
     {
         // NOTE: Don't remove the parantheses for PHP 8.x compatibility
-        yield $fieldName => $answer === null ? '' : ($answer ? 'Y' : 'N');
+        yield $fieldName => $answer === null ? '' : ($answer ? 'Y' : $falseResult);
     }
 
     private function generateString(?string $answer, string $fieldName): Generator
@@ -298,8 +298,7 @@ class AnswerGenerator
             $fieldNameBase,
             $question,
             function (string $fieldName, ?array $subAnswer): Generator {
-                // TODO: Return empty string when selected is false? (Also for with comments)
-                yield from $this->generateBool($subAnswer['selected'] ?? null, $fieldName);
+                yield from $this->generateBool($subAnswer['selected'] ?? null, $fieldName, '');
             }
         );
 
@@ -318,7 +317,7 @@ class AnswerGenerator
             $fieldNameBase,
             $question,
             function (string $fieldName, ?array $subAnswer): Generator {
-                yield from $this->generateBool($subAnswer['selected'] ?? null, $fieldName);
+                yield from $this->generateBool($subAnswer['selected'] ?? null, $fieldName, '');
                 yield "{$fieldName}comment" => $subAnswer['comment'] ?? '';
             }
         );
