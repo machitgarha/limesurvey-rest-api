@@ -45,6 +45,8 @@ class Plugin extends PluginBase
     protected static $name = 'LimeSurveyRestApi';
     protected static $description = 'LimeSurvey REST API provider';
 
+    protected $storage = 'DbStorage';
+
     protected $settings = [
         Config::KEY_DEBUG_MODE => [
             'type' => 'int',
