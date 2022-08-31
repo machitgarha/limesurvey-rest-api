@@ -28,7 +28,7 @@ class Config
 
     private function __construct()
     {
-        Dotenv::createImmutable(__DIR__ . '/../')->load();
+        Dotenv::createImmutable(__DIR__ . '/../')->safeLoad();
 
         $this->debugMode = (int)($_ENV['DEBUG_MODE']) ?? $this->debugMode;
         $this->cacheRebuild = (bool)($_ENV['CACHE_REBUILD']) ?? $this->cacheRebuild;
