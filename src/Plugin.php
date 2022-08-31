@@ -171,7 +171,7 @@ class Plugin extends PluginBase
     public function logThrowable(Throwable $throwable): void
     {
         $message = convertThrowableToLogMessage($throwable);
-        $this->log(\get_class($error) . ": $message", Logger::LEVEL_ERROR);
+        $this->log(\get_class($throwable) . ": $message", Logger::LEVEL_ERROR);
     }
 
     private static function removeUnnecessaryHeaders(): void

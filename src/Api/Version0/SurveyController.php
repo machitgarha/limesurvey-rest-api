@@ -3,7 +3,6 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0;
 
 use Survey;
-use IApplicationComponent;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
