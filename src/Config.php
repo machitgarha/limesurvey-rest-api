@@ -32,7 +32,7 @@ class Config
 
         $this->debugMode = (int)($_ENV['DEBUG_MODE']) ?? $this->debugMode;
         $this->cacheRebuild = (bool)($_ENV['CACHE_REBUILD']) ?? $this->cacheRebuild;
-        $this->logVerbosity = (bool)($_ENV['LOG_VERBOSITY']) ?? $this->logVerbosity;
+        $this->logVerbosity = (int)($_ENV['LOG_VERBOSITY']) ?? $this->logVerbosity;
     }
 
     public static function getInstance(): self

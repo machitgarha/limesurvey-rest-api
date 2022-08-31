@@ -38,7 +38,6 @@ use Respect\Validation\Exceptions\ValidationException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
-
 use function MAChitgarha\LimeSurveyRestApi\Helper\addThrowableAsDebugMessageToJsonResponse;
 
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\{error, errors};
