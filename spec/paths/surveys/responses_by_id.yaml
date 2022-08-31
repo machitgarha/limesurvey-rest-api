@@ -33,8 +33,9 @@ patch:
               - $ref: "../../components/schemas/error.yaml#/error_list_base_with_one_item"
               - properties:
                   errors:
+                    type: array
                     items:
-                      allOf:
+                      oneOf:
                         - $ref: "../../components/schemas/error.yaml#/survey_unaccessible"
                         - $ref: "../../components/schemas/error.yaml#/response_completed"
     "422":
