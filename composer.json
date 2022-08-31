@@ -19,7 +19,8 @@
         "league/openapi-psr7-validator": "^0.18.0",
         "symfony/psr-http-message-bridge": "^2.1.2",
         "nyholm/psr7": "^1.5.1",
-        "symfony/cache": "^5.4.11"
+        "symfony/cache": "^5.4.11",
+        "vlucas/phpdotenv": "^5.4"
     },
     "require-dev": {
         "cebe/php-openapi": "^1.7",

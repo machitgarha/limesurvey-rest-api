@@ -23,7 +23,7 @@ class ValidatorBuilder extends LeagueValidatorBuilder
 
     private function clearCacheIfNeeded(): void
     {
-        if (Config::CACHE_REBUILD) {
+        if (Config::getInstance()->getCacheRebuild()) {
             $this->cache->clear();
         }
     }

@@ -73,7 +73,7 @@ class Plugin extends PluginBase
 
     private function setDebugging(): void
     {
-        if (Config::DEBUG_MODE === DebugMode::FULL) {
+        if (Config::getInstance()->getDebugMode() === DebugMode::FULL) {
             $handler = function (int $code, string $message, string $file, int $line): bool {
                 $this->log(
                     "$message (at $file:$line, code: $code)",
@@ -109,7 +109,7 @@ class Plugin extends PluginBase
         }
 
         try {
-            if (Config::DEBUG_MODE === DebugMode::FULL) {
+            if (Config::getInstance()->getDebugMode() === DebugMode::FULL) {
                 $this->assertIsResponseValid($response, $pathInfoValue, $validatorBuilder, $request);
             }
         } catch (DebugError $error) {
@@ -168,7 +168,7 @@ class Plugin extends PluginBase
 
     public function logThrowable(Throwable $error): void
     {
-        $message = (Config::DEBUG_MODE === DebugMode::FULL)
+        $message = (Config::getInstance()->getDebugMode() === DebugMode::FULL)
             ? $error->__toString()
             : $error->getMessage();
 
