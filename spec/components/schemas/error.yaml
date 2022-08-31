@@ -34,6 +34,7 @@ api_version_missing_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:
@@ -56,6 +57,7 @@ bad_request_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             $ref: "#/bad_request"
 
@@ -64,8 +66,9 @@ bad_request_for_response_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
-            allOf:
+            oneOf:
               - $ref: "#/bad_request"
               - title: question_type_mismatch
                 allOf:
@@ -80,6 +83,7 @@ internal_server_error_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:
@@ -91,6 +95,7 @@ invalid_credentials_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:
@@ -102,6 +107,7 @@ maintenance_mode_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:
@@ -113,6 +119,7 @@ method_not_allowed_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:
@@ -124,6 +131,7 @@ not_implemented_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:
@@ -135,6 +143,7 @@ path_not_found_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:
@@ -147,6 +156,7 @@ permission_denied_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:
@@ -159,6 +169,7 @@ resource_not_found_list:
     - $ref: "#/error_optional_message"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:
@@ -186,6 +197,7 @@ survey_unaccessible_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             $ref: "#/survey_unaccessible"
 
@@ -194,6 +206,7 @@ too_many_authentication_failures_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:
@@ -219,6 +232,7 @@ unprocessable_entity_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             allOf:
               - $ref: "#/error_optional_message"
@@ -257,6 +271,7 @@ unsupported_media_type_list:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
+          type: array
           items:
             properties:
               id:
