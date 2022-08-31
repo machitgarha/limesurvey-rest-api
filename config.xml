@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <config>
     <metadata>
-        <name>LimeSurveyRestApi</name>
+        <name>RestApi</name>
         <type>plugin</type>
         <creationDate>2022-07-23</creationDate>
-        <lastUpdate>2022-08-29</lastUpdate>
+        <lastUpdate>2022-09-01</lastUpdate>
         <author>Mohammad Amin Chitgarha</author>
         <authorUrl>https://github.com/machitgarha</authorUrl>
         <version>0.1.0-beta.2</version>
         <license>GNU General Public License v2.0</license>
-        <description>LimeSurvey REST API provider</description>
+        <description>REST API provider</description>
     </metadata>
 
     <compatibility>

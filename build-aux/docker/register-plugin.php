@@ -88,7 +88,7 @@ SQL
 function isPluginAlreadyInserted(\mysqli $mysql, string $tableName): bool
 {
     $result = $mysql->query(<<<SQL
-        SELECT `id` FROM `$tableName` WHERE `name` = 'LimeSurveyRestApi'
+        SELECT `id` FROM `$tableName` WHERE `name` = 'RestApi'
 SQL
 );
 
@@ -99,7 +99,7 @@ function insertPlugin(\mysqli $mysql, string $tableName): bool
 {
     return $mysql->query(<<<SQL
         INSERT INTO `$tableName`(`name`, `plugin_type`, `active`)
-            VALUES ('LimeSurveyRestApi', 'upload', 1)
+            VALUES ('RestApi', 'upload', 1)
 SQL
 );
 }
