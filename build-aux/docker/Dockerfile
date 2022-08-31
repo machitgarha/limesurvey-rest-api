@@ -28,7 +28,7 @@ RUN mv "$PLUGIN_SOURCE_DIR/build-aux/docker/entrypoint.sh" /usr/bin
 
 RUN cd "$PLUGIN_SOURCE_DIR" && \
     # Make sure to use PHP 7.2, not the one installed by APK (e.g. 7.3)
-    /usr/local/bin/php /usr/bin/composer install --no-dev &&
+    /usr/local/bin/php /usr/bin/composer install --no-dev && \
 
     echo "${LIMESURVEY_REST_API_ENV}" > .env
 
