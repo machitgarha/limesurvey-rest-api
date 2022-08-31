@@ -16,8 +16,6 @@ use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Authorization\BearerTokenAuthorizer;
 
-use MAChitgarha\LimeSurveyRestApi\Error\DebugError;
-
 use MAChitgarha\LimeSurveyRestApi\Routing\PathInfo;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
@@ -25,7 +23,6 @@ use MAChitgarha\LimeSurveyRestApi\Utility\DebugMode;
 use MAChitgarha\LimeSurveyRestApi\Routing\Router;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\DebugOption;
-use MAChitgarha\LimeSurveyRestApi\Utility\LogVerbosity;
 
 use MAChitgarha\LimeSurveyRestApi\Validation\RequestValidator;
 use MAChitgarha\LimeSurveyRestApi\Validation\ValidatorBuilder;

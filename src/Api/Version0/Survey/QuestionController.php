@@ -3,7 +3,6 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey;
 
 use Question;
-use QuestionAttribute;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
 
@@ -14,8 +13,6 @@ use MAChitgarha\LimeSurveyRestApi\Error\InvalidPathParameterError;
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\SurveyHelper;
 use MAChitgarha\LimeSurveyRestApi\Helper\PermissionChecker;
-
-use MAChitgarha\LimeSurveyRestApi\Error\NotImplementedError;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 

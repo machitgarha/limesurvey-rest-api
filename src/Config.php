@@ -23,7 +23,7 @@ class Config
     /** @var int */
     private $logVerbosity = LogVerbosity::MINIMAL;
 
-    /** @var ?static */
+    /** @var ?self */
     private static $instance = null;
 
     private function __construct()
@@ -50,7 +50,7 @@ class Config
 
     public function hasDebugOption(int $debugOption): bool
     {
-        return $this->debugMode & $debugOption;
+        return $this->debugMode & $debugOption !== 0;
     }
 
     public function getCacheRebuild(): bool

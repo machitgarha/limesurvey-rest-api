@@ -15,8 +15,6 @@ use League\OpenAPIValidation\PSR7\Exception\Validation\InvalidParameter;
 use League\OpenAPIValidation\Schema\Exception\TypeMismatch;
 use League\OpenAPIValidation\Schema\Exception\KeywordMismatch;
 
-use MAChitgarha\LimeSurveyRestApi\Error\DebugError;
-
 use MAChitgarha\LimeSurveyRestApi\Plugin;
 
 use MAChitgarha\LimeSurveyRestApi\Error\Error;
