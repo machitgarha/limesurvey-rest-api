@@ -320,11 +320,24 @@ class AnswerValidatorBuilder
             ->key('other_value', v::nullable(v::stringType()), false);
     }
 
+    private static function makeSubQuestionsWithOther(Question $question): array
+    {
+        $subQuestions = $question->subquestions;
+
+        $otherSubQuestion = new Question();
+        $otherSubQuestion->setAttributes([
+            'title' => 'other',
+        ]);
+
+        $subQuestions[] = $otherSubQuestion;
+        return $subQuestions;
+    }
+
     private function buildForMultipleChoice(Question $question): Validator
     {
         return $this->buildForSubQuestions($question, function () {
             return self::buildForMultipleChoiceInnerKeys();
-        });
+        }, self::makeSubQuestionsWithOther($question));
     }
 
     private function buildForMultipleChoiceWithComments(Question $question): Validator
@@ -332,7 +345,7 @@ class AnswerValidatorBuilder
         return $this->buildForSubQuestions($question, function () {
             return self::buildForMultipleChoiceInnerKeys()
                 ->key('comment', v::nullable(v::stringType()), false);
-        });
+        }, self::makeSubQuestionsWithOther($question));
     }
 
     private function buildForSubQuestions2d(Question $question, callable $valueValidatorBuilder): Validator
