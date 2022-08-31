@@ -245,9 +245,10 @@ unprocessable_response:
 
 unprocessable_response_list:
   allOf:
-    - $ref: "#/error_list_base_with_one_item"
+    - $ref: "#/error_list_base"
     - properties:
         errors:
+          type: array
           items:
             $ref: "#/unprocessable_response"
 
