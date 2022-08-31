@@ -13,6 +13,13 @@ use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 
+function jsonDecode(string $json)
+{
+    return (new JsonDecode())->decode($json, '', [
+        JsonDecode::ASSOCIATIVE => true,
+    ]);
+}
+
 function convertThrowableToLogMessage(Throwable $throwable): string
 {
     return (Config::getInstance()->getLogVerbosity() === LogVerbosity::FULL)
@@ -29,7 +36,7 @@ function addDebugMessageToJsonResponse(JsonResponse $jsonResponse, string $debug
         return;
     }
 
-    $data = new JsonDecode($jsonResponse->getContent());
+    $data = jsonDecode($jsonResponse->getContent());
 
     $data['debug'] = $data['debug'] ?? [];
     $data['debug'][] = $debugMessage;

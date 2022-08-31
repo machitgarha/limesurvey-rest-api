@@ -30,6 +30,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 
+use function MAChitgarha\LimeSurveyRestApi\Helper\jsonDecode;
+
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
 class FileController implements Controller
@@ -206,9 +208,7 @@ class FileController implements Controller
         }
         $output = \ob_get_clean();
 
-        $result = (new JsonDecode())->decode($output, '', [
-            JsonDecode::ASSOCIATIVE => true,
-        ]);
+        $result = jsonDecode($output);
 
         if (!$result['success'] && $result['msg'] !== gT('An unknown error occured')) {
             throw new UnprocessableEntityError($result['msg']);

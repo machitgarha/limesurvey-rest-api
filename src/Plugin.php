@@ -41,7 +41,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 
 use function MAChitgarha\LimeSurveyRestApi\Helper\convertThrowableToLogMessage;
-use function MAChitgarha\LimeSurveyRestApi\Helper\addDebugMessageToJsonResponse;
+use function MAChitgarha\LimeSurveyRestApi\Helper\addThrowableAsDebugMessageToJsonResponse;
 
 class Plugin extends PluginBase
 {
