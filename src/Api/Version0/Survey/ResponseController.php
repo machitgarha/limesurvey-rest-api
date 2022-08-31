@@ -100,7 +100,7 @@ class ResponseController implements Controller
                 'fieldnames' => '',
                 'start_time' => $apiData['start_time']
             ], [
-                // TODO: startingValues.seed
+                // TODO: startingValues.seed, although currently it seems to work perfectly without it
             ], true);
         } catch (SurveyResponseIdHolder $error) {
             return new EmptyResponse(
@@ -158,7 +158,7 @@ class ResponseController implements Controller
             'lastpage' => $postData['thisstep']
         ]);
 
-        return new EmptyResponse(Response::HTTP_OK);
+        return new EmptyResponse();
     }
 
     private function prepareLimeExpressionManager(
