@@ -41,7 +41,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 
 use function MAChitgarha\LimeSurveyRestApi\Helper\convertThrowableToLogMessage;
-use function MAChitgarha\LimeSurveyRestApi\Helper\addThrowableAsDebugMessageToJsonResponse;
+use function MAChitgarha\LimeSurveyRestApi\Helper\addThrowableAsDebugMessageToResponse;
 
 class Plugin extends PluginBase
 {
@@ -119,7 +119,7 @@ class Plugin extends PluginBase
                 $this->assertIsResponseValid($response, $pathInfoValue, $validatorBuilder, $request);
             }
         } catch (Throwable $throwable) {
-            addThrowableAsDebugMessageToJsonResponse($response, $throwable);
+            $response = addThrowableAsDebugMessageToResponse($response, $throwable);
             $this->logThrowable($throwable);
         }
 

@@ -3,6 +3,7 @@
 namespace MAChitgarha\LimeSurveyRestApi\Helper;
 
 use Throwable;
+use InvalidArgumentException;
 
 use MAChitgarha\LimeSurveyRestApi\Config;
 
@@ -10,6 +11,9 @@ use MAChitgarha\LimeSurveyRestApi\Utility\DebugOption;
 use MAChitgarha\LimeSurveyRestApi\Utility\LogVerbosity;
 
 use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
+use MAChitgarha\LimeSurveyRestApi\Utility\Response\EmptyResponse;
+
+use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 
@@ -30,21 +34,34 @@ function convertThrowableToLogMessage(Throwable $throwable): string
 /**
  * Pushes a debug message to a JsonResponse, if the related config is enabled.
  */
-function addDebugMessageToJsonResponse(JsonResponse $jsonResponse, string $debugMessage): void
+function addDebugMessageToResponse(Response $response, string $debugMessage): Response
 {
     if (!Config::getInstance()->hasDebugOption(DebugOption::IN_RESPONSE)) {
-        return;
+        return $response;
     }
 
-    $data = jsonDecode($jsonResponse->getContent());
+    if ($response instanceof JsonResponse) {
+        $data = jsonDecode($response->getContent());
 
-    $data['debug'] = $data['debug'] ?? [];
-    $data['debug'][] = $debugMessage;
+        $data['debug'] = $data['debug'] ?? [];
+        $data['debug'][] = $debugMessage;
 
-    $jsonResponse->setData($data);
+        $response->setData($data);
+        return $response;
+    }
+
+    if ($response instanceof EmptyResponse) {
+        return new JsonResponse(
+            ['debug' => [$debugMessage]],
+            JsonResponse::HTTP_OK,
+            $response->headers->all()
+        );
+    }
+
+    throw new InvalidArgumentException('Unhandled response type: ' . \get_class($response));
 }
 
-function addThrowableAsDebugMessageToJsonResponse(JsonResponse $jsonResponse, Throwable $throwable): void
+function addThrowableAsDebugMessageToResponse(Response $response, Throwable $throwable): Response
 {
-    addDebugMessageToJsonResponse($jsonResponse, convertThrowableToLogMessage($throwable));
+    return addDebugMessageToResponse($response, convertThrowableToLogMessage($throwable));
 }
