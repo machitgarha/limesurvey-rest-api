@@ -158,8 +158,6 @@ answer_ranking:
 answer_file:
   type: array
   description: Specific to 'File upload' question type
-  minItems: 0
-  maxItems: 1
   items:
     type: object
     required:
