@@ -5,9 +5,7 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 use Survey;
 use RuntimeException;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator\{
-    AnswerValidatorBuilder
-};
+use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator\AnswerValidatorBuilder;
 
 use MAChitgarha\LimeSurveyRestApi\Error\QuestionTypeMismatchError;
 
@@ -281,12 +279,12 @@ class AnswerValidatorBuilder
         callable $valueValidatorBuilder,
         array $subQuestions = null
     ): Validator {
-        return v::keySet(...\array_map(
+        return v::key('answers', v::keySet(...\array_map(
             function (Question $subQuestion) use ($valueValidatorBuilder, $question) {
                 return v::key($subQuestion->title, v::nullable($valueValidatorBuilder()), false);
             },
             $subQuestions ?? $question->subquestions
-        ));
+        )));
     }
 
     private function buildForIntSubQuestions(Question $question): Validator
