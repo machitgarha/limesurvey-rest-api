@@ -597,6 +597,9 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
 class IndexOutputController extends CController
 {
+    /** @var string Dummy */
+    public $sTemplate;
+
     public function renderExitMessage(
         int $surveyId,
         string $type,
