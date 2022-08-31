@@ -31,7 +31,8 @@
             "MAChitgarha\\LimeSurveyRestApi\\": "src/"
         },
         "files": [
-            "src/Utility/Response/functions.php"
+            "src/Utility/Response/functions.php",
+            "src/Helper/functions.php"
         ]
     },
     "config": {

@@ -38,6 +38,9 @@ use Respect\Validation\Exceptions\ValidationException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
+
+use function MAChitgarha\LimeSurveyRestApi\Helper\addThrowableAsDebugMessageToJsonResponse;
+
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\{error, errors};
 
 class JsonErrorResponseGenerator
@@ -50,11 +53,9 @@ class JsonErrorResponseGenerator
         $this->plugin = $plugin;
     }
 
-    public function generate(Throwable $throwable, bool $toLog = true): JsonResponse
+    public function generate(Throwable $throwable): JsonResponse
     {
-        if ($toLog) {
-            $this->plugin->logThrowable($throwable);
-        }
+        $this->plugin->logThrowable($throwable);
 
         $extraHeaders = [];
 
@@ -90,13 +91,17 @@ class JsonErrorResponseGenerator
         elseif ($throwable instanceof ValidationException) {
             $error = self::convertValidationExceptionToError($throwable);
         }
-        else /* if ($throwable instanceof Throwable) */ {
-            $error = $this->makeInternalServerError($throwable);
+        else {
+            $error = self::makeInternalServerError($throwable);
         }
 
         $response = $error instanceof ErrorBucket
             ? self::generateForErrorBucket($error)
             : self::generateForError($error);
+
+        if ($error instanceof InternalServerError) {
+            addThrowableAsDebugMessageToJsonResponse($response, $throwable);
+        }
 
         foreach ($extraHeaders as $headerName => $headerValue) {
             $response->headers->set($headerName, $headerValue);
@@ -164,7 +169,7 @@ class JsonErrorResponseGenerator
         return new KeywordMismatchError($exception->getMessage());
     }
 
-    private function makeInternalServerError(Throwable $throwable): InternalServerError
+    private static function makeInternalServerError(Throwable $throwable): InternalServerError
     {
         return new InternalServerError();
     }

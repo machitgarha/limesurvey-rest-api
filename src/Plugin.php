@@ -40,6 +40,9 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 use Symfony\Component\Serializer\Serializer;
 
+use function MAChitgarha\LimeSurveyRestApi\Helper\convertThrowableToLogMessage;
+use function MAChitgarha\LimeSurveyRestApi\Helper\addDebugMessageToJsonResponse;
+
 class Plugin extends PluginBase
 {
     protected static $name = 'LimeSurveyRestApi';
@@ -115,8 +118,9 @@ class Plugin extends PluginBase
             if (Config::getInstance()->hasDebugOption(DebugOption::VALIDATE_RESPONSE)) {
                 $this->assertIsResponseValid($response, $pathInfoValue, $validatorBuilder, $request);
             }
-        } catch (DebugError $error) {
-            $response = (new JsonErrorResponseGenerator($this))->generate($error, false);
+        } catch (Throwable $throwable) {
+            addThrowableAsDebugMessageToJsonResponse($response, $throwable);
+            $this->logThrowable($throwable);
         }
 
         $this->removeUnnecessaryHeaders();
@@ -156,25 +160,17 @@ class Plugin extends PluginBase
         ValidatorBuilder $validatorBuilder,
         Request $request
     ): void {
-        try {
-            (new ResponseValidator(
-                $response,
-                new PathInfo($pathInfoValue),
-                $validatorBuilder,
-                $request->getMethod()
-            ))->validate();
-        } catch (Throwable $throwable) {
-            $this->logThrowable($throwable);
-            throw DebugError::buildInvalidResponse($response);
-        }
+        (new ResponseValidator(
+            $response,
+            new PathInfo($pathInfoValue),
+            $validatorBuilder,
+            $request->getMethod()
+        ))->validate();
     }
 
-    public function logThrowable(Throwable $error): void
+    public function logThrowable(Throwable $throwable): void
     {
-        $message = (Config::getInstance()->getLogVerbosity() === LogVerbosity::FULL)
-            ? $error->__toString()
-            : $error->getMessage();
-
+        $message = convertThrowableToLogMessage($throwable);
         $this->log(\get_class($error) . ": $message", Logger::LEVEL_ERROR);
     }
 
