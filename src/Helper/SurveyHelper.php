@@ -40,7 +40,7 @@ class SurveyHelper
     public static function getQuestionInSurveyById(Survey $survey, int $questionId)
     {
         foreach ($survey->baseQuestions as $question) {
-            if ($question->qid === $questionId) {
+            if ((int) $question->qid === $questionId) {
                 return $question;
             }
         }
