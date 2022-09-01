@@ -210,7 +210,11 @@ class FileController implements Controller
 
         $result = jsonDecode($output);
 
-        if (!$result['success'] && $result['msg'] !== gT('An unknown error occured')) {
+        if (!$result['success'] && !\in_array($result['msg'], [
+            // For backward-compatbility
+            \gT('An unknown error occured'),
+            \gT('An unknown error occurred'),
+        ])) {
             throw new UnprocessableEntityError($result['msg']);
         }
     }
