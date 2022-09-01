@@ -100,7 +100,11 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataVali
 use Survey;
 use Question;
 
+use MAChitgarha\LimeSurveyRestApi\Error\QuestionTypeMismatchError;
+
 use MAChitgarha\LimeSurveyRestApi\Helper\ResponseGeneratorHelper;
+
+use Respect\Validation\Exceptions\ExistsException;
 
 use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
@@ -254,7 +258,19 @@ class AnswerValidatorBuilder
                 v::key('comment', v::stringType()),
                 v::key('size', v::floatVal()),
                 v::key('name', v::stringType()),
-                v::key('tmp_name', v::stringType()),
+                v::key('tmp_name', v::stringType()->callback(function (string $tmpName): bool {
+                    try {
+                        v::exists()->check(
+                            \App()->getConfig('tempdir') . "/upload/$tmpName"
+                        );
+                    } catch (ExistsException $e) {
+                        // TODO: Change error type?
+                        throw new QuestionTypeMismatchError(
+                            "'$tmpName' is invalid (not uploaded yet)"
+                        );
+                    }
+                    return true;
+                })),
                 v::key('extension', v::stringType())
             )
         );
