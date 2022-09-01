@@ -98,8 +98,8 @@ class QuestionController implements Controller
         $attributes = self::makeAttributesData($question, $language);
 
         return [
-            'id' => $question->qid,
-            'group_id' => $question->gid,
+            'id' => (int) $question->qid,
+            'group_id' => (int) $question->gid,
 
             'l10n' => [
                 'text' => $l10n->question,
