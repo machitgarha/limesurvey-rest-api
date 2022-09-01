@@ -43,8 +43,8 @@ class ApiDataValidator
     public function validate(): void
     {
         $this
-            ->validateAnswers()
             ->validateSurveyFormat()
+            ->validateAnswers()
         ;
     }
 
