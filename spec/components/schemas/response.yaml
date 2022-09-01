@@ -42,7 +42,6 @@ response_update:
   type: object
   required:
     - step
-    - relevances
   properties:
     step:
       type: integer
@@ -56,24 +55,19 @@ response_update:
 
     relevances:
       type: object
-      required:
-        - groups
-        - questions
       writeOnly: true
-      description: Whether the questions and question groups are relevant or not. A value of null means *not* relevant
+      description: Whether the questions and question groups are relevant or not. A value of null means *relevant*
       properties:
         groups:
           type: object
           description: Mapping of *group order* (not group ID) to its relevance
           additionalProperties:
             type: boolean
-            nullable: true
         questions:
           type: object
           description: Mapping of *question ID* to its relevance
           additionalProperties:
             type: boolean
-            nullable: true
 
     skip_soft_mandatory:
       type: boolean

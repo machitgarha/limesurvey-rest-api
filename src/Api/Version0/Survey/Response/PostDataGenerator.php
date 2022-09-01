@@ -3,6 +3,8 @@
 namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response;
 
 use Survey;
+use Question;
+use QuestionGroup;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\RecordGenerator\AnswerGenerator;
 
@@ -17,11 +19,42 @@ class PostDataGenerator
     /** @var Survey */
     private $survey;
 
+    /** @var Question[] */
+    private $baseQuestionsById;
+
+    /** @var QuestionGroup[] */
+    private $groupsById;
+
     public function __construct(array $responseData, array $surveyInfo)
     {
         $this->responseData = $responseData;
         $this->surveyInfo = $surveyInfo;
         $this->survey = $surveyInfo['oSurvey'];
+
+        $this->baseQuestionsById = $this->makeBaseQuestionById();
+        $this->groupsById = $this->makeGroupsById();
+    }
+
+    private function makeBaseQuestionById(): array
+    {
+        $result = [];
+
+        foreach ($this->survey->baseQuestions as $question) {
+            $result[$question->qid] = $question;
+        }
+
+        return $result;
+    }
+
+    private function makeGroupsById(): array
+    {
+        $result = [];
+
+        foreach ($this->survey->groups as $group) {
+            $result[$group->gid] = $group;
+        }
+
+        return $result;
     }
 
     public function generate(): array
@@ -83,15 +116,16 @@ class PostDataGenerator
     private function generateRelevances(): array
     {
         $result = [];
+
+        $answers = $this->responseData['answers'];
         $relevances = $this->responseData['relevances'];
 
-        foreach ($relevances['groups'] as $groupOrder => $relevance) {
-            --$groupOrder;
-            $result["relevanceG{$groupOrder}"] = $relevance ? '1' : '0';
-        }
+        foreach ($answers as $questionId => $answer) {
+            $question = $this->baseQuestionsById[$questionId];
+            $groupOrder = $this->groupsById[$question->gid]->group_order - 1;
 
-        foreach ($relevances['questions'] as $questionId => $relevance) {
-            $result["relevance{$questionId}"] = $relevance ? '1' : '0';
+            $result["relevanceG{$groupOrder}"] = ($relevances['groups'][$groupOrder + 1] ?? true) ? '1' : '0';
+            $result["relevance{$questionId}"] = ($relevances['questions'][$questionId] ?? true) ? '1' : '0';
         }
 
         return $result;
