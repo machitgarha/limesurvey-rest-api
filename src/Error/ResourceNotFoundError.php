@@ -2,6 +2,6 @@
 
 namespace MAChitgarha\LimeSurveyRestApi\Error;
 
-class ResourceNotFoundError extends BadRequestError
+class ResourceNotFoundError extends NotFoundError
 {
 }
