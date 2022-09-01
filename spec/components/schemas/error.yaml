@@ -42,15 +42,16 @@ api_version_missing_list:
                   - ApiVersionMissing
 
 bad_request:
-  allOf:
-    - $ref: "#/error_optional_message"
-    - properties:
-        id:
-          enum:
-            - MalformedRequestBody
-            - InvalidPathParameter
-            - KeywordMismatch
-            - TypeMismatch
+  oneOf:
+    - $ref: "#/invalid_path_parameter"
+    - allOf:
+      - $ref: "#/error_optional_message"
+      - properties:
+          id:
+            enum:
+              - MalformedRequestBody
+              - KeywordMismatch
+              - TypeMismatch
 
 bad_request_list:
   allOf:
@@ -101,6 +102,23 @@ invalid_credentials_list:
               id:
                 enum:
                   - InvalidCredentials
+
+invalid_path_parameter:
+  allOf:
+    - $ref: "#/error_optional_message"
+    - properties:
+        id:
+          enum:
+            - InvalidPathParameter
+
+invalid_path_parameter_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            $ref: "#/invalid_path_parameter"
 
 maintenance_mode_list:
   allOf:

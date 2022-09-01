@@ -36,6 +36,13 @@ invalid_credentials:
       schema:
         $ref: "./schemas/error.yaml#/invalid_credentials_list"
 
+invalid_path_parameter:
+  description: Invalid path parameter
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/invalid_path_parameter_list"
+
 maintenance_mode:
   description: The site is under maintenance mode (either soft or hard)
   content:

@@ -20,6 +20,8 @@ get:
                 properties:
                   contents:
                     $ref: "../../../components/schemas/response.yaml#/file_contents"
+    "400":
+      $ref: "../../../components/responses.yaml#/invalid_path_parameter"
     "401":
       $ref: "../../../components/responses.yaml#/unauthorized"
     "403":

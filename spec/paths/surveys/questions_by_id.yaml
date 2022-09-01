@@ -14,9 +14,8 @@ get:
             properties:
               data:
                 $ref: "../../components/schemas/question.yaml#/question"
-    # TODO: Narrow this to InvalidPathParameter
     "400":
-      $ref: "../../components/responses.yaml#/bad_request"
+      $ref: "../../components/responses.yaml#/invalid_path_parameter"
     "401":
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":

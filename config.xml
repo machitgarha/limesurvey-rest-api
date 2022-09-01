@@ -7,7 +7,7 @@
         <lastUpdate>2022-09-01</lastUpdate>
         <author>Mohammad Amin Chitgarha</author>
         <authorUrl>https://github.com/machitgarha</authorUrl>
-        <version>0.1.0-beta.3</version>
+        <version>0.1.0-beta.4</version>
         <license>GNU General Public License v2.0</license>
         <description>REST API provider</description>
     </metadata>

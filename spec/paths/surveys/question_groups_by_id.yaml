@@ -14,6 +14,8 @@ get:
             properties:
               data:
                 $ref: "../../components/schemas/question_group.yaml#/question_group"
+    "400":
+      $ref: "../../components/responses.yaml#/invalid_path_parameter"
     "401":
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":
