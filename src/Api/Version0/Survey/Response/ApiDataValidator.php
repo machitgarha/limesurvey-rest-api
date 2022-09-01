@@ -210,13 +210,10 @@ class AnswerValidatorBuilder
     private function build(Question $question): Validator
     {
         $method = $this->questionTypeToMethodMapping[$question->type];
-        $keyName = "answers.$question->qid";
 
-        /** @var Validator $validator */
-        $validator = $this->$method($question);
-        $validator->setName($keyName);
-
-        return v::nullable($validator);
+        return v::nullable(
+            $this->$method($question)
+        );
     }
 
     private function buildForBool(): Validator
