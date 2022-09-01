@@ -79,7 +79,7 @@ class QuestionController implements Controller
             throw new ResourceIdNotFoundError('question', $questionId);
         }
 
-        if ($question->parent_qid !== 0) {
+        if ((int) $question->parent_qid !== 0) {
             throw new InvalidPathParameterError(
                 'Only base questions can be retrieved, and subquestions can be accessed via their parent questions'
             );
@@ -112,7 +112,7 @@ class QuestionController implements Controller
             'is_hidden' => $attributes['hidden'] == '1',
             'is_other_enabled' => $question->other === 'Y',
             'mandatory' => $question->mandatory,
-            'order' => $question->question_order,
+            'order' => (int) $question->question_order,
             'randomization_id' => $attributes['random_group'],
             'relevance' => $question->relevance,
             'theme_name' => $question->getQuestionTheme()->name,
