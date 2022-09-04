@@ -42,6 +42,7 @@ response_update:
   type: object
   required:
     - step
+    - answers
   properties:
     step:
       type: integer
