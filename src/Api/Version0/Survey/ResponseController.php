@@ -140,7 +140,6 @@ class ResponseController implements Controller
         (new ApiDataValidator($apiData, $surveyInfo))->validate();
         $postData = (new PostDataGenerator($apiData, $surveyInfo))->generate();
 
-        // TODO: maxstep, datestamp?
         $sessionData = [];
         $sessionData["survey_$surveyId"] = [
             'step' => $postData['thisstep'],
@@ -185,7 +184,7 @@ class ResponseController implements Controller
             'ipaddr' => $surveyInfo['ipaddr'] === 'Y',
             'radix' => \getRadixPointData($surveyInfo['surveyls_numberformat'])['separator'],
             'refurl' => '',
-            'savetimings' => $surveyInfo['savetimings'] === "Y",
+            'savetimings' => $surveyInfo['savetimings'] === 'Y',
             'surveyls_dateformat' => $surveyInfo['surveyls_dateformat'] ?? 1,
             'startlanguage' => \App()->language ?? $surveyInfo['language'],
             'target' => \App()->getConfig('uploaddir')
@@ -324,7 +323,8 @@ class CoreSurveyIndexInvoker
             'twigRenderer',
             new CustomTwigRenderer(
                 $isPostRequest,
-                $this->apiData['skip_soft_mandatory'] ?? false
+                $this->apiData['skip_soft_mandatory'] ?? false,
+                $this->apiData['step']
             ),
             false
         );
@@ -360,11 +360,15 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     /** @var bool */
     private $skipSoftMandatory;
 
-    public function __construct(bool $isPostRequest, bool $skipSoftMandatory)
+    /** @var int */
+    private $step;
+
+    public function __construct(bool $isPostRequest, bool $skipSoftMandatory, int $step)
     {
         $this->errorBucket = new ErrorBucket();
         $this->isPostRequest = $isPostRequest;
         $this->skipSoftMandatory = $skipSoftMandatory;
+        $this->step = $step;
     }
 
     public function init()
@@ -500,13 +504,20 @@ class CustomTwigRenderer extends LSETwigViewRenderer
             $pipeSeparatedQuestionFieldNameList
         );
         $questionIndexInfoList = LimeExpressionManager::GetQuestionIndexInfo();
-
+        
         foreach ($questionIndexInfoList as $questionIndexInfo) {
+            $questionId = (int) $questionIndexInfo['qid'];
+            $groupId = (int) $questionIndexInfo['gid'];
+
+            if (
+                LimeExpressionManager::GetQuestionSeq($questionId) >= $this->step ||
+                LimeExpressionManager::GetGroupSeq($groupId) >= $this->step
+            ) {
+                continue;
+            }
+
             foreach ($questionFieldNameList as $questionFieldName) {
-                if (self::isQuestionFieldNameSameAsQuestionId(
-                    $questionFieldName,
-                    $questionId = (int) $questionIndexInfo['qid']
-                )) {
+                if (self::isQuestionFieldNameSameAsQuestionId($questionFieldName, $questionId)) {
                     $fn($questionId, $questionIndexInfo);
 
                     /*

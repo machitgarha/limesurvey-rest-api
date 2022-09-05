@@ -3,6 +3,7 @@
 namespace MAChitgarha\LimeSurveyRestApi\Helper;
 
 use Survey;
+use Question;
 use LogicException;
 
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotActiveError;
@@ -37,7 +38,7 @@ class SurveyHelper
         }
     }
 
-    public static function getQuestionInSurveyById(Survey $survey, int $questionId)
+    public static function getQuestionInSurveyById(Survey $survey, int $questionId): Question
     {
         foreach ($survey->baseQuestions as $question) {
             if ((int) $question->qid === $questionId) {
