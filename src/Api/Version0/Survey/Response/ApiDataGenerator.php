@@ -80,6 +80,9 @@ class AnswerGenerator
         'generateListWithComment' => [
             Question::QT_O_LIST_WITH_COMMENT,
         ],
+        'generateNull' => [
+            Question::QT_X_TEXT_DISPLAY,
+        ],
         'generateIntSubQuestions' => [
             Question::QT_A_ARRAY_5_POINT,
             Question::QT_B_ARRAY_10_CHOICE_QUESTIONS,
@@ -245,12 +248,20 @@ class AnswerGenerator
         }
     }
 
-    private function generateListWithComment(Question $question, string $fieldName)
+    private function generateListWithComment(Question $question, string $fieldName): array
     {
         return [
             'code' => $this->getRecordField($fieldName, 'string'),
             'comment' => $this->getRecordField($fieldName . 'comment', 'string'),
         ];
+    }
+
+    /**
+     * @return null
+     */
+    private function generateNull()
+    {
+        return null;
     }
 
     private function generateSubQuestions(Question $question, string $fieldNameBase, callable $fn): array

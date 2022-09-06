@@ -100,6 +100,7 @@ answers:
       - $ref: "#/answer_file"
       - $ref: "#/answer_list"
       - $ref: "#/answer_list_with_comment"
+      - $ref: "#/answer_text_display"
       - $ref: "#/answer_with_sub_questions"
 
 answer_yes_no:
@@ -227,6 +228,11 @@ answer_list_with_comment:
     comment:
       type: string
       nullable: true
+
+answer_text_display:
+  type: string
+  nullable: true
+  description: Specific to 'Text display' question type, and is *always* null
 
 answer_with_sub_questions:
   type: object

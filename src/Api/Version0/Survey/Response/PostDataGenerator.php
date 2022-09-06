@@ -173,6 +173,9 @@ class AnswerGenerator
         'generateListWithComment' => [
             Question::QT_O_LIST_WITH_COMMENT,
         ],
+        'generateNone' => [
+            Question::QT_X_TEXT_DISPLAY,
+        ],
         'generateStringSubQuestions' => [
             Question::QT_A_ARRAY_5_POINT,
             Question::QT_B_ARRAY_10_CHOICE_QUESTIONS,
@@ -279,6 +282,10 @@ class AnswerGenerator
     {
         yield $fieldName => $answer['code'] ?? '';
         yield "{$fieldName}comment" => $answer['comment'] ?? '';
+    }
+
+    private function generateNone(): void
+    {
     }
 
     private function generateSubQuestions(

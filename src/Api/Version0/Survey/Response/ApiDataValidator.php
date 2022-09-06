@@ -106,8 +106,6 @@ use MAChitgarha\LimeSurveyRestApi\Helper\ResponseGeneratorHelper;
 
 use Respect\Validation\Exceptions\ExistsException;
 
-use Respect\Validation\Rules\Key;
-
 use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
 
@@ -152,6 +150,9 @@ class AnswerValidatorBuilder
         ],
         'buildForListWithComment' => [
             Question::QT_O_LIST_WITH_COMMENT,
+        ],
+        'buildForNull' => [
+            Question::QT_X_TEXT_DISPLAY
         ],
         'buildForIntSubQuestions' => [
             Question::QT_A_ARRAY_5_POINT,
@@ -198,7 +199,7 @@ class AnswerValidatorBuilder
     {
         return v::keySet(...\array_map(
             // TODO: How nice it would look if we were able to use arrow functions! :)
-            function (Question $question): Key {
+            function (Question $question): Validator {
                 return v::key(
                     (string) $question->qid,
                     $this->build($question),
@@ -287,6 +288,11 @@ class AnswerValidatorBuilder
         return v::create()
             ->key('code', v::stringType())
             ->key('comment', v::stringType(), false);
+    }
+
+    private function buildForNull(): Validator
+    {
+        return v::nullType();
     }
 
     private function buildForSubQuestions(
