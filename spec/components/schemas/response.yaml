@@ -136,9 +136,9 @@ answer_gender:
     - F
 
 answer_date:
-  type: string
-  format: date-time
-  description: Specific to 'Date/time' question type
+  allOf:
+    - $ref: "./types.yaml#/date_time"
+    - description: Specific to 'Date/time' question type
 
 answer_equation:
   type: string
