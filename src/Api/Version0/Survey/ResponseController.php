@@ -277,6 +277,7 @@ use Yii;
 use Index;
 use Exception;
 use CController;
+use RuntimeException;
 use LSETwigViewRenderer;
 use LimeExpressionManager;
 use InvalidArgumentException;
@@ -321,11 +322,7 @@ class CoreSurveyIndexInvoker
     {
         \App()->setComponent(
             'twigRenderer',
-            new CustomTwigRenderer(
-                $isPostRequest,
-                $this->apiData['skip_soft_mandatory'] ?? false,
-                $this->apiData['step']
-            ),
+            new CustomTwigRenderer($isPostRequest, $this->apiData),
             false
         );
 
@@ -357,18 +354,19 @@ class CustomTwigRenderer extends LSETwigViewRenderer
      */
     private $expressionManagerTips = [];
 
+    /** @var array */
+    private $apiData;
+
     /** @var bool */
     private $skipSoftMandatory;
 
-    /** @var int */
-    private $step;
-
-    public function __construct(bool $isPostRequest, bool $skipSoftMandatory, int $step)
+    public function __construct(bool $isPostRequest, array $apiData)
     {
         $this->errorBucket = new ErrorBucket();
         $this->isPostRequest = $isPostRequest;
-        $this->skipSoftMandatory = $skipSoftMandatory;
-        $this->step = $step;
+        $this->apiData = $apiData;
+
+        $this->skipSoftMandatory = $this->apiData['skip_soft_mandatory'] ?? false;
     }
 
     public function init()
@@ -504,14 +502,19 @@ class CustomTwigRenderer extends LSETwigViewRenderer
             $pipeSeparatedQuestionFieldNameList
         );
         $questionIndexInfoList = LimeExpressionManager::GetQuestionIndexInfo();
-        
+
+        $step = $this->apiData['step'] ?? null;
+        if ($step === null) {
+            throw new RuntimeException('Step must be present in PATCH requests');
+        }
+
         foreach ($questionIndexInfoList as $questionIndexInfo) {
             $questionId = (int) $questionIndexInfo['qid'];
             $groupId = (int) $questionIndexInfo['gid'];
 
             if (
-                LimeExpressionManager::GetQuestionSeq($questionId) >= $this->step ||
-                LimeExpressionManager::GetGroupSeq($groupId) >= $this->step
+                LimeExpressionManager::GetQuestionSeq($questionId) >= $step ||
+                LimeExpressionManager::GetGroupSeq($groupId) >= $step
             ) {
                 continue;
             }
