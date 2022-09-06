@@ -52,6 +52,7 @@ class ResponseController implements Controller
     public const PATH = '/surveys/{survey_id}/responses';
     public const PATH_BY_ID = '/surveys/{survey_id}/responses/{response_id}';
 
+    // TODO: Probably document exceptions using @throws
     public function list(): JsonResponse
     {
         $this->validateRequest();
@@ -536,7 +537,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
     private function handleMandatoryViolations(array $lastMoveResult): void
     {
-        $isSoft = $lastMoveResult['mandNonSoft'] ?: $lastMoveResult['mandSoft'];
+        $isSoft = !$lastMoveResult['mandNonSoft'] && $lastMoveResult['mandSoft'];
         if ($isSoft && $this->skipSoftMandatory) {
             return;
         }
@@ -552,7 +553,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
         // TODO: Fix all passed questions being checked
         $fn = function (int $questionId, array $questionIndexInfo) use ($addError) {
-            $isSoft = $questionIndexInfo['mandNonSoft'] ?: $questionIndexInfo['mandSoft'];
+            $isSoft = !$questionIndexInfo['mandNonSoft'] && $questionIndexInfo['mandSoft'];
 
             if ($isSoft) {
                 if (!$this->skipSoftMandatory) {
