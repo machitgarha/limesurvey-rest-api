@@ -554,14 +554,12 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
         // TODO: Fix all passed questions being checked
         $fn = function (int $questionId, array $questionIndexInfo) use ($addError) {
-            $isSoft = !$questionIndexInfo['mandNonSoft'] && $questionIndexInfo['mandSoft'];
-
-            if ($isSoft) {
+            if ($questionIndexInfo['mandNonSoft']) {
+                $addError($questionId);
+            } elseif ($questionIndexInfo['mandSoft']) {
                 if (!$this->skipSoftMandatory) {
                     $addError($questionId);
                 }
-            } else {
-                $addError($questionId);
             }
         };
 
