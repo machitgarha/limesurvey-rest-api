@@ -283,6 +283,8 @@ use MAChitgarha\LimeSurveyRestApi\Error\MaintenanceModeError;
 use MAChitgarha\LimeSurveyRestApi\Error\SurveyNotStartedError;
 use MAChitgarha\LimeSurveyRestApi\Error\MandatoryQuestionMissingError;
 
+use MAChitgarha\LimeSurveyRestApi\Helper\SurveyFormat;
+
 class CoreSurveyIndexInvoker
 {
     /** @var array */
@@ -315,7 +317,7 @@ class CoreSurveyIndexInvoker
     {
         \App()->setComponent(
             'twigRenderer',
-            new CustomTwigRenderer($isPostRequest, $this->apiData),
+            new CustomTwigRenderer($isPostRequest, $this->apiData, $this->surveyInfo),
             false
         );
 
@@ -353,13 +355,17 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     /** @var bool */
     private $skipSoftMandatory;
 
-    public function __construct(bool $isPostRequest, array $apiData)
+    /** @var array */
+    private $surveyInfo;
+
+    public function __construct(bool $isPostRequest, array $apiData, array $surveyInfo)
     {
         $this->errorBucket = new ErrorBucket();
         $this->isPostRequest = $isPostRequest;
         $this->apiData = $apiData;
 
         $this->skipSoftMandatory = $this->apiData['skip_soft_mandatory'] ?? false;
+        $this->surveyInfo = $surveyInfo;
     }
 
     public function init()
@@ -503,11 +509,15 @@ class CustomTwigRenderer extends LSETwigViewRenderer
         foreach ($questionIndexInfoList as $questionIndexInfo) {
             $questionId = (int) $questionIndexInfo['qid'];
             $groupId = (int) $questionIndexInfo['gid'];
+            $surveyFormat = $this->surveyInfo['format'];
 
-            if (
-                LimeExpressionManager::GetQuestionSeq($questionId) >= $step ||
+            if ((
+                $surveyFormat === SurveyFormat::GROUP_BY_GROUP &&
                 LimeExpressionManager::GetGroupSeq($groupId) >= $step
-            ) {
+            ) || (
+                $surveyFormat === SurveyFormat::QUESTION_BY_QUESTION &&
+                LimeExpressionManager::GetQuestionSeq($questionId) >= $step
+            )) {
                 continue;
             }
 
@@ -517,7 +527,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
                     /*
                      * Prevent from repetitive errors. If a question has
-                     * subquestions, then for each one, the above function
+                     * sub-questions, then for each one, the above function
                      * would be called, and this is undesired.
                      */
                     break;

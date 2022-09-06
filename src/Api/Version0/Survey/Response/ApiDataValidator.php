@@ -9,6 +9,8 @@ use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator\
 
 use MAChitgarha\LimeSurveyRestApi\Error\QuestionTypeMismatchError;
 
+use MAChitgarha\LimeSurveyRestApi\Helper\SurveyFormat;
+
 use Respect\Validation\Exceptions\KeySetException;
 use Respect\Validation\Exceptions\ValidationException;
 
@@ -68,16 +70,17 @@ class ApiDataValidator
     private function validateSurveyFormat(): self
     {
         $valueValidatorList = [
-            'A' => v::identical(1),
-            'G' => v::intType()->in(
+            SurveyFormat::ALL_IN_ONE => v::identical(1),
+            SurveyFormat::GROUP_BY_GROUP => v::intType()->in(
                 range(1, \count($this->survey->groups)),
                 true
             ),
-            'S' => v::intType()->in(
+            SurveyFormat::QUESTION_BY_QUESTION => v::intType()->in(
                 range(1, \count($this->survey->baseQuestions)),
                 true
             ),
         ];
+
         $format = $this->surveyInfo['format'];
         $valueValidator = $valueValidatorList[$format] ?? null;
 
