@@ -4,9 +4,8 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey;
 
 use Question;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
+use MAChitgarha\LimeSurveyRestApi\Api\Controller;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Traits;
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
 use MAChitgarha\LimeSurveyRestApi\Error\InvalidPathParameterError;
 
@@ -18,14 +17,8 @@ use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
-class QuestionController implements Controller
+class QuestionController extends Controller
 {
-    use Traits\ContainerProperty;
-    use Traits\AuthorizerGetter;
-    use Traits\PathParameterGetter;
-    use Traits\RequestGetter;
-    use Traits\RequestValidator;
-
     public const PATH = '/surveys/{survey_id}/questions';
     public const PATH_BY_ID = '/surveys/{survey_id}/questions/{question_id}';
 

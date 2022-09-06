@@ -4,9 +4,7 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0;
 
 use Survey;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Traits;
+use MAChitgarha\LimeSurveyRestApi\Api\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Helper\Permission;
 use MAChitgarha\LimeSurveyRestApi\Helper\SurveyHelper;
@@ -16,15 +14,8 @@ use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
-class SurveyController implements Controller
+class SurveyController extends Controller
 {
-    use Traits\ContainerProperty;
-    use Traits\AuthorizerGetter;
-    use Traits\RequestGetter;
-    use Traits\SerializerGetter;
-    use Traits\RequestValidator;
-    use Traits\PathParameterGetter;
-
     public const PATH = '/surveys';
     public const PATH_BY_ID = '/surveys/{survey_id}';
 

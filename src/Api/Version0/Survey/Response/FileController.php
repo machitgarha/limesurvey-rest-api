@@ -10,9 +10,7 @@ use LogicException;
 use RuntimeException;
 use UploaderController;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Traits;
+use MAChitgarha\LimeSurveyRestApi\Api\Controller;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\FileController\EndRequestPreventer;
 
 use MAChitgarha\LimeSurveyRestApi\Error\ResourceIdNotFoundError;
@@ -28,22 +26,12 @@ use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Symfony\Component\Serializer\Encoder\JsonDecode;
-
 use function MAChitgarha\LimeSurveyRestApi\Helper\jsonDecode;
 
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
-class FileController implements Controller
+class FileController extends Controller
 {
-    use Traits\ContainerProperty;
-    use Traits\AuthorizerGetter;
-    use Traits\PathParameterGetter;
-    use Traits\RequestGetter;
-    use Traits\SerializerGetter;
-    use Traits\RequestBodyDecoder;
-    use Traits\RequestValidator;
-
     public const PATH = '/surveys/{survey_id}/responses/{response_id}/files';
     public const PATH_BY_ID = '/surveys/{survey_id}/responses/{response_id}/files/{file_id}';
 

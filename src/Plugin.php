@@ -8,11 +8,7 @@ use CLogger as Logger;
 
 use MAChitgarha\LimeSurveyRestApi\Api\JsonErrorResponseGenerator;
 
-use MAChitgarha\LimeSurveyRestApi\Config;
-
-use MAChitgarha\LimeSurveyRestApi\Api\ControllerDependencyContainer;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
+use MAChitgarha\LimeSurveyRestApi\Api\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Authorization\BearerTokenAuthorizer;
 
@@ -137,9 +133,7 @@ class Plugin extends PluginBase
         $validatorBuilder = new ValidatorBuilder(new FilesystemAdapter(), $this->_config);
 
         try {
-            $router = new Router(
-                $pathInfo = new PathInfo($pathInfoValue)
-            );
+            $router = new Router(new PathInfo($pathInfoValue));
 
             [[$controllerClass, $method], $params] = $router->route($request);
 
@@ -173,22 +167,14 @@ class Plugin extends PluginBase
         Router $router,
         ValidatorBuilder $validatorBuilder
     ): Controller {
-        /** @var Controller $controller */
-        $controller = new $controllerClass();
-
         $request->attributes->replace($params);
 
-        $pathInfo = $router->getPathInfo();
-
-        $container = new ControllerDependencyContainer(
+        return new $controllerClass(
             $request,
             new Serializer([], [new JsonEncoder()]),
             new BearerTokenAuthorizer($request),
-            new RequestValidator($request, $pathInfo, $validatorBuilder)
+            new RequestValidator($request, $router->getPathInfo(), $validatorBuilder)
         );
-
-        return $controller
-            ->setContainer($container);
     }
 
     private function assertIsResponseValid(

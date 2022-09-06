@@ -7,9 +7,7 @@ use LSUserIdentity as UserIdentity;
 use PluginEvent;
 use Session;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Traits;
+use MAChitgarha\LimeSurveyRestApi\Api\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Error\AccessTokenExpiredError;
 use MAChitgarha\LimeSurveyRestApi\Error\InvalidCredentialsError;
@@ -20,15 +18,8 @@ use MAChitgarha\LimeSurveyRestApi\Utility\Response\JsonResponse;
 
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
-class BearerTokenController implements Controller
+class BearerTokenController extends Controller
 {
-    use Traits\ContainerProperty;
-    use Traits\AuthorizerGetter;
-    use Traits\RequestGetter;
-    use Traits\SerializerGetter;
-    use Traits\RequestBodyDecoder;
-    use Traits\RequestValidator;
-
     public const PATH = '/login/bearer_token';
 
     public function new(): JsonResponse

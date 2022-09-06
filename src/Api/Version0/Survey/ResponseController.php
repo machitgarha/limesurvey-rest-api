@@ -10,9 +10,7 @@ use League\OpenAPIValidation\PSR7\Exception\Validation\InvalidBody;
 
 use League\OpenAPIValidation\Schema\Exception\NotEnoughValidSchemas;
 
-use MAChitgarha\LimeSurveyRestApi\Api\Interfaces\Controller;
-
-use MAChitgarha\LimeSurveyRestApi\Api\Traits;
+use MAChitgarha\LimeSurveyRestApi\Api\Controller;
 
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\ApiDataValidator;
 use MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\Response\PostDataGenerator;
@@ -39,16 +37,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 use function MAChitgarha\LimeSurveyRestApi\Utility\Response\data;
 
-class ResponseController implements Controller
+class ResponseController extends Controller
 {
-    use Traits\ContainerProperty;
-    use Traits\AuthorizerGetter;
-    use Traits\PathParameterGetter;
-    use Traits\RequestGetter;
-    use Traits\SerializerGetter;
-    use Traits\RequestBodyDecoder;
-    use Traits\RequestValidator;
-
     public const PATH = '/surveys/{survey_id}/responses';
     public const PATH_BY_ID = '/surveys/{survey_id}/responses/{response_id}';
 
