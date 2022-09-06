@@ -50,7 +50,7 @@ post:
     "404":
       $ref: "../../../components/responses.yaml#/resource_not_found"
     "409":
-      $ref: "../../../components/responses.yaml#/survey_unaccessible"
+      $ref: "../../../components/responses.yaml#/survey_inaccessible"
     "422":
       $ref: "../../../components/responses.yaml#/unprocessable_entity"
     # TODO: Add maintenance error

@@ -36,7 +36,7 @@ patch:
                     type: array
                     items:
                       oneOf:
-                        - $ref: "../../components/schemas/error.yaml#/survey_unaccessible"
+                        - $ref: "../../components/schemas/error.yaml#/survey_inaccessible"
                         - $ref: "../../components/schemas/error.yaml#/response_completed"
     "422":
       $ref: "../../components/responses.yaml#/unprocessable_response"

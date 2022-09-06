@@ -19,6 +19,8 @@ get:
       $ref: "../../components/responses.yaml#/unauthorized"
     "403":
       $ref: "../../components/responses.yaml#/permission_denied"
+    "409":
+      $ref: "../../components/responses.yaml#/survey_inaccessible"
     "503":
       $ref: "../../components/responses.yaml#/maintenance_mode"
 
@@ -56,6 +58,6 @@ post:
     "403":
       $ref: "../../components/responses.yaml#/permission_denied"
     "409":
-      $ref: "../../components/responses.yaml#/survey_unaccessible"
+      $ref: "../../components/responses.yaml#/survey_inaccessible"
     "503":
       $ref: "../../components/responses.yaml#/maintenance_mode"

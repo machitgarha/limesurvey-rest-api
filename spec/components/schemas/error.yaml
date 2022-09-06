@@ -201,7 +201,7 @@ response_completed:
       enum:
         - ResponseCompleted
 
-survey_unaccessible:
+survey_inaccessible:
   type: object
   properties:
     id:
@@ -210,14 +210,14 @@ survey_unaccessible:
         - SurveyNotStarted
         - SurveyExpired
 
-survey_unaccessible_list:
+survey_inaccessible_list:
   allOf:
     - $ref: "#/error_list_base_with_one_item"
     - properties:
         errors:
           type: array
           items:
-            $ref: "#/survey_unaccessible"
+            $ref: "#/survey_inaccessible"
 
 too_many_authentication_failures_list:
   allOf:

@@ -60,6 +60,8 @@ class ResponseController extends Controller
             'responses'
         );
 
+        SurveyHelper::assertIsActive($survey);
+
         $responseRecords = \array_map(
             function (SurveyDynamic $item) use ($survey): array {
                 return ApiDataGenerator::generate(

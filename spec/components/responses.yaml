@@ -92,12 +92,12 @@ resource_not_found:
       schema:
         $ref: "./schemas/error.yaml#/resource_not_found_list"
 
-survey_unaccessible:
+survey_inaccessible:
   description: Survey is not accessible (i.e. either inactive, not started or expired)
   content:
     application/json:
       schema:
-        $ref: "./schemas/error.yaml#/survey_unaccessible_list"
+        $ref: "./schemas/error.yaml#/survey_inaccessible_list"
 
 too_many_authentication_failures:
   description: Too many authentication failures
