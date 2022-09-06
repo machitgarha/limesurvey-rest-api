@@ -11,6 +11,7 @@
     ],
     "require": {
         "php": "^7.2.5|^8.0",
+        "ext-json": "*",
         "symfony/polyfill-php80": "^1.26",
         "symfony/routing": "^5.4.11|^6.0",
         "symfony/http-foundation": "^5.4.11|^6.0",

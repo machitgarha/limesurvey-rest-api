@@ -42,7 +42,7 @@ class ResponseController extends Controller
     public const PATH = '/surveys/{survey_id}/responses';
     public const PATH_BY_ID = '/surveys/{survey_id}/responses/{response_id}';
 
-    // TODO: Probably document exceptions using @throws
+    // TODO: Probably document exceptions using @throws just in every controller
     public function list(): JsonResponse
     {
         $this->validateRequest();
@@ -61,7 +61,7 @@ class ResponseController extends Controller
         );
 
         $responseRecords = \array_map(
-            function (SurveyDynamic $item) use ($survey) {
+            function (SurveyDynamic $item) use ($survey): array {
                 return ApiDataGenerator::generate(
                     $item->decrypt()->attributes,
                     $survey

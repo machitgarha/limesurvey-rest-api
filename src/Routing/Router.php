@@ -33,7 +33,7 @@ class Router
     }
 
     /**
-     * Returns pair of controller name and its method name to handle the request.
+     * Returns a pair of controller name and its method name to handle the request.
      *
      * @return array{0:array{0:string,1:string},1:array} A pair of the handler function
      * information, and the parameters extracted from the path (e.g. /survey/{survey_id}

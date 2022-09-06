@@ -13,9 +13,6 @@ class PostDataGenerator
     /** @var array[] */
     private $responseData;
 
-    /** @var array */
-    private $surveyInfo;
-
     /** @var Survey */
     private $survey;
 
@@ -28,7 +25,6 @@ class PostDataGenerator
     public function __construct(array $responseData, array $surveyInfo)
     {
         $this->responseData = $responseData;
-        $this->surveyInfo = $surveyInfo;
         $this->survey = $surveyInfo['oSurvey'];
 
         $this->baseQuestionsById = $this->makeBaseQuestionById();
@@ -235,7 +231,7 @@ class AnswerGenerator
 
     private function generateBool(?bool $answer, string $fieldName, string $falseResult = 'N'): Generator
     {
-        // NOTE: Don't remove the parantheses for PHP 8.x compatibility
+        // NOTE: Don't remove the parenthesis for PHP 8.x compatibility
         yield $fieldName => $answer === null ? '' : ($answer ? 'Y' : $falseResult);
     }
 

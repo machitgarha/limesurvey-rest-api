@@ -78,13 +78,11 @@ class BearerTokenAuthorizer implements Authorizer
         return $this->session;
     }
 
-    /** @inheritDoc */
     public function getUsername(): string
     {
         return $this->getSession()->data;
     }
 
-    /** @inheritDoc */
     public function getAccessToken(): string
     {
         return $this->getSession()->id;

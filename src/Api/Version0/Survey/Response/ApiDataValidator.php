@@ -37,7 +37,7 @@ class ApiDataValidator
      *
      * This method validates:
      *
-     * - each answer againts its related question type.
+     * - each answer against its related question type.
      * - have one of question_group_id or question_id (or none) wrt survey format.
      */
     public function validate(): void
@@ -105,6 +105,8 @@ use MAChitgarha\LimeSurveyRestApi\Error\QuestionTypeMismatchError;
 use MAChitgarha\LimeSurveyRestApi\Helper\ResponseGeneratorHelper;
 
 use Respect\Validation\Exceptions\ExistsException;
+
+use Respect\Validation\Rules\Key;
 
 use Respect\Validation\Validator;
 use Respect\Validation\Validator as v;
@@ -196,7 +198,7 @@ class AnswerValidatorBuilder
     {
         return v::keySet(...\array_map(
             // TODO: How nice it would look if we were able to use arrow functions! :)
-            function (Question $question): Validator {
+            function (Question $question): Key {
                 return v::key(
                     (string) $question->qid,
                     $this->build($question),

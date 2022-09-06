@@ -29,7 +29,7 @@ class QuestionController extends Controller
         $userId = $this->authorize()->getId();
 
         $survey = SurveyHelper::get(
-            $surveyId = $this->getPathParameterAsInt('survey_id')
+            $this->getPathParameterAsInt('survey_id')
         );
 
         PermissionChecker::assertHasSurveyPermission($survey, Permission::READ, $userId);
@@ -80,7 +80,7 @@ class QuestionController extends Controller
 
         return new JsonResponse(
             data(
-                self::makeQuestionData($question, $survey->language)
+                self::makeQuestionData($question, $language)
             )
         );
     }

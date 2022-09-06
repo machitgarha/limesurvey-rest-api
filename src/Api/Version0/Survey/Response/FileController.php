@@ -52,7 +52,7 @@ class FileController extends Controller
 
         [$surveyId, $responseId] = $this->getPathParameterListAsInt(
             'survey_id',
-            'response_id',
+            'response_id'
         );
         $fileId = $this->getPathParameter('file_id');
 
@@ -75,7 +75,7 @@ class FileController extends Controller
         return new JsonResponse(
             data([
                 'contents' => \base64_encode(\file_get_contents($filePath))
-            ]),
+            ])
         );
     }
 
@@ -85,10 +85,7 @@ class FileController extends Controller
 
         $userId = $this->authorize()->getId();
 
-        [$surveyId, $responseId] = $this->getPathParameterListAsInt(
-            'survey_id',
-            'response_id',
-        );
+        $surveyId = $this->getPathParameterAsInt('survey_id');
 
         $survey = SurveyHelper::get($surveyId);
 
@@ -158,7 +155,7 @@ class FileController extends Controller
         $tempUploadDir = \App()->getConfig('tempdir') . '/upload/';
         $filename = 'fupratmp_' . \randomChars(15);
 
-        return new SplFileObject("$tempUploadDir/$filename.$extension", "w");
+        return new SplFileObject("$tempUploadDir/$filename.$extension", 'w');
     }
 
     private static function validateUsingCoreUploader(

@@ -35,7 +35,7 @@ class BearerTokenController extends Controller
 
         $session = $this->makeNewSession(
             $data['username'],
-            App()->securityManager->generateRandomString(32),
+            App()->securityManager->generateRandomString(32)
         );
         $session->save();
 
@@ -76,7 +76,7 @@ class BearerTokenController extends Controller
 
                 default:
                     throw new \Exception(
-                        "{$identity->errorMessage} (code: {$identity->errorCode}"
+                        "$identity->errorMessage (code: $identity->errorCode)"
                     );
             }
         }
@@ -117,8 +117,7 @@ class BearerTokenController extends Controller
         try {
             $accessToken = $this->getAuthorizer()->authorize(false)->getAccessToken();
             Session::model()->deleteByPk($accessToken);
-
-        } catch (AccessTokenExpiredError $_) {
+        } catch (AccessTokenExpiredError $error) {
             // Deletion doesn't care about expiration
         }
 

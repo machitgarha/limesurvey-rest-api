@@ -11,11 +11,11 @@ class PathInfo
     /** @var string */
     private $pathInfo;
 
-    /** @var ?string */
-    private $apiVersion = null;
+    /** @var string */
+    private $apiVersion;
 
-    /** @var ?string */
-    private $routedPath = null;
+    /** @var string */
+    private $routedPath;
 
     public function __construct(string $pathInfo)
     {

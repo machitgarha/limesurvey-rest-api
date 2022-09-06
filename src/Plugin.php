@@ -88,7 +88,7 @@ class Plugin extends PluginBase
         $this->setDebugging();
 
         $this->log(
-            "New request caught: {$request->getMethod()} {$pathInfoValue}",
+            "New request caught: {$request->getMethod()} $pathInfoValue",
             Logger::LEVEL_INFO
         );
 
