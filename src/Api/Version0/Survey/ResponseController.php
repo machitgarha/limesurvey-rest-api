@@ -194,7 +194,7 @@ class ResponseController implements Controller
                 . DIRECTORY_SEPARATOR . 'files'
                 . DIRECTORY_SEPARATOR,
             'tempdir' => \App()->getConfig('tempdir') . DIRECTORY_SEPARATOR,
-            'timeadjust' => \App()->getConfig("timeadjust"),
+            'timeadjust' => \App()->getConfig('timeadjust'),
             'token' => '',
         ];
 
@@ -277,8 +277,8 @@ namespace MAChitgarha\LimeSurveyRestApi\Api\Version0\Survey\ResponseController;
 use Yii;
 use Index;
 use Exception;
-use CController;
 use RuntimeException;
+use SurveyController;
 use LSETwigViewRenderer;
 use LimeExpressionManager;
 use InvalidArgumentException;
@@ -374,31 +374,31 @@ class CustomTwigRenderer extends LSETwigViewRenderer
     {
     }
 
-    public function renderPartial($twigPath, $data)
+    public function renderPartial($twigView, $aData): string
     {
         $twigName = \str_replace([
             '/survey/questions/question_help/',
             '/subviews/privacy/',
             '.twig'
-        ], '', $twigPath);
+        ], '', $twigView);
 
-        $questionId = $data['qid'] ?? $data['qInfo']['qid'];
+        $questionId = $aData['qid'] ?? $aData['qInfo']['qid'];
 
         switch ($twigName) {
             case 'error_tip':
                 $this->errorBucket->addItem(new InvalidAnswerError(
                     $questionId,
-                    self::normalizeMessage($data['vtip'])
+                    self::normalizeMessage($aData['vtip'])
                 ));
                 break;
 
             case 'mandatory_tip':
-                $this->mandatoryTips[$questionId] = $data['sMandatoryText'];
+                $this->mandatoryTips[$questionId] = $aData['sMandatoryText'];
                 break;
 
             case 'em_tip':
                 $tip = LimeExpressionManager::ProcessString(
-                    $data['vtip'],
+                    $aData['vtip'],
                     $questionId,
                     null,
                     1,
@@ -416,16 +416,16 @@ class CustomTwigRenderer extends LSETwigViewRenderer
 
             default:
                 throw new InvalidArgumentException(
-                    "Unhandled Twig path '$twigPath'"
+                    "Unhandled Twig path '$twigView'"
                 );
         }
 
         return '';
     }
 
-    public function renderTemplateFromFile($layout, $data, $return)
+    public function renderTemplateFromFile($sLayout, $aData, $bReturn): string
     {
-        $layoutName = \str_replace('.twig', '', $layout);
+        $layoutName = \str_replace('.twig', '', $sLayout);
 
         // TODO: Handle surveyls_policy_error and datasecurity_error
         switch ($layoutName) {
@@ -434,12 +434,12 @@ class CustomTwigRenderer extends LSETwigViewRenderer
                 // No break
 
             case 'layout_global':
-                $this->handleGlobalLayoutRenderRequest($data, $return);
+                $this->handleGlobalLayoutRenderRequest($aData);
                 break;
 
             default:
                 throw new InvalidArgumentException(
-                    "Unhandled Twig layout '$layout'"
+                    "Unhandled Twig layout '$sLayout'"
                 );
                 // No break
         }
@@ -447,7 +447,7 @@ class CustomTwigRenderer extends LSETwigViewRenderer
         return '';
     }
 
-    private function handleGlobalLayoutRenderRequest(array $data, bool $return): void
+    private function handleGlobalLayoutRenderRequest(array $data): void
     {
         $surveyInfo = $data['aSurveyInfo'];
         $surveyId = $surveyInfo['sid'];
@@ -473,9 +473,8 @@ class CustomTwigRenderer extends LSETwigViewRenderer
             if (!$lastMoveResult['valid']) {
                 $this->handleInvalidAnswers($lastMoveResult);
             }
-        } else {
-            // TODO: Right to leave without any actions?
         }
+        // TODO: Right not to have an else clause?
 
         if (!$this->errorBucket->isEmpty()) {
             throw $this->errorBucket;
@@ -586,43 +585,27 @@ class CustomTwigRenderer extends LSETwigViewRenderer
         $this->handleLastMoveResultError($lastMoveResult['invalidSQs'], $fn);
     }
 
-    private function addExpressionManagerTipsAsErrors(int $questionId): void
-    {
-        foreach ($this->expressionManagerTips[$questionId] as $tip => $true) {
-            $this->errorBucket->addItem(
-                new InvalidAnswerError($questionId, $tip)
-            );
-        }
-    }
-
     private static function normalizeMessage(string $message): string
     {
         return \strip_tags($message);
     }
 
-    public function renderHtmlPage($html, $template): void
+    public function renderHtmlPage($sHtml, $oTemplate): void
     {
     }
 
-    public function renderQuestion($view, $render)
+    public function renderQuestion($sView, $aData): string
     {
         return '';
     }
 }
 
-class IndexOutputController extends CController
+class IndexOutputController extends SurveyController
 {
-    /** @var string Dummy */
-    public $sTemplate;
 
-    public function renderExitMessage(
-        int $surveyId,
-        string $type,
-        array $messages = [],
-        array $url = null,
-        array $errors = null
-    ): void {
-        switch ($type) {
+    public function renderExitMessage($iSurveyId, $sType, $aMessages = [], $aUrl = null, $aErrors = null): void
+    {
+        switch ($sType) {
             case 'survey-expiry':
                 throw new SurveyExpiredError();
                 // No break
@@ -633,30 +616,30 @@ class IndexOutputController extends CController
 
             default:
                 throw new InvalidArgumentException(
-                    "Unhandled exit type '$type'"
+                    "Unhandled exit type '$sType'"
                 );
         }
     }
 
-    public function createAbsoluteUrl($a, $b = [], $c = '', $d = '&'): string
+    public function createAbsoluteUrl($route, $params = [], $schema = '', $ampersand = '&'): string
     {
         return '';
     }
 
-    public function createUrl($a, $b = [], $c = '&'): string
+    public function createUrl($route, $params = [], $ampersand = '&'): string
     {
         return '';
     }
 
-    public function createAction($actionId)
+    public function createAction($actionID)
     {
-        if ($actionId === 'captcha') {
+        if ($actionID === 'captcha') {
             throw new NotImplementedError('Captcha is not implemented yet');
         }
-        return parent::createAction($actionId);
+        return parent::createAction($actionID);
     }
 
-    public function recordCachingAction($a, $b, $c)
+    public function recordCachingAction($context, $method, $params)
     {
     }
 }
