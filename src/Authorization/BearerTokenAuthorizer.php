@@ -30,7 +30,7 @@ class BearerTokenAuthorizer implements Authorizer
     }
 
     /** @inheritDoc */
-    public function authorize(bool $errorOnExpiration = true): self
+    public function authorize(bool $errorOnExpiration = true)
     {
         // Although redundant, but might become useful when Authorization header cannot be read
         if (!$this->request->headers->has(self::HEADER_AUTHORIZATION)) {

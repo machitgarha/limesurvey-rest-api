@@ -11,7 +11,7 @@ interface Authorizer
      * token is expired.
      * @return static
      */
-    public function authorize(bool $errorOnExpiration = true): self;
+    public function authorize(bool $errorOnExpiration = true);
 
     public function getUsername(): string;
     public function getAccessToken(): string;
