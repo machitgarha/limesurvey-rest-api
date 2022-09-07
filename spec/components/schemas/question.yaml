@@ -29,6 +29,7 @@ question:
           description: Question text
         help:
           type: string
+          nullable: true
 
     code:
       $ref: "#/code"
