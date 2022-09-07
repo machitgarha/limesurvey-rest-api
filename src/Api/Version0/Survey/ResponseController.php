@@ -195,7 +195,11 @@ class ResponseController extends Controller
         LimeExpressionManager::StartSurvey($surveyId, $surveyMode, $surveyOptions, true);
 
         $expressionManager = LimeExpressionManager::singleton();
-        $currentSequence = ($response->lastpage ?? 0) - 1;
+        /*
+         * +1 for going to the next page (i.e. step);
+         * -1 for converting a step to a sequence (unlike steps, the later is 0-based).
+         */
+        $currentSequence = ($response->lastpage ?? 0) + 1 - 1;
 
         foreach ([
             'currentGroupSeq' => $currentSequence,
