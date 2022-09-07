@@ -232,13 +232,17 @@ class AnswerGenerator
         }
     }
 
-    private function generateBool(?bool $answer, string $fieldName, string $falseResult = 'N'): Generator
-    {
+    private function generateBool(
+        ?bool $answer,
+        string $fieldName,
+        Question $question,
+        string $falseResult = 'N'
+    ): Generator {
         // NOTE: Don't remove the parenthesis for PHP 8.x compatibility
         yield $fieldName => $answer === null ? '' : ($answer ? 'Y' : $falseResult);
     }
 
-    private function generateString(?string $answer, string $fieldName): Generator
+    private function generateString(?string $answer, string $fieldName, Question $question): Generator
     {
         yield $fieldName => $answer ?? '';
     }
@@ -297,7 +301,8 @@ class AnswerGenerator
         foreach ($question->subquestions as $subQuestion) {
             yield from $fn(
                 $fieldNameBase . FieldNameGenerator::generateSubQuestionSuffix($subQuestion),
-                $answer['answers'][$subQuestion->title] ?? null
+                $answer['answers'][$subQuestion->title] ?? null,
+                $subQuestion
             );
         }
     }
@@ -334,8 +339,8 @@ class AnswerGenerator
             $answer,
             $fieldNameBase,
             $question,
-            function (string $fieldName, ?array $subAnswer): Generator {
-                yield from $this->generateBool($subAnswer['selected'] ?? null, $fieldName, '');
+            function (string $fieldName, ?array $subAnswer, Question $subQuestion): Generator {
+                yield from $this->generateBool($subAnswer['selected'] ?? null, $fieldName, $subQuestion, '');
             }
         );
 
@@ -353,8 +358,8 @@ class AnswerGenerator
             $answer,
             $fieldNameBase,
             $question,
-            function (string $fieldName, ?array $subAnswer): Generator {
-                yield from $this->generateBool($subAnswer['selected'] ?? null, $fieldName, '');
+            function (string $fieldName, ?array $subAnswer, Question $subQuestion): Generator {
+                yield from $this->generateBool($subAnswer['selected'] ?? null, $fieldName, $subQuestion, '');
                 yield "{$fieldName}comment" => $subAnswer['comment'] ?? '';
             }
         );
