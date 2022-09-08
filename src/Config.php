@@ -15,43 +15,35 @@ class Config
     public const DEFAULT_CACHE_REBUILD = false;
     public const DEFAULT_LOG_VERBOSITY = LogVerbosity::MINIMAL;
 
-    /** @var int */
-    private $debugMode;
+    /** @var callable(string|null, string|null, int|null, mixed): mixed */
+    private $getter;
 
-    /**
-     * Enabling this causes the OpenAPI spec cache (used in request validation)
-     * to rebuild, which is useful for development purposes.
-     * @var bool
-     */
-    private $cacheRebuild;
-
-    /** @var int */
-    private $logVerbosity;
-
-    public function __construct(int $debugMode, bool $cacheRebuild, int $logVerbosity)
+    public function __construct(callable $getter)
     {
-        $this->debugMode = $debugMode;
-        $this->cacheRebuild = $cacheRebuild;
-        $this->logVerbosity = $logVerbosity;
+        $this->getter = $getter;
     }
 
     public function getDebugMode(): int
     {
-        return $this->debugMode;
+        return (int) ($this->getter)(self::KEY_DEBUG_MODE, null, null, self::DEFAULT_DEBUG_MODE);
     }
 
     public function hasDebugOption(int $debugOption): bool
     {
-        return ($this->debugMode & $debugOption) !== 0;
+        return ($this->getDebugMode() & $debugOption) !== 0;
     }
 
+    /**
+     * Enabling this causes the OpenAPI spec cache (used in request validation)
+     * to rebuild, which is useful for development purposes.
+     */
     public function getCacheRebuild(): bool
     {
-        return $this->cacheRebuild;
+        return ($this->getter)(self::KEY_CACHE_REBUILD, null, null, self::DEFAULT_CACHE_REBUILD);
     }
 
     public function getLogVerbosity(): int
     {
-        return $this->logVerbosity;
+        return (int) ($this->getter)(self::KEY_LOG_VERBOSITY, null, null, self::DEFAULT_LOG_VERBOSITY);
     }
 }

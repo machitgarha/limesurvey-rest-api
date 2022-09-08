@@ -104,9 +104,7 @@ class Plugin extends PluginBase
     private function makeConfig(): Config
     {
         return new Config(
-            (int) $this->get(Config::KEY_DEBUG_MODE, null, null, Config::DEFAULT_DEBUG_MODE),
-            (bool) $this->get(Config::KEY_CACHE_REBUILD, null, null, Config::DEFAULT_CACHE_REBUILD),
-            (int) $this->get(Config::KEY_LOG_VERBOSITY, null, null, Config::DEFAULT_LOG_VERBOSITY)
+            \Closure::fromCallable([$this, 'get'])
         );
     }
 
