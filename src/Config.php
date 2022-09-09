@@ -7,6 +7,27 @@ use MAChitgarha\LimeSurveyRestApi\Utility\LogVerbosity;
 
 class Config
 {
+    public const SETTINGS = [
+        self::KEY_DEBUG_MODE => [
+            'type' => 'int',
+            'label' => 'Debug mode',
+            'help' => '0: Disable (default), -1: Full',
+            'default' => self::DEFAULT_DEBUG_MODE,
+        ],
+        self::KEY_CACHE_REBUILD => [
+            'type' => 'checkbox',
+            'label' => 'Disable cache',
+            'help' => 'Negatively impacts performance, but useful for development purposes',
+            'default' => self::DEFAULT_CACHE_REBUILD,
+        ],
+        self::KEY_LOG_VERBOSITY => [
+            'type' => 'int',
+            'label' => 'How verbose the logs and debug messages should be',
+            'help' => '1: Minimal (default), -1: Full',
+            'default' => self::DEFAULT_LOG_VERBOSITY,
+        ],
+    ];
+
     public const KEY_DEBUG_MODE = 'debug_mode';
     public const KEY_CACHE_REBUILD = 'cache_rebuild';
     public const KEY_LOG_VERBOSITY = 'log_verbosity';

@@ -42,27 +42,7 @@ class Plugin extends PluginBase
     protected static $description = 'LimeSurvey REST API provider';
 
     protected $storage = 'DbStorage';
-
-    protected $settings = [
-        Config::KEY_DEBUG_MODE => [
-            'type' => 'int',
-            'label' => 'Debug mode',
-            'help' => '0: Disable (default), -1: Full',
-            'default' => Config::DEFAULT_DEBUG_MODE,
-        ],
-        Config::KEY_CACHE_REBUILD => [
-            'type' => 'checkbox',
-            'label' => 'Disable cache',
-            'help' => 'Negatively impacts performance, but useful for development purposes',
-            'default' => Config::DEFAULT_CACHE_REBUILD,
-        ],
-        Config::KEY_LOG_VERBOSITY => [
-            'type' => 'int',
-            'label' => 'How verbose the logs and debug messages should be',
-            'help' => '1: Minimal (default), -1: Full',
-            'default' => Config::DEFAULT_LOG_VERBOSITY,
-        ],
-    ];
+    protected $settings = Config::SETTINGS;
 
     /** @var Config */
     private $_config;
