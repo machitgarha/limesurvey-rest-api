@@ -92,6 +92,7 @@ class SurveyController extends Controller
             'is_backward_navigation_allowed' => $surveyInfo['allowprev'] === 'Y',
             'is_datestamps_stored' => $surveyInfo['datestamp'] === 'Y',
             'is_ip_address_stored' => $surveyInfo['ipaddr'] === 'Y',
+            'is_timings_stored' => $surveyInfo['savetimings'] === 'Y',
             'is_progress_shown' => $surveyInfo['showprogress'] === 'Y',
             'is_welcome_message_shown' => $surveyInfo['showwelcome'] === 'Y',
 
