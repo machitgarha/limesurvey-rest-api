@@ -43,8 +43,8 @@ jobs:
 
             -   name: Install redoc-cli using NPM
                 run: |
-                  apt install npm
-                  npm i -g redoc-cli
+                  sudo apt install npm
+                  sudo npm i -g redoc-cli
 
             -   name: Generate documentation
                 run: redoc-cli build spec/openapi.yaml -o build/limesurvey-rest-api-docs.html
