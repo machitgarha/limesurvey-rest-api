@@ -19,15 +19,19 @@ The main features are:
 - LimeSurvey >= 5.3
 - PHP >= 7.2
 
-## How to Install?
+## How to Use?
+
+### Installation
 
 Download the latest ZIP file from [Releases](https://github.com/machitgarha/limesurvey-rest-api/releases). Then in LimeSurvey, from the top bar, click on "Configuration", go to "Plugins", click on "Upload and install" at the top, and select the downloaded file.
 
+### Documentation
+
+Alongside the ZIP file for each release, there's a standalone HTML file named `limesurvey-rest-api-docs.html`. This is the API reference for available endpoints and their information (e.g. arguments, responses, etc.).
+
 ### Updating
 
-Repeat the steps above to update the plugin, with one more step: You have to deactivate and activate the plugin for the cache to be cleared.
-
-## How to Use?
+Repeat the steps in the "Installation" section above to update the plugin, with one more step: You have to deactivate and activate the plugin for the cache to be cleared.
 
 ### API location
 
@@ -36,18 +40,6 @@ The API is located at:
 ```text
 https://your-website.com/index.php/restApi/v0/
 ```
-
-## Documentation
-
-You can generate the documentation using any OpenAPI documentation generator. We recommend using [redoc-cli](https://github.com/Redocly/redoc).
-
-Example of generating the docs using it:
-
-```sh
-redoc-cli build spec/openapi.yaml -o build/docs.html
-```
-
-Running this, you can use the HTML file (`build/docs.html`) as documentation.
 
 ## What is Implemented?
 
@@ -82,6 +74,18 @@ Phan is used as the static analyzer. In order to run Phan, you have to put a sym
 ### Customize Plugin Behavior
 
 Under the Development section of plugin settings, there are options to customize the development-related behavior of the plugin. All options are well-described.
+
+### Documentation Generation
+
+You can generate the documentation using any OpenAPI documentation generator. We recommend using [redoc-cli](https://github.com/Redocly/redoc).
+
+Example of the command for documentation generation:
+
+```sh
+redoc-cli build spec/openapi.yaml -o build/docs.html
+```
+
+Which results in a standalone HTML documentation file located at `build/docs.html`
 
 ## License
 
