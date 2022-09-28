@@ -27,11 +27,27 @@ Download the latest ZIP file from [Releases](https://github.com/machitgarha/lime
 
 Repeat the steps above to update the plugin, with one more step: You have to deactivate and activate the plugin for the cache to be cleared.
 
+## Documentation
+
+You can generate the documentation using any OpenAPI documentation generator. We recommend using [redoc-cli](https://github.com/Redocly/redoc).
+
+Example of generating the docs using it:
+
+```sh
+redoc-cli build spec/openapi.yaml -o build/docs.html
+```
+
+Running this, you can use the HTML file (`build/docs.html`) as documentation.
+
 ## What is Implemented?
 
 This plugin has limited functionality, i.e. it doesn't provide an endpoint for all actions. It however provides the required functionality for filling survey answers.
 
 More precisely, you can log in as a user, get the information of surveys, their questions and question groups, and send responses for surveys. Note that, for responses, all question types are supported.
+
+## Contributions, Please! :)
+
+I kindly ask you that, if you have time and the ability to complete unimplemented parts, or fix or implement one of the [issues](https://github.com/machitgarha/limesurvey-rest-api/issues), then start doing so, we'll appreciate your effort for sure (and everyone will benefit from it).
 
 ## License
 
