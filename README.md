@@ -19,7 +19,7 @@ The main features are:
 - LimeSurvey >= 5.3
 - PHP >= 7.2
 
-## How to install
+## How to Install?
 
 Download the latest ZIP file from [Releases](https://github.com/machitgarha/limesurvey-rest-api/releases). Then in LimeSurvey, from the top bar, click on "Configuration", go to "Plugins", click on "Upload and install" at the top, and select the downloaded file.
 
@@ -27,6 +27,12 @@ Download the latest ZIP file from [Releases](https://github.com/machitgarha/lime
 
 Repeat the steps above to update the plugin, with one more step: You have to deactivate and activate the plugin for the cache to be cleared.
 
-### License
+## What is Implemented?
+
+This plugin has limited functionality, i.e. it doesn't provide an endpoint for all actions. It however provides the required functionality for filling survey answers.
+
+More precisely, you can log in as a user, get the information of surveys, their questions and question groups, and send responses for surveys. Note that, for responses, all question types are supported.
+
+## License
 
 [GPLv2](./LICENSE.md)
