@@ -41,10 +41,13 @@ jobs:
         steps:
             -   uses: actions/checkout@v3
 
+            -   name: Install redoc-cli using NPM
+                run: |
+                  apt install npm
+                  npm i -g redoc-cli
+
             -   name: Generate documentation
-                uses: seeebiii/redoc-cli-github-action@v10
-                with:
-                    args: "build spec/openapi.yaml -o build/limesurvey-rest-api-docs.html"
+                run: redoc-cli build spec/openapi.yaml -o build/limesurvey-rest-api-docs.html
 
             -   name: Upload release files
                 uses: svenstaro/upload-release-action@v2
