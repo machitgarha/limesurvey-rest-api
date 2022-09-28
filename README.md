@@ -49,6 +49,26 @@ More precisely, you can log in as a user, get the information of surveys, their 
 
 I kindly ask you that, if you have time and the ability to complete unimplemented parts, or fix or implement one of the [issues](https://github.com/machitgarha/limesurvey-rest-api/issues), then start doing so, we'll appreciate your effort for sure (and everyone will benefit from it).
 
+## Development
+
+### Build
+
+In order to build plugin's ZIP file, do:
+
+```sh
+./build-aux/build-zip.sh
+```
+
+This creates a ZIP file at `build/limesurvey-rest-api.zip`. You don't need to do anything else, e.g. dependencies are automatically installed.
+
+### Static Analysis
+
+Phan is used as the static analyzer. In order to run Phan, you have to put a symlink to LimeSurvey at `vendor/limesurvey`. Then run:
+
+```sh
+./vendor/bin/phan --color
+```
+
 ## License
 
 [GPLv2](./LICENSE.md)
