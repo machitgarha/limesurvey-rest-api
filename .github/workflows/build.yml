@@ -44,7 +44,7 @@ jobs:
             -   name: Generate documentation
                 uses: seeebiii/redoc-cli-github-action@v10
                 with:
-                    args: "build spec/openapi.yaml -o limesurvey-rest-api-docs.html"
+                    args: "build spec/openapi.yaml -o build/limesurvey-rest-api-docs.html"
 
             -   name: Upload release files
                 uses: svenstaro/upload-release-action@v2
