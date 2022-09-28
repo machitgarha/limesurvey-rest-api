@@ -24,6 +24,8 @@ use MAChitgarha\LimeSurveyRestApi\Validation\RequestValidator;
 use MAChitgarha\LimeSurveyRestApi\Validation\ValidatorBuilder;
 use MAChitgarha\LimeSurveyRestApi\Validation\ResponseValidator;
 
+use Psr\Cache\CacheItemPoolInterface;
+
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -50,6 +52,7 @@ class Plugin extends PluginBase
     public function init(): void
     {
         $this->subscribe('beforeControllerAction');
+        $this->subscribe('beforeDeactivate');
     }
 
     public function beforeControllerAction(): void
@@ -108,7 +111,7 @@ class Plugin extends PluginBase
 
     private function handleRequest(Request $request, string $pathInfoValue): void
     {
-        $validatorBuilder = new ValidatorBuilder(new FilesystemAdapter(), $this->_config);
+        $validatorBuilder = new ValidatorBuilder($this->makeCache(), $this->_config);
 
         try {
             $router = new Router(new PathInfo($pathInfoValue));
@@ -136,6 +139,11 @@ class Plugin extends PluginBase
 
         /** @var Response $response */
         $response->send();
+    }
+
+    private function makeCache(): CacheItemPoolInterface
+    {
+        return new FilesystemAdapter();
     }
 
     private function makeController(
@@ -182,5 +190,11 @@ class Plugin extends PluginBase
         ] as $headerName) {
             \header_remove($headerName);
         }
+    }
+
+    public function beforeDeactivate(): void
+    {
+        // No need to check the output
+        $this->makeCache()->clear();
     }
 }
