@@ -8,22 +8,51 @@ use MAChitgarha\LimeSurveyRestApi\Utility\LogVerbosity;
 class Config
 {
     public const SETTINGS = [
+        'development_section' => [
+            'type' => 'info',
+            'label' => '<h2>Development</h2>',
+        ],
         self::KEY_DEBUG_MODE => [
             'type' => 'int',
             'label' => 'Debug mode',
-            'help' => '0: Disable (default), -1: Full',
+            'help' => <<<HTML
+            Possible values:
+            <ul>
+               <li>0: Disable (default)</li>
+               <li>-1: Full</li>
+            </ul>
+            Setting this to full (-1) causes the plugin to:
+            <ol>
+                <li>log all errors, including PHP notices and warnings,</li>
+                <li>validate response errors based on the spec (1),</li>
+                <li>include errors in the responses in a 'debug' field (2).</li>
+            </ol>
+            To enable only a limited set of the options above, use the number in the parentheses (they can also be
+            bitwise-xor-ed).
+            <br/>
+            Note that, by default, all errors are logged.
+HTML,
             'default' => self::DEFAULT_DEBUG_MODE,
         ],
         self::KEY_CACHE_REBUILD => [
             'type' => 'checkbox',
             'label' => 'Disable cache',
-            'help' => 'Negatively impacts performance, but useful for development purposes',
+            'help' => <<<HTML
+            Clears the spec cache every time, meaning no cache will be used. Useful when the spec is being updated 
+            frequently (e.g. via Docker or rsync). Negatively impacts performance.
+HTML,
             'default' => self::DEFAULT_CACHE_REBUILD,
         ],
         self::KEY_LOG_VERBOSITY => [
             'type' => 'int',
-            'label' => 'How verbose the logs and debug messages should be',
-            'help' => '1: Minimal (default), -1: Full',
+            'label' => 'Log verbosity',
+            'help' => <<<HTML
+            Possible values:
+            <ul>
+                <li>1: Minimal (default)</li>
+                <li>-1: Full</li>
+            </ul>
+HTML,
             'default' => self::DEFAULT_LOG_VERBOSITY,
         ],
     ];
@@ -46,7 +75,7 @@ class Config
 
     public function getDebugMode(): int
     {
-        return (int) ($this->getter)(self::KEY_DEBUG_MODE, null, null, self::DEFAULT_DEBUG_MODE);
+        return (int)($this->getter)(self::KEY_DEBUG_MODE, null, null, self::DEFAULT_DEBUG_MODE);
     }
 
     public function hasDebugOption(int $debugOption): bool
@@ -65,6 +94,6 @@ class Config
 
     public function getLogVerbosity(): int
     {
-        return (int) ($this->getter)(self::KEY_LOG_VERBOSITY, null, null, self::DEFAULT_LOG_VERBOSITY);
+        return (int)($this->getter)(self::KEY_LOG_VERBOSITY, null, null, self::DEFAULT_LOG_VERBOSITY);
     }
 }
