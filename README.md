@@ -79,6 +79,10 @@ Phan is used as the static analyzer. In order to run Phan, you have to put a sym
 ./vendor/bin/phan --color
 ```
 
+### Customize Plugin Behavior
+
+Under the Development section of plugin settings, there are options to customize the development-related behavior of the plugin. All options are well-described.
+
 ## License
 
 [GPLv2](./LICENSE.md)
