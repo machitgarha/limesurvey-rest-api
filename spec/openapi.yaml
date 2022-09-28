@@ -10,7 +10,6 @@ info:
 
     **Note:** Throughout this document, a null value is identical to the value absence.
 
-# TODO: Add 409 Conflict to POSTs
 # TODO: Support pagination
 paths:
   /:
