@@ -19,6 +19,14 @@ The main features are:
 - LimeSurvey >= 5.3
 - PHP >= 7.2
 
-## License
+## How to install
+
+Download the latest ZIP file from [Releases](https://github.com/machitgarha/limesurvey-rest-api/releases). Then in LimeSurvey, from the top bar, click on "Configuration", go to "Plugins", click on "Upload and install" at the top, and select the downloaded file.
+
+### Updating
+
+Repeat the steps above to update the plugin, with one more step: You have to deactivate and activate the plugin for the cache to be cleared.
+
+### License
 
 [GPLv2](./LICENSE.md)

@@ -13,7 +13,7 @@ jobs:
         steps:
             -   uses: actions/checkout@v3
 
-            -   name: Setup PHP and Phive
+            -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: "7.2"
