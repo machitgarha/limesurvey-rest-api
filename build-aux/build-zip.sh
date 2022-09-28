@@ -2,14 +2,14 @@
 
 # Config
 pluginName="RestApi"
-outputFilename="limesurvey-rest-api.zip"
+outputFile="build/limesurvey-rest-api.zip"
 
 # Exit on error
 set -e
 
 mainRepoDir="$(dirname "$(realpath "$0/..")")"
 # The resulting file path
-zipFilePath="$mainRepoDir/$outputFilename"
+zipFilePath="$mainRepoDir/$outputFile"
 
 cd "$mainRepoDir"
 

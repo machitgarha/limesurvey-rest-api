@@ -1,3 +1,4 @@
 /vendor/
 
-/limesurvey-rest-api.zip
+/build/*
+!/build/.gitkeep
