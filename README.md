@@ -27,6 +27,16 @@ Download the latest ZIP file from [Releases](https://github.com/machitgarha/lime
 
 Repeat the steps above to update the plugin, with one more step: You have to deactivate and activate the plugin for the cache to be cleared.
 
+## How to Use?
+
+### API location
+
+The API is located at:
+
+```text
+https://your-website.com/index.php/restApi/v0/
+```
+
 ## Documentation
 
 You can generate the documentation using any OpenAPI documentation generator. We recommend using [redoc-cli](https://github.com/Redocly/redoc).
