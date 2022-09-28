@@ -1,0 +1,34 @@
+file_id:
+  name: file_id
+  in: path
+  required: true
+  schema:
+    $ref: "./schemas/response.yaml#/file_id"
+
+question_id:
+  name: question_id
+  in: path
+  required: true
+  schema:
+    $ref: "./schemas/question.yaml#/question_id"
+
+question_group_id:
+  name: question_group_id
+  in: path
+  required: true
+  schema:
+    $ref: "./schemas/question_group.yaml#/question_group_id"
+
+response_id:
+  name: response_id
+  in: path
+  required: true
+  schema:
+    $ref: "./schemas/response.yaml#/id"
+
+survey_id:
+  name: survey_id
+  in: path
+  required: true
+  schema:
+    $ref: "./schemas/survey.yaml#/survey_id"

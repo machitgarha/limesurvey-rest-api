@@ -1,0 +1,49 @@
+post:
+  summary: Create a new access token
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  minLength: 1
+                password:
+                  type: string
+                  minLength: 1
+  responses:
+    "201":
+      description: Created
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: "../../components/schemas/bearer_token.yaml#/token_info"
+    "400":
+      $ref: "../../components/responses.yaml#/bad_request"
+    "401":
+      $ref: "../../components/responses.yaml#/invalid_credentials"
+    "429":
+      $ref: "../../components/responses.yaml#/too_many_authentication_failures"
+  # Disable global authorization
+  security: []
+
+delete:
+  summary: Delete an existing access token
+  responses:
+    "204":
+      $ref: "../../components/responses.yaml#/empty_ok"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"

@@ -1,0 +1,9 @@
+setting_global:
+  type: object
+  properties:
+    name:
+      type: string
+      description: 'Setting name'
+    value:
+      type: string
+      description: 'Setting value'

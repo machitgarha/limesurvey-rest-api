@@ -1,0 +1,23 @@
+get:
+  summary: List question groups of the survey
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: "../../components/schemas/question_group.yaml#/question_group_list"
+    "400":
+      $ref: "../../components/responses.yaml#/invalid_path_parameter"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"
+    "404":
+      $ref: "../../components/responses.yaml#/resource_not_found"

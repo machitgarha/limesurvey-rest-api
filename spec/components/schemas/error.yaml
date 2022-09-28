@@ -1,0 +1,297 @@
+error_base:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+
+error_optional_message:
+  type: object
+  properties:
+    message:
+      type: string
+
+error_list_base:
+  type: object
+  required: [errors]
+  properties:
+    errors:
+      type: array
+      minItems: 1
+      items:
+        $ref: "#/error_base"
+
+error_list_base_with_one_item:
+  allOf:
+    - $ref: "#/error_list_base"
+    - properties:
+        errors:
+          maxItems: 1
+
+api_version_missing_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - ApiVersionMissing
+
+bad_request:
+  oneOf:
+    - $ref: "#/invalid_path_parameter"
+    - allOf:
+      - $ref: "#/error_optional_message"
+      - properties:
+          id:
+            enum:
+              - MalformedRequestBody
+              - KeywordMismatch
+              - TypeMismatch
+
+bad_request_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            $ref: "#/bad_request"
+
+bad_request_for_response_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            oneOf:
+              - $ref: "#/bad_request"
+              - title: question_type_mismatch
+                allOf:
+                  - $ref: "#/error_optional_message"
+                  - properties:
+                      id:
+                        enum:
+                          - QuestionTypeMismatch
+
+internal_server_error_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - InternalServerError
+
+invalid_credentials_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - InvalidCredentials
+
+invalid_path_parameter:
+  allOf:
+    - $ref: "#/error_optional_message"
+    - properties:
+        id:
+          enum:
+            - InvalidPathParameter
+
+invalid_path_parameter_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            $ref: "#/invalid_path_parameter"
+
+maintenance_mode_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - MaintenanceMode
+
+method_not_allowed_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - MethodNotAllowed
+
+not_implemented_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - NotImplemented
+
+path_not_found_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - PathNotFound
+                  - ApiVersionNotFound
+
+permission_denied_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - PermissionDenied
+
+resource_not_found_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - $ref: "#/error_optional_message"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - ResourceIdNotFound
+
+response_completed:
+  type: object
+  properties:
+    id:
+      enum:
+        - ResponseCompleted
+
+survey_inaccessible:
+  type: object
+  properties:
+    id:
+      enum:
+        - SurveyNotActive
+        - SurveyNotStarted
+        - SurveyExpired
+
+survey_inaccessible_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            $ref: "#/survey_inaccessible"
+
+too_many_authentication_failures_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - TooManyAuthenticationFailures
+
+unauthorized_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - AccessTokenExpired
+                  - AccessTokenInvalid
+                  - InvalidSecurity
+
+unprocessable_entity_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            allOf:
+              - $ref: "#/error_optional_message"
+              - properties:
+                  id:
+                    enum:
+                      - UnprocessableEntity
+
+unprocessable_response:
+  type: object
+  required:
+    - question_id
+    - message
+  properties:
+    question_id:
+      type: integer
+    message:
+      type: string
+      description: Localized message of the error
+    id:
+      enum:
+        - MandatoryQuestionMissing
+        - InvalidAnswer
+
+unprocessable_response_list:
+  allOf:
+    - $ref: "#/error_list_base"
+    - properties:
+        errors:
+          type: array
+          items:
+            $ref: "#/unprocessable_response"
+
+unsupported_media_type_list:
+  allOf:
+    - $ref: "#/error_list_base_with_one_item"
+    - properties:
+        errors:
+          type: array
+          items:
+            properties:
+              id:
+                enum:
+                  - UnsupportedMediaType

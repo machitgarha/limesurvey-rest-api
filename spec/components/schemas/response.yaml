@@ -1,0 +1,384 @@
+response_list:
+  type: array
+  items:
+    $ref: "#/response_get"
+
+response_get:
+  type: object
+  required:
+    - id
+    - submit_time
+    - answers
+  properties:
+    id:
+      $ref: "#/id"
+
+    submit_time:
+      allOf:
+        - $ref: "./types.yaml#/date_time"
+        - description: Submission time, a value of null means an incomplete response
+          nullable: true
+
+    answers:
+        $ref: "#/answers"
+
+    start_time:
+      $ref: "#/start_time"
+
+    end_time:
+      allOf:
+        - description: The time responder did the last action
+        - $ref: "./types.yaml#/date_time"
+
+response_new:
+  type: object
+  required:
+    - start_time
+  properties:
+    start_time:
+      $ref: "#/start_time"
+
+response_update:
+  type: object
+  required:
+    - step
+    - answers
+  properties:
+    step:
+      type: integer
+      description: |
+        The step of the response, based on survey format.
+
+        For "all in one" surveys, its only possible value is 1. For "group by group" or "question by question" surveys, it must be up to total count of groups or questions, respectively.
+
+    answers:
+      $ref: "#/answers"
+
+    relevances:
+      type: object
+      writeOnly: true
+      description: Whether the questions and question groups are relevant or not. A value of null means *relevant*
+      properties:
+        groups:
+          type: object
+          description: Mapping of *group order* (not group ID) to its relevance
+          additionalProperties:
+            type: boolean
+        questions:
+          type: object
+          description: Mapping of *question ID* to its relevance
+          additionalProperties:
+            type: boolean
+
+    skip_soft_mandatory:
+      type: boolean
+      description: Whether to skip soft mandatory questions or not; a null value is identical to false
+
+id:
+  type: integer
+  description: Survey response ID
+
+start_time:
+  allOf:
+    - description: The time responding has been started
+    - $ref: "./types.yaml#/date_time"
+
+answers:
+  type: object
+  description: Mappings of question IDs to the answers
+  additionalProperties:
+    anyOf:
+      - $ref: "#/unanswered"
+      - $ref: "#/answer_yes_no"
+      - $ref: "#/answer_5_point_choice"
+      - $ref: "#/answer_numerical_input"
+      - $ref: "#/answer_text"
+      - $ref: "#/answer_gender"
+      - $ref: "#/answer_date"
+      - $ref: "#/answer_equation"
+      - $ref: "#/answer_ranking"
+      - $ref: "#/answer_file"
+      - $ref: "#/answer_list"
+      - $ref: "#/answer_list_with_comment"
+      - $ref: "#/answer_text_display"
+      - $ref: "#/answer_with_sub_questions"
+
+answer_yes_no:
+  type: boolean
+  description: Specific to 'Yes/no' question type
+
+answer_5_point_choice:
+  type: integer
+  description: Specific to '5 point choice' question type
+  minimum: 1
+  maximum: 5
+
+answer_numerical_input:
+  type: number
+  description: Specific to 'Numerical input' question type
+
+answer_text:
+  type: string
+  description: |
+    The answer text. Specific to following question types:
+
+    - Language switch
+    - Browser detection
+    - Short free text
+    - Long free text
+    - Huge free text
+  minLength: 1
+
+answer_gender:
+  type: string
+  description: Specific to 'Gender' question type
+  enum:
+    - M
+    - F
+
+answer_date:
+  allOf:
+    - $ref: "./types.yaml#/date_time"
+    - description: Specific to 'Date/time' question type
+
+answer_equation:
+  type: string
+  description: The equation result. Specific to 'Equation' question type
+
+answer_ranking:
+  type: array
+  description: The answers (i.e. choices) sorted by their rankings. Specific to Ranking question types. If a choice is not ranked, then it must be excluded
+  items:
+    $ref: "./question.yaml#/answer_code"
+
+answer_file:
+  type: array
+  description: Specific to 'File upload' question type
+  items:
+    type: object
+    required:
+      - title
+      - comment
+      - size
+      - name
+      - tmp_name
+      - extension
+      - uri
+    properties:
+      # TODO: Maybe add ID?
+      title:
+        type: string
+        description: User-entered file title
+      comment:
+        type: string
+      size:
+        type: number
+        format: double
+        description: The size of the file in KiloBytes
+        minimum: 1
+      name:
+        type: string
+        description: The client name of the file (i.e. just before upload)
+        minLength: 1
+      tmp_name:
+        writeOnly: true
+        type: string
+        minLength: 1
+      extension:
+        type: string
+        description: File extension (e.g. PNG)
+        minLength: 1
+      uri:
+        readOnly: true
+        type: string
+        description: The relative URI to retrieve the file contents
+
+answer_list:
+  type: object
+  description: |
+      The answer code. Specific to following question types:
+
+      - Bootstrap options (buttons)
+      - Bootstrap dropdown
+      - Image select list (radio)
+      - List (radio)
+      - List (dropdown)
+  required:
+    - value
+  properties:
+    value:
+      anyOf:
+        - $ref: "./question.yaml#/answer_code"
+        - type: string
+          nullable: true
+          description: The text value of the other option. It must *not* be null if question's Other option is mandatory
+    other:
+      type: boolean
+      nullable: true
+      description: Whether the other option is selected or not. A null value is equivalent to false
+
+answer_list_with_comment:
+  type: object
+  description: Specific to 'List with comment' question type
+  required:
+    - code
+  properties:
+    code:
+      $ref: "./question.yaml#/answer_code"
+    comment:
+      type: string
+      nullable: true
+
+answer_text_display:
+  type: string
+  nullable: true
+  description: Specific to 'Text display' question type, and is *always* null
+
+answer_with_sub_questions:
+  type: object
+  required: [answers]
+  properties:
+    answers:
+      type: object
+      description: |
+        Mapping of each subquestion code to its answer. Specific to all question types having subquestions, including Arrays (e.g. 'Array, dual scale', 'Array, Yes/No/Uncertain') and Multiple inputs (e.g. 'Multipleshort free texts', 'Multiple choice with comments').
+
+        **Note**: If the question is of type 'Multiple choice' or 'Multiple choice with comments', the keys may include the special value 'other' (case-sensitive) if the question's Other option is enabled (and must be available if it is user-selected).
+      additionalProperties:
+        anyOf:
+          - $ref: "#/unanswered"
+          - $ref: "#/answer_item_array_5_point_choice"
+          - $ref: "#/answer_item_array_10_point_choice"
+          - $ref: "#/answer_item_multiple_numerical_input"
+          - $ref: "#/answer_item_array_increase_same_decrease"
+          - $ref: "#/answer_item_yes_no_uncertain"
+          - $ref: "#/answer_item_multiple_short_free_texts"
+          - $ref: "#/answer_item_array_answer_code"
+          - $ref: "#/answer_item_array_dual"
+          - $ref: "#/answer_item_multiple_choice"
+          - $ref: "#/answer_item_multiple_choice_with_comments"
+          - $ref: "#/answer_item_array_2d"
+
+answer_item_array_5_point_choice:
+  allOf:
+    - description: Specific to 'Array, 5 point choice' question type
+    - $ref: "#/answer_5_point_choice"
+
+answer_item_array_10_point_choice:
+  type: integer
+  description: Specific to 'Array, 10 point choice' question type
+  minimum: 1
+  maximum: 10
+
+answer_item_multiple_numerical_input:
+  allOf:
+    - description: Specific to 'Multiple numerical input' question type
+    - $ref: "#/answer_numerical_input"
+
+answer_item_array_increase_same_decrease:
+  type: string
+  description: Specific to 'Array, Increase/Same/Decrease' question type
+  minLength: 1
+  maxLength: 1
+  enum:
+    - I
+    - S
+    - D
+
+answer_item_yes_no_uncertain:
+  type: string
+  description: Specific to 'Array, Yes/No/Uncertain' question type
+  minLength: 1
+  maxLength: 1
+  enum:
+    - Y
+    - N
+    - U
+
+answer_item_multiple_short_free_texts:
+  type: string
+  description: Specific to 'Multiple short free texts' question type
+  minLength: 1
+
+answer_item_array_answer_code:
+  allOf:
+    - description: The answer code; specific to 'Array (using flexible labels)' and 'Array, column' question types
+    - $ref: "./question.yaml#/answer_code"
+
+answer_item_array_dual:
+  type: array
+  description: A pair of answer codes; specific to 'Array, dual scale' question type
+  minItems: 1
+  maxItems: 2
+  items:
+    oneOf:
+      - $ref: "#/unanswered"
+      - $ref: "./question.yaml#/answer_code"
+
+answer_item_multiple_choice:
+  type: object
+  required: [selected]
+  properties:
+    selected:
+      type: boolean
+      description: Whether the subquestion is selected or not
+    other_value:
+      type: string
+      nullable: true
+      description: |
+        The value of the other option; present if the subquestion code is 'other' and the 'selected' field is true
+
+answer_item_multiple_choice_with_comments:
+  allOf:
+    - $ref: "#/answer_item_multiple_choice"
+    - type: object
+      properties:
+        comment:
+          type: string
+          nullable: true
+          description: The comment. *Must* be null when the selected field is false. *Must not* be null if the subquestion code is 'other' and the comment field is mandatory
+
+answer_item_array_2d:
+  type: object
+  required: [answers]
+  properties:
+    answers:
+      type: object
+      description: Mapping of subquestion code with X-scale to their actual values (i.e. answers). The parent key of 'answers' is the subquestion code with Y-scale
+      additionalProperties:
+        oneOf:
+          - $ref: "#/unanswered"
+          - $ref: "#/answer_subitem_array_2d_numbers"
+          - $ref: "#/answer_subitem_array_2d_texts"
+
+answer_subitem_array_2d_numbers:
+  type: integer
+  description: Specific to 'Array, numbers' question type
+  minimum: 1
+  maximum: 10
+
+answer_subitem_array_2d_texts:
+  type: string
+  description: The answer text; specific to 'Array, texts' question types
+  minLength: 1
+
+unanswered:
+  type: string
+  nullable: true
+  minLength: 0
+  maxLength: 0
+  description: If question (i.e. parent question of the current subquestion) is *not* mandatory, giving a null value means the question was leaved unanswered
+
+file_id:
+  type: string
+  description: File ID
+  pattern: '^[a-zA-Z0-9_]+$'
+
+file_tmp_name:
+  type: string
+  description: Temporary name of the uploaded file (via file creation endpoint). The difference between this and file ID is that the later is permanent
+
+file_contents:
+  type: string
+  format: byte
+  description: Base64-encoded contents of the file

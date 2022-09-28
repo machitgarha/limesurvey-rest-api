@@ -1,0 +1,106 @@
+survey:
+  type: object
+  required:
+    - id
+    - group_id
+    - l10n
+    - creation_time
+    - start_time
+    - expiry_time
+    - format
+    - is_active
+    - is_backward_navigation_allowed
+    - is_datestamps_stored
+    - is_ip_address_stored
+    - is_timings_stored
+    - is_progress_shown
+    - is_welcome_message_shown
+    - navigation_delay
+  properties:
+    id:
+      $ref: "#/survey_id"
+    group_id:
+      type: integer
+      description: Survey group ID, from which this survey belongs to
+
+    l10n:
+      type: object
+      required:
+        - title
+        - description
+        - welcome_message
+        - end_message
+        - end_url
+        - end_url_title
+      description: Localized texts
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+
+        welcome_message:
+          type: string
+        end_message:
+          type: string
+          description: The text to be shown at the end of survey
+        end_url:
+          type: string
+          description: The URL to be shown at the end of survey
+        end_url_title:
+          type: string
+          description: The title of the end_url
+
+    creation_time:
+      $ref: "./types.yaml#/date_time"
+    start_time:
+      allOf:
+        - $ref: "./types.yaml#/date_time"
+        - nullable: true
+    expiry_time:
+      allOf:
+        - $ref: "./types.yaml#/date_time"
+        - nullable: true
+
+    format:
+      type: string
+      enum:
+        - A
+        - G
+        - S
+      description: |
+        - A: All in one
+        - G: Group by group
+        - S: Question by question
+
+    is_active:
+      type: boolean
+      description: Whether the survey is activated
+    is_backward_navigation_allowed:
+      type: boolean
+      description: Whether backwards navigation is allowed
+    is_datestamps_stored:
+      type: boolean
+      description: Whether to store datestamps (i.e. the start and end time) for each response
+    is_ip_address_stored:
+      type: boolean
+      description: Whether to store IP address for each response
+    is_timings_stored:
+      type: boolean
+      description: Whether to store the time spent on each page for each response
+    is_progress_shown:
+      type: boolean
+    is_welcome_message_shown:
+      type: boolean
+
+    navigation_delay:
+      type: integer
+
+survey_id:
+  type: integer
+  description: Survey ID
+
+survey_list:
+  type: array
+  items:
+    $ref: "#/survey"

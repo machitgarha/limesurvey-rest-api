@@ -1,0 +1,17 @@
+access_token:
+  type: string
+  description: Bearer access token value.
+  # TODO: Add real example (is it secure)?
+
+token_info:
+  type: object
+  required:
+    - access_token
+    - expire_time
+  properties:
+    access_token:
+      $ref: "#/access_token"
+    expire_time:
+      type: integer
+      description: The absolute Unix time in which the token expires.
+      example: 1658791438

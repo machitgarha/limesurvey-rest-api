@@ -1,0 +1,216 @@
+question:
+  type: object
+  required:
+    - id
+    - group_id
+    - l10n
+    - type
+    - code
+    - is_hidden
+    - is_other_enabled
+    - mandatory
+    - order
+    - relevance
+    - theme_name
+    - validation_pattern
+    - attributes
+  properties:
+    id:
+      $ref: "#/id"
+    group_id:
+      type: integer
+      description: Question group ID, from which the question belongs to
+
+    l10n:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Question text
+        help:
+          type: string
+          nullable: true
+
+    code:
+      $ref: "#/code"
+    is_hidden:
+      type: boolean
+      description: Whether the question must be shown
+    is_other_enabled:
+      type: boolean
+      description: Whether the other option is enabled (useful for e.g. dropdown list question type)
+    mandatory:
+      type: string
+      enum:
+        - Y
+        - S
+        - N
+      description: |
+        - Y: Mandatory
+        - S: Soft mandatory
+        - N: Not mandatory
+    order:
+      type: integer
+      description: Question order in group
+    randomization_id:
+      type: string
+      nullable: true
+    relevance:
+      $ref: "#/relevance"
+    theme_name:
+      type: string
+      description: |
+        Theme name of the question; specifies how the question is displayed.
+
+        For example, if the question type is M (Multiple choice), the difference between 'bootstrap_buttons_multi' and 'multiplechoice' theme names is that the former is shown as normal buttons, but the later as radio buttons.
+    type:
+      $ref: "#/type"
+    validation_pattern:
+      type: string
+      nullable: true
+      description: PCRE-formatted regex for input validation
+
+    attributes:
+      type: object
+      description: Attributes specific to the question (i.e. based on question type). Mapping of attribute names to their values
+      additionalProperties: {}
+
+    subquestions:
+      type: array
+      description: A null value means not applicable regarding question type (e.g. L (List) question type)
+      nullable: true
+      minItems: 1
+      items:
+        type: object
+        properties:
+          code:
+            $ref: "#/code"
+          relevance:
+            $ref: "#/relevance"
+          scale:
+            type: integer
+            minimum: 0
+            maximum: 1
+          l10n:
+            type: object
+            properties:
+              text:
+                type: string
+
+    answers:
+      type: array
+      description: A null value means not applicable regarding question type (e.g. A (Array 5 point choice) question type)
+      nullable: true
+      minItems: 1
+      items:
+        $ref: "#/answer"
+
+question_list:
+  type: array
+  items:
+    $ref: "#/question"
+
+question_id:
+  $ref: "#/id"
+
+id:
+  type: integer
+  description: Question ID
+
+code:
+  type: string
+  description: The unique code of the question
+  minLength: 1
+  maxLength: 20
+
+relevance:
+  type: string
+  description: The expression evaluated to determine whether the (sub)question must be displayed or not
+
+type:
+  type: string
+  enum:
+    - '1'
+    - '5'
+    - A
+    - B
+    - C
+    - D
+    - E
+    - F
+    - G
+    - H
+    - I
+    - K
+    - L
+    - M
+    - N
+    - O
+    - P
+    - Q
+    - R
+    - S
+    - T
+    - U
+    - X
+    - Y
+    - '!'
+    - '|'
+    - '*'
+    - ':'
+    - ';'
+  description: |
+    - 1: Array dual
+    - 5: 5 Point choice
+    - A: Array 5 point choice
+    - B: Array 10 point choice
+    - C: Array yes/uncertain/no
+    - D: Date
+    - E: Array increase/same/decrease
+    - F: Array
+    - G: Gender
+    - H: Array column
+    - I: Language
+    - K: Multiple numerical
+    - L: List
+    - M: Multiple choice
+    - N: Numerical
+    - O: List with comment
+    - P: Multiple choice with comments
+    - Q: Multiple short text
+    - R: Ranking
+    - S: Short free text
+    - T: Long free text
+    - U: Huge free text
+    - X: Text display
+    - Y: Yes no radio
+    - !: List dropdown
+    - |: File upload
+    - *: Equation
+    - :: Array numbers
+    - ;: Array text
+
+answer:
+  type: object
+  properties:
+    code:
+      $ref: "#/answer_code"
+    order:
+      type: integer
+      description: Answer sort order
+    scale:
+      type: integer
+      minimum: 0
+      maximum: 1
+    l10n:
+      type: object
+      properties:
+        text:
+          type: string
+          description: The answer text
+
+answer_code:
+  type: string
+  description: The answer code
+  minLength: 1
+  maxLength: 5

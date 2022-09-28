@@ -1,0 +1,36 @@
+name: Build release files
+
+on:
+    push:
+        tags: "*"
+    release:
+        types: [created]
+
+jobs:
+    build-zip:
+        name: Build plugin ZIP file
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v3
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: "7.2"
+
+            -   name: Install Composer dependencies
+                uses: ramsey/composer-install@v2
+                with:
+                    composer-options: "--no-dev --optimize-autoloader"
+
+            -   name: Build ZIP file
+                run: ./build-aux/build-zip.sh
+
+            -   name: Upload release files
+                uses: svenstaro/upload-release-action@v2
+                with:
+                    repo_token: ${{ secrets.GITHUB_TOKEN }}
+                    file: build/limesurvey-rest-api.zip
+                    asset_name: limesurvey-rest-api.zip
+                    tag: ${{ github.ref }}
+                    prerelease: true

@@ -1,0 +1,44 @@
+patch:
+  summary: Updates the answers of a response
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+    - $ref: "../../components/parameters.yaml#/response_id"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [data]
+          properties:
+            data:
+              $ref: "../../components/schemas/response.yaml#/response_update"
+  responses:
+    "204":
+      $ref: "../../components/responses.yaml#/empty_ok"
+    "400":
+      $ref: "../../components/responses.yaml#/bad_request_for_response"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"
+    "404":
+      $ref: "../../components/responses.yaml#/resource_not_found"
+    "409":
+      description: Bad request, mostly malformed or invalid request body
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../../components/schemas/error.yaml#/error_list_base_with_one_item"
+              - properties:
+                  errors:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: "../../components/schemas/error.yaml#/survey_inaccessible"
+                        - $ref: "../../components/schemas/error.yaml#/response_completed"
+    "422":
+      $ref: "../../components/responses.yaml#/unprocessable_response"
+    "503":
+      $ref: "../../components/responses.yaml#/maintenance_mode"

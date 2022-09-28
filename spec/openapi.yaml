@@ -1,0 +1,51 @@
+openapi: 3.0.2
+info:
+  title: LimeSurvey REST API
+  version: 0.1.0
+  license:
+    name: GPL-2.0
+    url: "https://www.gnu.org/licenses/gpl-2.0.html"
+  description: |
+    The API is located at /index.php/restApi/v{version}/, relative to LimeSurvey root, in which {version} is the major version of the API. Each endpoint listed here itself is relative to the mentioned path.
+
+    **Note:** Throughout this document, a null value is identical to the value absence.
+
+# TODO: Support pagination
+paths:
+  /:
+    $ref: "./paths/root.yaml"
+
+  /login/bearer_token:
+    $ref: "./paths/login/bearer_token.yaml"
+
+  /surveys:
+    $ref: "./paths/surveys.yaml"
+  /surveys/{survey_id}:
+    $ref: "./paths/surveys_by_id.yaml"
+  /surveys/{survey_id}/question_groups:
+    $ref: "./paths/surveys/question_groups.yaml"
+  /surveys/{survey_id}/question_groups/{question_group_id}:
+    $ref: "./paths/surveys/question_groups_by_id.yaml"
+  /surveys/{survey_id}/questions:
+    $ref: "./paths/surveys/questions.yaml"
+  /surveys/{survey_id}/questions/{question_id}:
+    $ref: "./paths/surveys/questions_by_id.yaml"
+
+  /surveys/{survey_id}/responses:
+    $ref: "./paths/surveys/responses.yaml"
+  /surveys/{survey_id}/responses/{response_id}:
+    $ref: "./paths/surveys/responses_by_id.yaml"
+  /surveys/{survey_id}/responses/{response_id}/files:
+    $ref: "./paths/surveys/responses/files.yaml"
+  /surveys/{survey_id}/responses/{response_id}/files/{file_id}:
+    $ref: "./paths/surveys/responses/files_by_id.yaml"
+
+components:
+  securitySchemes:
+    bearer_auth:
+      type: http
+      scheme: bearer
+
+security:
+  # Apply it globally
+  - bearer_auth: []

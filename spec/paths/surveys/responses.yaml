@@ -1,0 +1,63 @@
+get:
+  summary: List responses of a survey
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: "../../components/schemas/response.yaml#/response_list"
+    "400":
+      $ref: "../../components/responses.yaml#/invalid_path_parameter"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"
+    "409":
+      $ref: "../../components/responses.yaml#/survey_inaccessible"
+    "503":
+      $ref: "../../components/responses.yaml#/maintenance_mode"
+
+post:
+  summary: Pushes a new response to a survey
+  description: |
+    In the case of a 422 (Unprocessable Entity) error, unlike other errors, the Location header exists.
+  parameters:
+    - $ref: "../../components/parameters.yaml#/survey_id"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [data]
+          properties:
+            data:
+              $ref: "../../components/schemas/response.yaml#/response_new"
+  responses:
+    "201":
+      description: Created
+      headers:
+        Location:
+          description: The URI of the new survey response
+          required: true
+          schema:
+            type: string
+          example:
+            /surveys/313313/responses/1
+    "400":
+      $ref: "../../components/responses.yaml#/bad_request_for_response"
+    "401":
+      $ref: "../../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../../components/responses.yaml#/permission_denied"
+    "409":
+      $ref: "../../components/responses.yaml#/survey_inaccessible"
+    "503":
+      $ref: "../../components/responses.yaml#/maintenance_mode"

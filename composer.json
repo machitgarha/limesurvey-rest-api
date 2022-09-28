@@ -1,0 +1,43 @@
+{
+    "name": "machitgarha/limesurvey-rest-api",
+    "description": "LimeSurvey REST API plugin",
+    "type": "library",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Mohammad Amin Chitgarha",
+            "email": "machitgarha@outlook.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2.5|^8.0",
+        "ext-json": "*",
+        "symfony/polyfill-php80": "^1.26",
+        "symfony/routing": "^5.4.11|^6.0",
+        "symfony/http-foundation": "^5.4.11|^6.0",
+        "respect/validation": "^2.0.17",
+        "symfony/serializer": "^5.4.11|^6.0",
+        "league/openapi-psr7-validator": "^0.18.0",
+        "symfony/psr-http-message-bridge": "^2.1.2",
+        "nyholm/psr7": "^1.5.1",
+        "symfony/cache": "^5.4.11"
+    },
+    "require-dev": {
+        "cebe/php-openapi": "^1.7",
+        "phan/phan": "^5.3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "MAChitgarha\\LimeSurveyRestApi\\": "src/"
+        },
+        "files": [
+            "src/Utility/Response/functions.php",
+            "src/Helper/functions.php"
+        ]
+    },
+    "config": {
+        "platform": {
+            "php": "7.2.5"
+        }
+    }
+}

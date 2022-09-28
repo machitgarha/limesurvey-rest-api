@@ -1,0 +1,17 @@
+get:
+  summary: List all surveys
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: "../components/schemas/survey.yaml#/survey_list"
+    "401":
+      $ref: "../components/responses.yaml#/unauthorized"
+    "403":
+      $ref: "../components/responses.yaml#/permission_denied"

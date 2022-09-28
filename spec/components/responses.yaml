@@ -1,0 +1,135 @@
+api_version_missing:
+  description: Missing API version in the format of v{version}, e.g. v1
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/api_version_missing_list"
+
+bad_request:
+  description: Bad request, mostly malformed or invalid request body
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/bad_request_list"
+
+bad_request_for_response:
+  description: Bad request, mostly malformed or invalid request body
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/bad_request_for_response_list"
+
+empty_ok:
+  description: OK (no content)
+
+internal_server_error:
+  description: Unknown internal server error
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/internal_server_error_list"
+
+invalid_credentials:
+  description: Invalid username or password
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/invalid_credentials_list"
+
+invalid_path_parameter:
+  description: Invalid path parameter
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/invalid_path_parameter_list"
+
+maintenance_mode:
+  description: The site is under maintenance mode (either soft or hard)
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/maintenance_mode_list"
+
+method_not_allowed:
+  description: Method not allowed
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/method_not_allowed_list"
+  headers:
+    Allow:
+      schema:
+        type: string
+      description: List of allowed methods on the endpoint
+      required: true
+      example: GET, POST
+
+not_implemented:
+  description: The interface is available, but not yet implemented
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/not_implemented_list"
+
+path_not_found:
+  description: Path not found
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/path_not_found_list"
+
+permission_denied:
+  description: Permission denied
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/permission_denied_list"
+
+resource_not_found:
+  description: Resource not found
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/resource_not_found_list"
+
+survey_inaccessible:
+  description: Survey is not accessible (i.e. either inactive, not started or expired)
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/survey_inaccessible_list"
+
+too_many_authentication_failures:
+  description: Too many authentication failures
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/too_many_authentication_failures_list"
+
+unauthorized:
+  description: Unauthorized request
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/unauthorized_list"
+
+unprocessable_entity:
+  description: Faield file upload as response answer upload
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/unprocessable_entity_list"
+
+unprocessable_response:
+  description: Cannot process response because of semantic errors, e.g. invalid or missing answers
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/unprocessable_response_list"
+
+unsupported_media_type:
+  description: Unsupported media type given
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas/error.yaml#/unsupported_media_type_list"
