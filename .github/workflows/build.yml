@@ -34,3 +34,23 @@ jobs:
                     asset_name: limesurvey-rest-api.zip
                     tag: ${{ github.ref }}
                     prerelease: true
+
+    generate-documentation:
+        name: Generate documentation using Redoc CLI
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v3
+
+            -   name: Generate documentation
+                uses: seeebiii/redoc-cli-github-action@v10
+                with:
+                    args: "build spec/openapi.yaml -o limesurvey-rest-api-docs.html"
+
+            -   name: Upload release files
+                uses: svenstaro/upload-release-action@v2
+                with:
+                    repo_token: ${{ secrets.GITHUB_TOKEN }}
+                    file: build/limesurvey-rest-api-docs.html
+                    asset_name: limesurvey-rest-api-docs.html
+                    tag: ${{ github.ref }}
+                    prerelease: true
