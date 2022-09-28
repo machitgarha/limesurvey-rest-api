@@ -1,6 +1,6 @@
 # LimeSurvey REST API
 
-A LimeSurvey plugin providing RESTful API. It's a (yet-incomplete) replacement for LimeSurvey's built-in JSON RPC interface.
+A [LimeSurvey](https://github.com/LimeSurvey/LimeSurvey) plugin providing RESTful API. It's a (yet-incomplete) replacement for LimeSurvey's built-in JSON RPC interface.
 
 ## Features
 
